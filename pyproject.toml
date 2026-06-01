@@ -12,7 +12,9 @@ authors = [
     { name = "Ephi Blanshey", email = "hello@blanshey.com" }
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "PyYAML>=6.0.2",
+]
 
 [dependency-groups]
 dev = [
@@ -24,6 +26,7 @@ dev = [
     "radon>=6.0.1",
     "ruff>=0.12.11",
     "taskfile-help>=0.4.1",
+    "types-PyYAML>=6.0.12.20250516",
 ]
 
 [tool.hatch.build.targets.wheel]
