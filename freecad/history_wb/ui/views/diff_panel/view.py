@@ -12,7 +12,7 @@ from ...presenters.presentation_models import (
 from ..document_diff.panel import DocumentDiffTreeWidget
 from ..history.models import HistorySelection
 from ..history.panel import HistoryPanelWidget
-from ..property_diff_tree_widget import PropertyDiffTreeWidget
+from ..property_diff.tree import PropertyDiffTreeWidget
 from .dialogs import (
     GitConfigDialogResult,
     show_configure_author_dialog,

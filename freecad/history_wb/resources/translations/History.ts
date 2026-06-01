@@ -472,22 +472,22 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="159"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="36"/>
         <source>Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="160"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="37"/>
         <source>Old Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="161"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="38"/>
         <source>New Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="189"/>
+        <location filename="../../ui/views/property_diff/tree_items.py" line="27"/>
         <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
