@@ -1,6 +1,6 @@
 """Module responsibility: UI view implementations."""
 
-from .diff_panel_view import DiffPanelView
+from .diff_panel import DiffPanelView
 from .settings_preferences_page import DiffSettingsPreferencesPage
 
 

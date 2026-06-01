@@ -2,7 +2,7 @@
 
 # Lazy imports for UI widgets - load through project Qt wrapper boundary
 try:
-    from .views.diff_panel_view import DiffPanelView
+    from .views.diff_panel import DiffPanelView
 except ImportError:
     # Qt binding not available (running outside FreeCAD)
     DiffPanelView = None  # type: ignore

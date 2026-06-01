@@ -1,23 +1,30 @@
-"""File responsibility: History panel view with 3-column layout, implementing DiffView protocol."""
+"""File responsibility: History panel view facade with 3-column layout and dialog delegates."""
 
 from collections.abc import Callable
 
-from ...domain.git.models import GitCommit, GitRepository
-from ...domain.settings import SettingsRepository
-from ...qt import QtCore, QtWidgets
-from ...utils import translate
-from ..presenters.presentation_models import (
+from ....domain.git.models import GitCommit, GitRepository
+from ....domain.settings import SettingsRepository
+from ....qt import QtCore, QtWidgets
+from ...presenters.presentation_models import (
     DiffTreePresentation,
     NodePresentation,
     PropertyPresentation,
 )
-from .document_diff_tree_widget import DocumentDiffTreeWidget
-from .history_panel_widget import HistoryPanelWidget
-from .models import GitConfigDialogResult, HistorySelection
-from .property_diff_tree_widget import PropertyDiffTreeWidget
+from ..document_diff_tree_widget import DocumentDiffTreeWidget
+from ..history_panel_widget import HistoryPanelWidget
+from ..models import HistorySelection
+from ..property_diff_tree_widget import PropertyDiffTreeWidget
+from .dialogs import (
+    GitConfigDialogResult,
+    show_configure_author_dialog,
+    show_restore_file_confirmation_dialog,
+    show_restore_scope_dialog,
+    show_save_iteration_dialog,
+)
+from .messages import show_error_message, show_info_message, show_warning_message
 
 
-__all__ = ["DiffPanelView", "HistorySelection"]
+__all__ = ["DiffPanelView"]
 
 
 class DiffPanelView(QtWidgets.QWidget):
@@ -351,48 +358,19 @@ class DiffPanelView(QtWidgets.QWidget):
 
     def show_warning_message(self, title: str, message: str) -> None:
         """Show warning dialog."""
-        QtWidgets.QMessageBox.warning(self, title, message)
+        show_warning_message(self, title, message)
 
     def show_info_message(self, title: str, message: str) -> None:
         """Show informational dialog."""
-        QtWidgets.QMessageBox.information(self, title, message)
+        show_info_message(self, title, message)
 
     def show_error_message(self, title: str, message: str) -> None:
         """Show error dialog."""
-        QtWidgets.QMessageBox.critical(self, title, message)
+        show_error_message(self, title, message)
 
     def show_save_iteration_dialog(self) -> str | None:
         """Show Save Iteration dialog and return notes when accepted."""
-        dialog = QtWidgets.QDialog(self)
-        dialog.setWindowTitle(translate("History", "Save Iteration"))
-        dialog.setSizeGripEnabled(True)
-
-        layout = QtWidgets.QVBoxLayout(dialog)
-        label = QtWidgets.QLabel(translate("History", "Enter iteration notes:"))
-        layout.addWidget(label)
-
-        text_edit = QtWidgets.QPlainTextEdit(dialog)
-        text_edit.setPlaceholderText(translate("History", "Enter iteration notes (subject and optional body)..."))
-        text_edit.setTabStopDistance(40)
-        text_edit.setMinimumHeight(100)
-        text_edit.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
-        layout.addWidget(text_edit)
-
-        button_layout = QtWidgets.QHBoxLayout()
-        ok_button = QtWidgets.QPushButton(translate("History", "OK"))
-        cancel_button = QtWidgets.QPushButton(translate("History", "Cancel"))
-        ok_button.clicked.connect(dialog.accept)
-        cancel_button.clicked.connect(dialog.reject)
-        button_layout.addStretch()
-        button_layout.addWidget(ok_button)
-        button_layout.addWidget(cancel_button)
-        layout.addLayout(button_layout)
-
-        dialog.resize(500, 300)
-        accepted = dialog.exec() == 1
-        if not accepted:
-            return None
-        return text_edit.toPlainText()
+        return show_save_iteration_dialog(self)
 
     def show_configure_author_dialog(
         self,
@@ -402,162 +380,17 @@ class DiffPanelView(QtWidgets.QWidget):
         global_config_writable: bool = True,
     ) -> GitConfigDialogResult | None:
         """Show configure-author dialog and return entered values."""
-        dialog = QtWidgets.QDialog(self)
-        dialog.setWindowTitle(translate("History", "Configure Author"))
-        layout = QtWidgets.QVBoxLayout(dialog)
-        layout.addWidget(
-            QtWidgets.QLabel(
-                translate(
-                    "History",
-                    "Enter the name and email you'd like to use for your git identity, "
-                    "which is used for authoring project iterations.",
-                ),
-                dialog,
-            )
-        )
-        if message:
-            message_label = QtWidgets.QLabel(message, dialog)
-            message_label.setStyleSheet("color: red;")
-            layout.addWidget(message_label)
-
-        form_layout = QtWidgets.QFormLayout()
-        name_edit = QtWidgets.QLineEdit(dialog)
-        email_edit = QtWidgets.QLineEdit(dialog)
-        remember_checkbox = QtWidgets.QCheckBox(
-            translate("History", "Configure globally for all projects"),
-            dialog,
-        )
-        if initial_values is not None:
-            name_edit.setText(initial_values.author_name)
-            email_edit.setText(initial_values.author_email)
-            remember_checkbox.setChecked(initial_values.should_save_globally)
-        if not global_config_writable:
-            remember_checkbox.setChecked(False)
-            remember_checkbox.setEnabled(False)
-
-        form_layout.addRow(translate("History", "Name:"), name_edit)
-        form_layout.addRow(translate("History", "Email:"), email_edit)
-        layout.addLayout(form_layout)
-        layout.addWidget(remember_checkbox)
-        if not global_config_writable:
-            global_config_label = QtWidgets.QLabel(
-                translate(
-                    "History",
-                    "Global configuration option disabled because global config file not writable.",
-                ),
-                dialog,
-            )
-            global_config_label.setStyleSheet("color: red;")
-            layout.addWidget(global_config_label)
-
-        button_layout = QtWidgets.QHBoxLayout()
-        ok_button = QtWidgets.QPushButton(translate("History", "OK"))
-        cancel_button = QtWidgets.QPushButton(translate("History", "Cancel"))
-        ok_button.clicked.connect(dialog.accept)
-        cancel_button.clicked.connect(dialog.reject)
-        button_layout.addStretch()
-        button_layout.addWidget(ok_button)
-        button_layout.addWidget(cancel_button)
-        layout.addLayout(button_layout)
-
-        ok = dialog.exec() == 1
-        if not ok:
-            return None
-        return GitConfigDialogResult(
-            author_name=name_edit.text().strip(),
-            author_email=email_edit.text().strip(),
-            should_save_globally=remember_checkbox.isChecked(),
+        return show_configure_author_dialog(
+            self,
+            message=message,
+            initial_values=initial_values,
+            global_config_writable=global_config_writable,
         )
 
-    def show_restore_file_confirmation_dialog(self, _git_path: str) -> bool:
+    def show_restore_file_confirmation_dialog(self, git_path: str) -> bool:
         """Show destructive confirmation dialog for file restore."""
-        title = translate("History", "Restore")
-        message = translate(
-            "History",
-            "This operation will overwrite the current files on disk with the selected saved copies.\n\nOpen FreeCAD "
-            "documents will be closed and reopened to ensure links are updated.\n\n"
-            "Unsaved in-memory changes in open files will be lost.\n\nSaved history is not affected.",
-        )
-        restore_button_text = translate("History", "Restore")
-        cancel_button_text = translate("History", "Cancel")
-        dialog = QtWidgets.QMessageBox(self)
-        dialog.setIcon(QtWidgets.QMessageBox.Icon.Warning)
-        dialog.setWindowTitle(title)
-        dialog.setText(message)
-        restore_button = dialog.addButton(restore_button_text, QtWidgets.QMessageBox.ButtonRole.DestructiveRole)
-        dialog.addButton(cancel_button_text, QtWidgets.QMessageBox.ButtonRole.RejectRole)
-        dialog.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Cancel)
-        dialog.exec()
-        return dialog.clickedButton() == restore_button
+        return show_restore_file_confirmation_dialog(self, git_path)
 
     def show_restore_scope_dialog(self) -> str | None:
         """Show bulk scope picker for restore-all action."""
-        dialog = QtWidgets.QDialog(self)
-        dialog.setWindowTitle(translate("History", "Restore All"))
-        dialog.setMinimumWidth(620)
-        layout = QtWidgets.QVBoxLayout(dialog)
-        layout.setSpacing(10)
-        title_label = QtWidgets.QLabel(translate("History", "Which files would you like to restore?"))
-        title_label.setWordWrap(True)
-        layout.addWidget(title_label)
-        listed = QtWidgets.QRadioButton(translate("History", "Listed FreeCAD files"))
-        listed_desc = QtWidgets.QLabel(
-            translate(
-                "History",
-                "Restore only the FreeCAD files changed in the selected iteration. "
-                "Other files on disk are left unchanged.",
-            )
-        )
-        listed_desc.setWordWrap(True)
-        all_fcstd = QtWidgets.QRadioButton(translate("History", "All FreeCAD files"))
-        all_desc = QtWidgets.QLabel(
-            translate(
-                "History",
-                "Restore all previously saved FreeCAD files to how they were in this iteration. "
-                "Any previously saved FreeCAD files that did not exist in this iteration are removed. "
-                "New files not yet saved to history are kept.",
-            )
-        )
-        all_desc.setWordWrap(True)
-        listed_desc.setIndent(22)
-        all_desc.setIndent(22)
-        scope_group = QtWidgets.QButtonGroup(dialog)
-        scope_group.setExclusive(True)
-        scope_group.addButton(listed)
-        scope_group.addButton(all_fcstd)
-        listed.setChecked(True)
-
-        listed_group = QtWidgets.QWidget(dialog)
-        listed_group_layout = QtWidgets.QVBoxLayout(listed_group)
-        listed_group_layout.setContentsMargins(0, 0, 0, 0)
-        listed_group_layout.setSpacing(2)
-        listed_group_layout.addWidget(listed)
-        listed_group_layout.addWidget(listed_desc)
-
-        all_group = QtWidgets.QWidget(dialog)
-        all_group_layout = QtWidgets.QVBoxLayout(all_group)
-        all_group_layout.setContentsMargins(0, 0, 0, 0)
-        all_group_layout.setSpacing(2)
-        all_group_layout.addWidget(all_fcstd)
-        all_group_layout.addWidget(all_desc)
-
-        layout.addWidget(listed_group)
-        layout.addWidget(all_group)
-        buttons = QtWidgets.QDialogButtonBox(self)
-        restore_button = buttons.addButton(
-            translate("History", "Restore"),
-            QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole,
-        )
-        cancel_button = buttons.addButton(
-            translate("History", "Cancel"),
-            QtWidgets.QDialogButtonBox.ButtonRole.RejectRole,
-        )
-        cancel_button.setDefault(True)
-        cancel_button.setAutoDefault(True)
-        restore_button.clicked.connect(dialog.accept)
-        buttons.rejected.connect(dialog.reject)
-        layout.addWidget(buttons)
-        dialog.resize(700, dialog.sizeHint().height())
-        if dialog.exec() != 1:
-            return None
-        return "listed_fcstd" if listed.isChecked() else "all_fcstd"
+        return show_restore_scope_dialog(self)

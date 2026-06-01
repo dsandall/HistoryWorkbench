@@ -18,8 +18,8 @@ from freecad.history_wb.application.actions.get_staged_file_paths import GetStag
 from freecad.history_wb.application.actions.save_git_identity import SaveGitIdentityAction
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.ui.state import UIState
-from freecad.history_wb.ui.views.diff_panel_view import DiffPanelView
-from freecad.history_wb.ui.views.models import GitConfigDialogResult
+from freecad.history_wb.ui.views.diff_panel import DiffPanelView
+from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
 from freecad.history_wb.utils import Log, translate
 
 

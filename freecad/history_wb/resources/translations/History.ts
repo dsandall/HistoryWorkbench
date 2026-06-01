@@ -40,63 +40,63 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="406"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="63"/>
         <source>Configure Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="410"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="67"/>
         <source>Enter the name and email you&apos;d like to use for your git identity, which is used for authoring project iterations.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="427"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="86"/>
         <source>Configure globally for all projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="438"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="101"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="439"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="102"/>
         <source>Email:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="444"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="109"/>
         <source>Global configuration option disabled because global config file not writable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="496"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="164"/>
         <location filename="../../ui/views/document_diff_tree_widget.py" line="116"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="500"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="168"/>
         <source>Which files would you like to restore?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="505"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="173"/>
         <source>Restore only the FreeCAD files changed in the selected iteration. Other files on disk are left unchanged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="514"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="182"/>
         <source>Restore all previously saved FreeCAD files to how they were in this iteration. Any previously saved FreeCAD files that did not exist in this iteration are removed. New files not yet saved to history are kept.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="503"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="171"/>
         <source>Listed FreeCAD files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="475"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
         <source>This operation will overwrite the current files on disk with the selected saved copies.
 
 Open FreeCAD documents will be closed and reopened to ensure links are updated.
@@ -107,23 +107,23 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="512"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="180"/>
         <source>All FreeCAD files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="382"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="454"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="39"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="119"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../entrypoints/commands.py" line="276"/>
         <location filename="../../entrypoints/commands.py" line="414"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="383"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="455"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="482"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="552"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="40"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="120"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="149"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="216"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -169,18 +169,18 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="367"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="24"/>
         <location filename="../../ui/views/history_panel_widget.py" line="181"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="371"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="28"/>
         <source>Enter iteration notes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="375"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="32"/>
         <source>Enter iteration notes (subject and optional body)...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -560,9 +560,9 @@ Saved history is not affected.</source>
     <message>
         <location filename="../../ui/presenters/diff_presenter.py" line="863"/>
         <location filename="../../ui/presenters/diff_presenter.py" line="865"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="474"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="481"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="548"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="141"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="148"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="215"/>
         <location filename="../../ui/views/document_diff_tree_widget.py" line="382"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>

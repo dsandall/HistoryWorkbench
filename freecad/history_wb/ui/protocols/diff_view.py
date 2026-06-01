@@ -19,7 +19,8 @@ from ..presenters.presentation_models import (
     NodePresentation,
     PropertyPresentation,
 )
-from ..views.models import GitConfigDialogResult, HistorySelection
+from ..views.diff_panel.dialogs import GitConfigDialogResult
+from ..views.models import HistorySelection
 
 
 __all__ = ["DiffView"]

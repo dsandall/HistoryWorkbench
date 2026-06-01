@@ -1,8 +1,4 @@
-"""File responsibility: Shared models for UI views layer.
-
-This module contains data classes and models that are shared across multiple
-UI components and need to be imported without causing circular dependencies.
-"""
+"""File responsibility: Shared history-selection model for current UI view modules."""
 
 from dataclasses import dataclass
 from typing import Literal
@@ -19,12 +15,3 @@ class HistorySelection:
 
     item_kind: Literal["WORKING_TREE", "STAGING", "COMMIT"]
     commit_hash: str | None
-
-
-@dataclass(frozen=True)
-class GitConfigDialogResult:
-    """Git identity configuration values collected from the user."""
-
-    author_name: str
-    author_email: str
-    should_save_globally: bool

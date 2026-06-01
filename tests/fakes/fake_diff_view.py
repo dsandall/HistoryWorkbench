@@ -9,7 +9,8 @@ from freecad.history_wb.ui.presenters.presentation_models import (
     NodePresentation,
     PropertyPresentation,
 )
-from freecad.history_wb.ui.views.models import GitConfigDialogResult, HistorySelection
+from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
+from freecad.history_wb.ui.views.models import HistorySelection
 
 
 class FakeDiffView:

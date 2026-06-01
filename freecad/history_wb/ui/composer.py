@@ -7,7 +7,7 @@
 from ..application.di.container import ApplicationContainer
 from ..ui.registry import ui_registry
 from ..ui.state import UIState
-from ..ui.views.diff_panel_view import DiffPanelView
+from ..ui.views.diff_panel import DiffPanelView
 from .presenters.diff_presenter import DiffPresenter
 from .presenters.git_repository_presenter import GitRepositoryPresenter
 
