@@ -30,7 +30,7 @@ from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.domain.snapshots.models import Snapshot
 from freecad.history_wb.ui.presenters.diff_presenter import DiffPresenter
 from freecad.history_wb.ui.state import UIState
-from freecad.history_wb.ui.views.models import HistorySelection
+from freecad.history_wb.ui.views.history.models import HistorySelection
 from tests.fakes.fake_diff_view import FakeDiffView
 
 

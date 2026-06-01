@@ -10,7 +10,7 @@ from freecad.history_wb.ui.presenters.presentation_models import (
     PropertyPresentation,
 )
 from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
-from freecad.history_wb.ui.views.models import HistorySelection
+from freecad.history_wb.ui.views.history.models import HistorySelection
 
 
 class FakeDiffView:
@@ -23,7 +23,7 @@ class FakeDiffView:
         self._calls: list[dict[str, Any]] = []
         self._last_call: dict[str, Any] | None = None
         self._refresh_callback: Callable[[], None] | None = None
-        self._history_selection_callback: Callable[[Any], None] | None = None
+        self._user_history_selection_requested_callback: Callable[[Any], None] | None = None
         self._save_iteration_callback: Callable[[], None] | None = None
         self._history_scroll_bottom_callback: Callable[[], None] | None = None
         self._add_button_callback: Callable[[str], None] | None = None
@@ -94,14 +94,14 @@ class FakeDiffView:
         self._record_call("set_refresh_callback", callback=callback)
         self._refresh_callback = callback
 
-    def set_history_selection_callback(self, callback: Callable[[Any], None]) -> None:
-        """Capture history selection callback registration instead of connecting to view.
+    def set_user_history_selection_requested_callback(self, callback: Callable[[Any], None]) -> None:
+        """Capture direct user-history selection callback registration instead of connecting to view.
 
         Args:
             callback: A callable that takes a HistorySelection argument to invoke on selection.
         """
-        self._record_call("set_history_selection_callback", callback=callback)
-        self._history_selection_callback = callback
+        self._record_call("set_user_history_selection_requested_callback", callback=callback)
+        self._user_history_selection_requested_callback = callback
 
     def set_save_iteration_callback(self, callback: Callable[[], None]) -> None:
         """Capture save-iteration callback registration."""

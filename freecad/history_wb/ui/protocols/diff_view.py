@@ -20,7 +20,7 @@ from ..presenters.presentation_models import (
     PropertyPresentation,
 )
 from ..views.diff_panel.dialogs import GitConfigDialogResult
-from ..views.models import HistorySelection
+from ..views.history.models import HistorySelection
 
 
 __all__ = ["DiffView"]
@@ -99,8 +99,8 @@ class DiffView(Protocol):
     def set_save_iteration_callback(self, callback: Callable[[], None]) -> None:
         """Set callback fired by Save Iteration panel button."""
 
-    def set_history_selection_callback(self, callback: Callable[[HistorySelection], None]) -> None:
-        """Set the callback for history list selection.
+    def set_user_history_selection_requested_callback(self, callback: Callable[[HistorySelection], None]) -> None:
+        """Set callback for direct user-driven history selection requests.
 
         Args:
             callback: A callable that receives HistorySelection with item_kind and commit_hash

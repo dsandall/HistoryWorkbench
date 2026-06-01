@@ -11,8 +11,8 @@ from ...presenters.presentation_models import (
     PropertyPresentation,
 )
 from ..document_diff_tree_widget import DocumentDiffTreeWidget
-from ..history_panel_widget import HistoryPanelWidget
-from ..models import HistorySelection
+from ..history.models import HistorySelection
+from ..history.panel import HistoryPanelWidget
 from ..property_diff_tree_widget import PropertyDiffTreeWidget
 from .dialogs import (
     GitConfigDialogResult,
@@ -65,7 +65,7 @@ class DiffPanelView(QtWidgets.QWidget):
 
         # Column 1: History panel widget
         self._history_panel = HistoryPanelWidget(self)
-        self._history_panel.set_selection_changed_callback(self._on_history_panel_selection_changed)
+        self._history_panel.set_effective_selection_changed_callback(self._on_history_panel_selection_changed)
 
         # Column 2: Document diff tree widget
         self._document_diff_tree = DocumentDiffTreeWidget(self)
@@ -130,15 +130,15 @@ class DiffPanelView(QtWidgets.QWidget):
         """Set callback fired by Save Iteration panel button."""
         self._history_panel.set_save_iteration_callback(callback)
 
-    def set_history_selection_callback(self, callback: Callable[[HistorySelection], None]) -> None:
-        """Set the callback for history list selection.
+    def set_user_history_selection_requested_callback(self, callback: Callable[[HistorySelection], None]) -> None:
+        """Set callback for direct user-driven history selection requests.
 
         Delegates to HistoryPanelWidget.
 
         Args:
             callback: A callable that receives HistorySelection with item_kind and commit_hash
         """
-        self._history_panel.set_history_selection_callback(callback)
+        self._history_panel.set_user_history_selection_requested_callback(callback)
 
     def set_history_scroll_bottom_callback(self, callback: Callable[[], None]) -> None:
         """Set callback invoked when history list is near scroll bottom.

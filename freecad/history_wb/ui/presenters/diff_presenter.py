@@ -51,7 +51,7 @@ from ...domain.tree.data_path import PropertyPathType
 from ...utils import Log, format_float, translate
 from ..protocols.diff_view import DiffView
 from ..state import UIState
-from ..views.models import HistorySelection
+from ..views.history.models import HistorySelection
 from .presentation_models import (
     DiffComputationFailedIndicator,
     DiffTreePresentation,
@@ -434,7 +434,7 @@ class DiffPresenter:
         self._focus_history_window_callback: Callable[[], None] | None = None
 
         # Wire up the callback for history selection
-        self._view.set_history_selection_callback(self.on_history_item_selected)
+        self._view.set_user_history_selection_requested_callback(self.on_history_item_selected)
 
         # Wire Stage All callback
         self._view.set_stage_all_callback(self.on_stage_all_clicked)

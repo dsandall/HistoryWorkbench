@@ -1,0 +1,46 @@
+"""File responsibility: Unit tests for DiffPanelView cross-column coordination behavior."""
+
+from __future__ import annotations
+
+from freecad.history_wb.domain.diff.models import DiffState
+from freecad.history_wb.qt import QtWidgets
+from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation
+from freecad.history_wb.ui.views.diff_panel.view import DiffPanelView
+from freecad.history_wb.ui.views.document_diff_tree_widget import DocumentDiffTreeWidget
+from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
+
+
+def test_history_click_updates_document_row_buttons_on_first_click() -> None:
+    """History selection updates document-row action buttons before diff render callback runs."""
+    app = QtWidgets.QApplication.instance()
+    if app is None:
+        app = QtWidgets.QApplication([])
+
+    panel = DiffPanelView()
+    history_panel = panel.findChild(HistoryPanelWidget)
+    document_tree = panel.findChild(DocumentDiffTreeWidget)
+    assert history_panel is not None
+    assert document_tree is not None
+
+    history_panel.show_commits([])
+    panel.set_user_history_selection_requested_callback(lambda _selection: panel.show_doc_diffs([_sample_diff_tree()]))
+
+    history_panel.history_list.itemClicked.emit(history_panel.history_list.item(1))
+    assert _document_row_button_texts(document_tree) == ["Restore", "Remove"]
+
+    history_panel.history_list.itemClicked.emit(history_panel.history_list.item(0))
+    assert _document_row_button_texts(document_tree) == ["+ Reviewed"]
+
+
+def _sample_diff_tree() -> DiffTreePresentation:
+    """Build minimal document diff presentation for button-state tests."""
+    return DiffTreePresentation(nodes=[], git_path="parts/A.FCStd", indicators=[], document_state=DiffState.MODIFIED)
+
+
+def _document_row_button_texts(widget: DocumentDiffTreeWidget) -> list[str]:
+    """Return visible action-button texts from first document row."""
+    root_item = widget.tree_widget.topLevelItem(0)
+    assert root_item is not None
+    row_widget = widget.tree_widget.itemWidget(root_item, 0)
+    assert row_widget is not None
+    return [button.text() for button in row_widget.findChildren(QtWidgets.QToolButton) if button.text()]

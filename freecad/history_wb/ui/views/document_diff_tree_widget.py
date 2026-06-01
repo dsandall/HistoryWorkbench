@@ -13,7 +13,7 @@ from ..presenters.presentation_models import (
     NodePresentation,
     WorkingTreeDocumentClosedIndicator,
 )
-from .models import HistorySelection
+from .history.models import HistorySelection
 from .theme.diff import DiffItemDelegate, apply_diff_state_to_item, apply_diff_state_to_widget
 from .widgets.buttons import make_icon_tool_button, make_row_action_button, make_tool_button
 from .widgets.styles import (

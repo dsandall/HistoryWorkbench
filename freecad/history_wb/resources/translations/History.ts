@@ -170,7 +170,7 @@ Saved history is not affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="24"/>
-        <location filename="../../ui/views/history_panel_widget.py" line="181"/>
+        <location filename="../../ui/views/history/repository_header.py" line="108"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,7 +318,7 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="478"/>
+        <location filename="../../ui/views/history/history_list.py" line="161"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -413,62 +413,62 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="164"/>
+        <location filename="../../ui/views/history/panel.py" line="131"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="172"/>
+        <location filename="../../ui/views/history/repository_header.py" line="98"/>
         <source>Refresh Project and Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="296"/>
+        <location filename="../../ui/views/history/panel.py" line="180"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="297"/>
+        <location filename="../../ui/views/history/panel.py" line="186"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="326"/>
+        <location filename="../../ui/views/history/panel.py" line="81"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="471"/>
+        <location filename="../../ui/views/history/history_list.py" line="153"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="485"/>
+        <location filename="../../ui/views/history/history_list.py" line="168"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="486"/>
+        <location filename="../../ui/views/history/history_list.py" line="169"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="498"/>
+        <location filename="../../ui/views/history/history_list.py" line="183"/>
         <source>Restore all files from iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="601"/>
+        <location filename="../../ui/views/history/formatters.py" line="27"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="618"/>
+        <location filename="../../ui/views/history/repository_header.py" line="78"/>
         <source>No project detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="627"/>
+        <location filename="../../ui/views/history/repository_header.py" line="85"/>
         <source>Project: %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -198,7 +198,7 @@ class TestShowDocDiffsWithStageButtons:
 
     def test_document_row_action_buttons_keep_button_background(self, widget) -> None:  # type: ignore[no-untyped-def]
         from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         widget.clear_doc_diffs()
         widget.set_current_history_selection(HistorySelection(item_kind="WORKING_TREE", commit_hash=None))
@@ -268,7 +268,7 @@ class TestShowDocDiffsWithStageButtons:
             DiffTreePresentation,
             NodePresentation,
         )
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         # Clear any previous state
         widget.clear_doc_diffs()
@@ -304,7 +304,7 @@ class TestShowDocDiffsWithStageButtons:
             DiffTreePresentation,
             NodePresentation,
         )
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         # Clear any previous state
         widget.clear_doc_diffs()
@@ -371,7 +371,7 @@ class TestShowDocDiffsWithStageButtons:
     @pytest.mark.parametrize("kind", ["WORKING_TREE", "COMMIT"])
     def test_remove_buttons_hidden_when_not_staging(self, widget, kind: str) -> None:  # type: ignore[no-untyped-def]
         from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         widget.clear_doc_diffs()
         selection = HistorySelection(item_kind=kind, commit_hash=None if kind != "COMMIT" else "abc123")
@@ -407,7 +407,7 @@ class TestCallbackWiring:
             DiffTreePresentation,
             NodePresentation,
         )
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         captured: list[str] = []
 
@@ -445,7 +445,7 @@ class TestCallbackWiring:
 
     def test_remove_button_callback_receives_git_path(self, widget) -> None:  # type: ignore[no-untyped-def]
         from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         captured: list[str] = []
         widget.clear_doc_diffs()
@@ -532,7 +532,7 @@ class TestCallbackWiring:
     def test_visual_diff_button_only_for_enabled_nodes(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Visual diff button appears only when presentation enables it."""
         from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         widget.clear_doc_diffs()
         widget.set_current_history_selection(HistorySelection(item_kind="WORKING_TREE", commit_hash=None))
@@ -578,7 +578,7 @@ class TestCallbackWiring:
     def test_visual_diff_button_emits_git_path_and_node_path(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Visual diff button callback emits (git_path, node_path)."""
         from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         captured: list[tuple[str, str]] = []
         widget.clear_doc_diffs()
@@ -804,7 +804,7 @@ class TestSetStageButtonEnabled:
             DiffTreePresentation,
             NodePresentation,
         )
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         widget.clear_doc_diffs()
         widget.set_current_history_selection(HistorySelection(item_kind="WORKING_TREE", commit_hash=None))
@@ -845,7 +845,7 @@ class TestOpenDocumentIndicator:
             DiffTreePresentation,
             WorkingTreeDocumentClosedIndicator,
         )
-        from freecad.history_wb.ui.views.models import HistorySelection
+        from freecad.history_wb.ui.views.history.models import HistorySelection
 
         captured: list[str] = []
         widget.set_open_document_for_comparison_callback(lambda git_path: captured.append(git_path))
