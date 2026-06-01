@@ -4,7 +4,7 @@ import pytest
 
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtCore, QtWidgets
-from freecad.history_wb.ui.views.diff_theme import DIFF_STATE_ROLE
+from freecad.history_wb.ui.views.theme.diff import DIFF_STATE_ROLE
 
 
 @pytest.fixture(scope="module")

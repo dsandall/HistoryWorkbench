@@ -8,7 +8,7 @@ from ...domain.settings import SettingsRepository
 from ...qt import QtCore, QtGui, QtWidgets
 from ...utils import format_float, translate
 from ..presenters.presentation_models import PropertyPresentation
-from .diff_theme import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
+from .theme.diff import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
 
 
 __all__ = ["PropertyDiffTreeWidget"]

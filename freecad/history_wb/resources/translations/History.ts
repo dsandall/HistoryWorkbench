@@ -71,7 +71,7 @@
     </message>
     <message>
         <location filename="../../ui/views/diff_panel_view.py" line="496"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="85"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="86"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -323,47 +323,62 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="77"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="78"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="102"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="103"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="33"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="34"/>
         <source>Remove document(s) from Reviewed.
 The current file(s) stay unchanged.
 They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="90"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="91"/>
         <source>Choose which files to restore from the selected iteration.
 Current files on disk can be overwritten or removed.
 Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="221"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="248"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="116"/>
+        <source>Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="123"/>
+        <source>Collapse All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="124"/>
+        <source>Collapse all tree nodes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="244"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="271"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="299"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="322"/>
         <source>+ Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="312"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="335"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="333"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="356"/>
         <source>Restore the selected file.
 This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.
 THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.
@@ -371,33 +386,33 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="347"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="554"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="370"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="577"/>
         <source>No changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="390"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="413"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="496"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="519"/>
         <source>Open 3D comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="557"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="580"/>
         <source>Modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="558"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="581"/>
         <source>Deleted:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="559"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="582"/>
         <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -552,7 +567,7 @@ Saved history is not affected.</source>
         <location filename="../../ui/views/diff_panel_view.py" line="474"/>
         <location filename="../../ui/views/diff_panel_view.py" line="481"/>
         <location filename="../../ui/views/diff_panel_view.py" line="548"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="329"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="352"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>

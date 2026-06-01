@@ -10,8 +10,8 @@ import pytest
 
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtCore, QtWidgets
-from freecad.history_wb.ui.views.diff_theme import DIFF_STATE_ROLE
 from freecad.history_wb.ui.views.document_diff_tree_widget import DocumentDiffTreeWidget
+from freecad.history_wb.ui.views.theme.diff import DIFF_STATE_ROLE
 
 
 @pytest.fixture(scope="module")
@@ -732,6 +732,12 @@ class TestSetStageAllButtonVisibilityAndEnabled:
 class TestCollapseTreeItem:
     """Tests for collapse_tree_item() method."""
 
+    def test_collapse_all_button_is_icon_only(self, widget) -> None:  # type: ignore[no-untyped-def]
+        """Collapse All action uses icon-only button with tooltip."""
+        assert widget._collapse_all_button.text() == ""
+        assert not widget._collapse_all_button.icon().isNull()
+        assert "Collapse all tree nodes" in widget._collapse_all_button.toolTip()
+
     def test_collapse_tree_item_collapses_root(self, widget) -> None:  # type: ignore[no-untyped-def]
         """collapse_tree_item() collapses the root item for given git_path."""
         from freecad.history_wb.ui.presenters.presentation_models import NodePresentation
@@ -757,6 +763,36 @@ class TestCollapseTreeItem:
 
         widget.collapse_tree_item("parts/A.FCStd")
         assert not root_item.isExpanded()
+
+    def test_collapse_all_tree_items_collapses_every_root(self, widget) -> None:  # type: ignore[no-untyped-def]
+        """collapse_all_tree_items() collapses every expanded root item."""
+        from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation
+
+        node = NodePresentation(
+            path="Body/Pad",
+            type_id="PartDesign::Pad",
+            label="Pad",
+            state=DiffState.MODIFIED,
+            has_changes=True,
+            children=[],
+        )
+        widget.show_doc_diffs(
+            [
+                DiffTreePresentation(nodes=[node], git_path="parts/A.FCStd", indicators=[]),
+                DiffTreePresentation(nodes=[node], git_path="parts/B.FCStd", indicators=[]),
+            ]
+        )
+        first_root = widget.tree_widget.topLevelItem(0)
+        second_root = widget.tree_widget.topLevelItem(1)
+        assert first_root is not None
+        assert second_root is not None
+        first_root.setExpanded(True)
+        second_root.setExpanded(True)
+
+        widget.collapse_all_tree_items()
+
+        assert not first_root.isExpanded()
+        assert not second_root.isExpanded()
 
 
 class TestSetStageButtonEnabled:

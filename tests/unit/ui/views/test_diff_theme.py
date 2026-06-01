@@ -4,7 +4,7 @@ import pytest
 
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtGui
-from freecad.history_wb.ui.views.diff_theme import background_for_state, foreground_for_background
+from freecad.history_wb.ui.views.theme.diff import background_for_state, foreground_for_background
 
 
 def _palette(base: QtGui.QColor, text: QtGui.QColor, window: QtGui.QColor) -> QtGui.QPalette:

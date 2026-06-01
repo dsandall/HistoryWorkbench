@@ -12,8 +12,9 @@ from ..presenters.presentation_models import (
     NodePresentation,
     WorkingTreeDocumentClosedIndicator,
 )
-from .diff_theme import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
 from .models import HistorySelection
+from .theme.diff import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
+from .theme.icons import set_themed_icon
 
 
 __all__ = ["DocumentDiffTreeWidget"]
@@ -108,6 +109,23 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._remove_all_button.clicked.connect(self._on_remove_all_clicked)
         summary_layout.addWidget(self._remove_all_button)
 
+        tree_header = QtWidgets.QWidget()
+        tree_header_layout = QtWidgets.QHBoxLayout(tree_header)
+        tree_header_layout.setContentsMargins(4, 2, 4, 2)
+        tree_header_layout.setSpacing(4)
+        tree_header_layout.addWidget(QtWidgets.QLabel(translate("History", "Tree")))
+        tree_header_layout.addStretch()
+
+        self._collapse_all_button = QtWidgets.QToolButton()
+        set_themed_icon(self._collapse_all_button, "Collapse.svg")
+        self._collapse_all_button.setIconSize(QtCore.QSize(TREE_ITEM_ICON_SIZE, TREE_ITEM_ICON_SIZE))
+        self._collapse_all_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
+        self._collapse_all_button.setAccessibleName(translate("History", "Collapse All"))
+        self._collapse_all_button.setToolTip(translate("History", "Collapse all tree nodes."))
+        self._collapse_all_button.setFixedSize(TREE_ITEM_HEIGHT, TREE_ITEM_HEIGHT)
+        self._collapse_all_button.clicked.connect(self.collapse_all_tree_items)
+        tree_header_layout.addWidget(self._collapse_all_button)
+
         self._tree_widget = QtWidgets.QTreeWidget()
         self._tree_widget.header().hide()
         self._tree_widget.setColumnCount(1)
@@ -119,11 +137,16 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(summary_container)
+        layout.addWidget(tree_header)
         layout.addWidget(self._tree_widget)
 
     def set_current_history_selection(self, selection: HistorySelection | None) -> None:
         """Set current history selection for conditional Current Files controls."""
         self._current_selection = selection
+
+    def collapse_all_tree_items(self) -> None:
+        """Collapse every document and node row in the tree."""
+        self._tree_widget.collapseAll()
 
     def set_node_selection_callback(self, callback: Callable[[str, str], None]) -> None:
         """Set callback for node selection with (git_path, node_path).
