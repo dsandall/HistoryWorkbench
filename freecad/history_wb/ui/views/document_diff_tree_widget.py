@@ -64,6 +64,34 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         """Expose underlying tree for facade compatibility and focused tests."""
         return self._tree_widget
 
+    @property
+    def summary_label(self) -> QtWidgets.QLabel:
+        """Expose summary label for observable tests and facade integrations."""
+        return self._changed_label
+
+    @property
+    def stage_all_button(self) -> QtWidgets.QToolButton:
+        """Expose Mark All Reviewed button for observable tests and facade integrations."""
+        return self._stage_all_button
+
+    @property
+    def remove_all_button(self) -> QtWidgets.QToolButton:
+        """Expose Remove All button for observable tests and facade integrations."""
+        return self._remove_all_button
+
+    @property
+    def collapse_all_button(self) -> QtWidgets.QToolButton:
+        """Expose Collapse All button for observable tests and facade integrations."""
+        return self._collapse_all_button
+
+    def get_stage_button(self, git_path: str) -> QtWidgets.QToolButton | None:
+        """Return stage button for document path when rendered."""
+        return self._stage_buttons.get(git_path)
+
+    def get_remove_from_reviewed_button(self, git_path: str) -> QtWidgets.QToolButton | None:
+        """Return remove-from-reviewed button for document path when rendered."""
+        return self._remove_from_reviewed_buttons.get(git_path)
+
     def _setup_ui(self) -> None:
         summary_container = QtWidgets.QWidget(self)
         summary_layout = QtWidgets.QHBoxLayout(summary_container)

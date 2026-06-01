@@ -98,14 +98,14 @@ class TestHistoryPanelWidgetRefreshButton:
 
         # Then: Callback should be connected (we verify by simulating a click)
         # Simulate button click
-        widget._refresh_button.click()
+        widget.refresh_button.click()
 
         # Verify callback was invoked
         assert callback_called is True
 
     def test_refresh_button_has_tooltip(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Refresh button has a tooltip."""
-        tooltip = widget._refresh_button.toolTip()
+        tooltip = widget.refresh_button.toolTip()
         assert "refresh" in tooltip.lower() or "git" in tooltip.lower()
 
 
@@ -114,7 +114,7 @@ class TestHistoryPanelWidgetSaveIterationButton:
 
     def test_save_iteration_button_has_tooltip(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Save iteration button has expected tooltip."""
-        assert widget._save_iteration_button.toolTip() == "Save Iteration"
+        assert widget.save_iteration_button.toolTip() == "Save Iteration"
 
     def test_save_iteration_button_is_left_of_refresh(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Save iteration button is placed before refresh button in header layout."""
@@ -126,14 +126,14 @@ class TestHistoryPanelWidgetSaveIterationButton:
             if child_widget is not None:
                 button_positions.append(child_widget)
 
-        assert button_positions[-2] is widget._save_iteration_button
-        assert button_positions[-1] is widget._refresh_button
+        assert button_positions[-2] is widget.save_iteration_button
+        assert button_positions[-1] is widget.refresh_button
 
     def test_save_iteration_button_has_compact_width(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Save iteration button uses compact icon-only sizing policy."""
-        policy = widget._save_iteration_button.sizePolicy()
+        policy = widget.save_iteration_button.sizePolicy()
         assert policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Minimum
-        assert widget._save_iteration_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
+        assert widget.save_iteration_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
 
     def test_set_save_iteration_callback_connects_to_button_clicked(self, widget) -> None:  # type: ignore[no-untyped-def]
         """set_save_iteration_callback() registers callback used by save button click."""
@@ -144,15 +144,15 @@ class TestHistoryPanelWidgetSaveIterationButton:
             callback_called = True
 
         widget.set_save_iteration_callback(mock_callback)
-        widget._save_iteration_button.click()
+        widget.save_iteration_button.click()
 
         assert callback_called is True
 
     def test_refresh_button_uses_compact_icon_only_sizing(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Refresh button uses compact icon-only sizing policy."""
-        policy = widget._refresh_button.sizePolicy()
+        policy = widget.refresh_button.sizePolicy()
         assert policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Minimum
-        assert widget._refresh_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
+        assert widget.refresh_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
 
 
 class TestHistoryPanelWidgetShowRepository:
@@ -164,9 +164,9 @@ class TestHistoryPanelWidgetShowRepository:
         widget.show_repository(None)
 
         # Then: Label shows no repo message with italic gray styling
-        text = widget._repository_label.text()
+        text = widget.repository_label.text()
         assert "no git repository" in text.lower() or "detected" in text.lower()
-        stylesheet = widget._repository_label.styleSheet()
+        stylesheet = widget.repository_label.styleSheet()
         assert "italic" in stylesheet
         assert "gray" in stylesheet
 
@@ -181,12 +181,12 @@ class TestHistoryPanelWidgetShowRepository:
         widget.show_repository(repo)
 
         # Then: Label shows project name with path in tooltip
-        text = widget._repository_label.text()
+        text = widget.repository_label.text()
         assert "test_project" in text
         assert "Project:" in text
         # Path should be in tooltip, not in displayed text
-        assert widget._repository_label.toolTip() == "/home/user/test_project"
-        stylesheet = widget._repository_label.styleSheet()
+        assert widget.repository_label.toolTip() == "/home/user/test_project"
+        stylesheet = widget.repository_label.styleSheet()
         assert "bold" in stylesheet
         assert "underline" in stylesheet
 
@@ -197,18 +197,18 @@ class TestHistoryPanelWidgetShowRepository:
 
         repo1 = GitRepository(name="old_project", absolute_path="/home/old")
         widget.show_repository(repo1)
-        assert "old_project" in widget._repository_label.text()
+        assert "old_project" in widget.repository_label.text()
 
         # When: Call show_repository with a different repository
         repo2 = GitRepository(name="new_project", absolute_path="/home/new")
         widget.show_repository(repo2)
 
         # Then: New repository info replaces old one
-        text = widget._repository_label.text()
+        text = widget.repository_label.text()
         assert "new_project" in text
         assert "old_project" not in text
         # Tooltip should also be updated
-        assert widget._repository_label.toolTip() == "/home/new"
+        assert widget.repository_label.toolTip() == "/home/new"
 
     def test_show_repository_none_after_repo_resets_style(self, widget) -> None:  # type: ignore[no-untyped-def]
         """show_repository(None) after showing a repo resets to italic gray style and clears tooltip."""
@@ -222,10 +222,10 @@ class TestHistoryPanelWidgetShowRepository:
         widget.show_repository(None)
 
         # Then: Style is reset to italic gray and tooltip is cleared
-        stylesheet = widget._repository_label.styleSheet()
+        stylesheet = widget.repository_label.styleSheet()
         assert "italic" in stylesheet
         assert "gray" in stylesheet
-        assert widget._repository_label.toolTip() == ""
+        assert widget.repository_label.toolTip() == ""
 
     def test_repository_label_click_opens_project_directory(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Clicking repository label opens project directory in native file browser."""
@@ -235,7 +235,7 @@ class TestHistoryPanelWidgetShowRepository:
         widget.show_repository(repo)
 
         with patch.object(QtGui.QDesktopServices, "openUrl", return_value=True) as open_url:
-            widget._repository_label.open_repository_directory()
+            widget.open_repository_directory()
 
         open_url.assert_called_once_with(QtCore.QUrl.fromLocalFile("/home/user/test_project"))
 
@@ -244,7 +244,7 @@ class TestHistoryPanelWidgetShowRepository:
         widget.show_repository(None)
 
         with patch.object(QtGui.QDesktopServices, "openUrl", return_value=True) as open_url:
-            widget._repository_label.open_repository_directory()
+            widget.open_repository_directory()
 
         open_url.assert_not_called()
 

@@ -673,12 +673,12 @@ class TestShowSummary:
     def test_show_summary_with_zero_changes(self, widget) -> None:  # type: ignore[no-untyped-def]
         """show_summary(0) displays 'No changes'."""
         widget.show_summary(0, 0, 0)
-        assert widget._changed_label.text() == "No changes"
+        assert widget.summary_label.text() == "No changes"
 
     def test_show_summary_with_per_status_counts(self, widget) -> None:  # type: ignore[no-untyped-def]
         """show_summary() displays Modified/Deleted/Added counts."""
         widget.show_summary(2, 1, 3)
-        assert widget._changed_label.text() == "Modified: 2  Deleted: 1  Added: 3"
+        assert widget.summary_label.text() == "Modified: 2  Deleted: 1  Added: 3"
 
 
 class TestSetStageAllButtonVisibilityAndEnabled:
@@ -687,35 +687,35 @@ class TestSetStageAllButtonVisibilityAndEnabled:
     def test_set_stage_all_button_visible(self, widget) -> None:  # type: ignore[no-untyped-def]
         """set_stage_all_button_visible() controls button visibility."""
         widget.set_stage_all_button_visible(True)
-        assert not widget._stage_all_button.isHidden()
+        assert not widget.stage_all_button.isHidden()
 
         widget.set_stage_all_button_visible(False)
-        assert widget._stage_all_button.isHidden()
+        assert widget.stage_all_button.isHidden()
 
     def test_set_stage_all_button_enabled(self, widget) -> None:  # type: ignore[no-untyped-def]
         """set_stage_all_button_enabled() controls button enabled state."""
         widget.set_stage_all_button_enabled(True)
-        assert widget._stage_all_button.isEnabled()
+        assert widget.stage_all_button.isEnabled()
 
         widget.set_stage_all_button_enabled(False)
-        assert not widget._stage_all_button.isEnabled()
+        assert not widget.stage_all_button.isEnabled()
 
     def test_set_remove_all_button_visible_and_enabled(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Remove All summary button visibility/enabled controls work."""
         widget.set_remove_all_button_visible(True)
-        assert not widget._remove_all_button.isHidden()
+        assert not widget.remove_all_button.isHidden()
         widget.set_remove_all_button_enabled(True)
-        assert widget._remove_all_button.isEnabled()
+        assert widget.remove_all_button.isEnabled()
 
         widget.set_remove_all_button_enabled(False)
-        assert not widget._remove_all_button.isEnabled()
+        assert not widget.remove_all_button.isEnabled()
         widget.set_remove_all_button_visible(False)
-        assert widget._remove_all_button.isHidden()
+        assert widget.remove_all_button.isHidden()
 
     def test_remove_all_button_has_requested_text_and_tooltip(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Remove All summary button has requested text and tooltip."""
-        assert widget._remove_all_button.text() == "Remove All"
-        assert "will not be saved in the next iteration" in widget._remove_all_button.toolTip()
+        assert widget.remove_all_button.text() == "Remove All"
+        assert "will not be saved in the next iteration" in widget.remove_all_button.toolTip()
 
     def test_set_remove_all_button_callback_invokes_callback(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Remove All summary callback invoked on click."""
@@ -734,9 +734,9 @@ class TestCollapseTreeItem:
 
     def test_collapse_all_button_is_icon_only(self, widget) -> None:  # type: ignore[no-untyped-def]
         """Collapse All action uses icon-only button with tooltip."""
-        assert widget._collapse_all_button.text() == ""
-        assert not widget._collapse_all_button.icon().isNull()
-        assert "Collapse all tree nodes" in widget._collapse_all_button.toolTip()
+        assert widget.collapse_all_button.text() == ""
+        assert not widget.collapse_all_button.icon().isNull()
+        assert "Collapse all tree nodes" in widget.collapse_all_button.toolTip()
 
     def test_collapse_tree_item_collapses_root(self, widget) -> None:  # type: ignore[no-untyped-def]
         """collapse_tree_item() collapses the root item for given git_path."""
@@ -829,7 +829,8 @@ class TestSetStageButtonEnabled:
             ]
         )
 
-        stage_button = widget._stage_buttons["parts/A.FCStd"]
+        stage_button = widget.get_stage_button("parts/A.FCStd")
+        assert stage_button is not None
         assert stage_button.isEnabled()
 
         widget.set_stage_button_enabled("parts/A.FCStd", False)

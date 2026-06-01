@@ -131,6 +131,25 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         """Expose list widget for facade compatibility and tests."""
         return self._history_list
 
+    @property
+    def refresh_button(self) -> QtWidgets.QToolButton:
+        """Expose refresh button for observable tests and facade integrations."""
+        return self._refresh_button
+
+    @property
+    def save_iteration_button(self) -> QtWidgets.QToolButton:
+        """Expose save-iteration button for observable tests and facade integrations."""
+        return self._save_iteration_button
+
+    @property
+    def repository_label(self) -> QtWidgets.QLabel:
+        """Expose repository label for observable tests and facade integrations."""
+        return self._repository_label
+
+    def open_repository_directory(self) -> None:
+        """Open current repository directory when one is displayed."""
+        self._repository_label.open_repository_directory()
+
     def _setup_ui(self) -> None:
         self._history_list = _HistoryListWidget()
         self._history_list.setMinimumWidth(150)

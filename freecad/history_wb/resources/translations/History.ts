@@ -71,7 +71,7 @@
     </message>
     <message>
         <location filename="../../ui/views/diff_panel_view.py" line="496"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="86"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="114"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -170,7 +170,7 @@ Saved history is not affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel_view.py" line="367"/>
-        <location filename="../../ui/views/history_panel_widget.py" line="169"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="188"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,17 +318,17 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="458"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="477"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="78"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="106"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="103"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="131"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -340,45 +340,45 @@ They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="91"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="119"/>
         <source>Choose which files to restore from the selected iteration.
 Current files on disk can be overwritten or removed.
 Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="116"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="144"/>
         <source>Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="123"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="151"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="124"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="152"/>
         <source>Collapse all tree nodes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="244"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="271"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="272"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="299"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="322"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="350"/>
         <source>+ Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="335"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="363"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="356"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="384"/>
         <source>Restore the selected file.
 This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.
 THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.
@@ -386,93 +386,93 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="370"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="577"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="398"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="605"/>
         <source>No changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="413"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="441"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="519"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="547"/>
         <source>Open 3D comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="580"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="608"/>
         <source>Modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="581"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="609"/>
         <source>Deleted:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="582"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="610"/>
         <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="143"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="162"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="158"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="177"/>
         <source>Refresh Project and Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="276"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="295"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="277"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="296"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="306"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="325"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="451"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="470"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="465"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="484"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="466"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="485"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="478"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="497"/>
         <source>Restore all files from iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="581"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="600"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="598"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="617"/>
         <source>No project detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="607"/>
+        <location filename="../../ui/views/history_panel_widget.py" line="626"/>
         <source>Project: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -567,7 +567,7 @@ Saved history is not affected.</source>
         <location filename="../../ui/views/diff_panel_view.py" line="474"/>
         <location filename="../../ui/views/diff_panel_view.py" line="481"/>
         <location filename="../../ui/views/diff_panel_view.py" line="548"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="352"/>
+        <location filename="../../ui/views/document_diff_tree_widget.py" line="380"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
