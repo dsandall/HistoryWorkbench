@@ -9,6 +9,8 @@ from ...qt import QtCore, QtGui, QtWidgets
 from ...resources import get_icon_path
 from ...utils import translate
 from .models import HistorySelection
+from .widgets.buttons import make_tool_button
+from .widgets.styles import HEADER_ICON_BUTTON_STYLE, REPOSITORY_LABEL_EMPTY_STYLE, REPOSITORY_LABEL_LINK_STYLE
 
 
 __all__ = ["HistoryPanelWidget"]
@@ -164,28 +166,27 @@ class HistoryPanelWidget(QtWidgets.QWidget):
 
         self._repository_label = _ClickableRepositoryLabel(self._get_repository_path)
         self._repository_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        self._repository_label.setStyleSheet("font-size: 11px; color: gray; font-style: italic;")
+        self._repository_label.setStyleSheet(REPOSITORY_LABEL_EMPTY_STYLE)
 
-        button_style = "QToolButton { padding: 5px; }"
-
-        self._refresh_button = QtWidgets.QToolButton()
+        self._refresh_button = make_tool_button(
+            tooltip=translate("History", "Refresh Project and Iterations"),
+            style=HEADER_ICON_BUTTON_STYLE,
+            icon_size=QtCore.QSize(24, 24),
+            tool_button_style=QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly,
+        )
         self._refresh_button.setIcon(_REFRESH_ICON)
-        self._refresh_button.setIconSize(QtCore.QSize(24, 24))
-        self._refresh_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
         self._refresh_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        self._refresh_button.setStyleSheet(button_style)
-        refresh_tooltip = translate("History", "Refresh Project and Iterations")
-        self._refresh_button.setToolTip(refresh_tooltip)
 
-        self._save_iteration_button = QtWidgets.QToolButton()
+        self._save_iteration_button = make_tool_button(
+            tooltip=translate("History", "Save Iteration"),
+            style=HEADER_ICON_BUTTON_STYLE,
+            icon_size=QtCore.QSize(24, 24),
+            tool_button_style=QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly,
+        )
         self._save_iteration_button.setIcon(_SAVE_ITERATION_ICON)
-        self._save_iteration_button.setIconSize(QtCore.QSize(24, 24))
-        self._save_iteration_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
         self._save_iteration_button.setSizePolicy(
             QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed
         )
-        self._save_iteration_button.setStyleSheet(button_style)
-        self._save_iteration_button.setToolTip(translate("History", "Save Iteration"))
         self._save_iteration_button.clicked.connect(self._on_save_iteration_button_clicked)
 
         repository_header_layout = QtWidgets.QHBoxLayout()
@@ -618,7 +619,7 @@ class HistoryPanelWidget(QtWidgets.QWidget):
             self._repository_label.setText(text)
             self._repository_label.setToolTip("")
             self._repository_label.setCursor(QtCore.Qt.CursorShape.ArrowCursor)
-            self._repository_label.setStyleSheet("font-size: 11px; color: gray; font-style: italic;")
+            self._repository_label.setStyleSheet(REPOSITORY_LABEL_EMPTY_STYLE)
         else:
             name = repo.name
             path = repo.absolute_path
@@ -631,7 +632,7 @@ class HistoryPanelWidget(QtWidgets.QWidget):
             self._repository_label.setToolTip(path)
             self._repository_label.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
             # Style with underline to indicate clickable/tooltip
-            self._repository_label.setStyleSheet("font-size: 11px; font-weight: bold; text-decoration: underline;")
+            self._repository_label.setStyleSheet(REPOSITORY_LABEL_LINK_STYLE)
 
     def _get_repository_path(self) -> str | None:
         """Return current repository absolute path."""

@@ -8,7 +8,12 @@ from ...domain.settings import SettingsRepository
 from ...qt import QtCore, QtGui, QtWidgets
 from ...utils import format_float, translate
 from ..presenters.presentation_models import PropertyPresentation
-from .theme.diff import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
+from .theme.diff import (
+    DiffItemDelegate,
+    apply_diff_state_to_item,
+    background_for_state,
+    foreground_for_background,
+)
 
 
 __all__ = ["PropertyDiffTreeWidget"]
@@ -407,11 +412,7 @@ class PropertyDiffTreeWidget(QtWidgets.QTreeWidget):
         """
         if color is None:
             return
-        foreground = foreground_for_background(color, self.palette())
-        for column in range(3):
-            item.setData(column, DIFF_STATE_ROLE, state)
-            item.setBackground(column, QtGui.QBrush(color))
-            item.setForeground(column, QtGui.QBrush(foreground))
+        apply_diff_state_to_item(item, state, self.palette(), columns=range(3))
 
     def _apply_group_header_colors(self, item: QtWidgets.QTreeWidgetItem) -> None:
         """Apply theme palette colors to group header row."""

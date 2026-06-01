@@ -1,6 +1,7 @@
 """File responsibility: Document diff tree widget with summary and staging controls."""
 
 from collections.abc import Callable
+from functools import partial
 
 from ...domain.diff.models import DiffState
 from ...qt import QtCore, QtGui, QtWidgets
@@ -13,24 +14,24 @@ from ..presenters.presentation_models import (
     WorkingTreeDocumentClosedIndicator,
 )
 from .models import HistorySelection
-from .theme.diff import DIFF_STATE_ROLE, DiffItemDelegate, background_for_state, foreground_for_background
-from .theme.icons import set_themed_icon
+from .theme.diff import DiffItemDelegate, apply_diff_state_to_item, apply_diff_state_to_widget
+from .widgets.buttons import make_icon_tool_button, make_row_action_button, make_tool_button
+from .widgets.styles import (
+    DIFF_ROW_CONTAINER_OBJECT_NAME,
+    DIFF_ROW_LABEL_OBJECT_NAME,
+    TREE_ITEM_HEIGHT,
+    TREE_ITEM_ICON_SIZE,
+    VISUAL_DIFF_ICON_BUTTON_STYLE,
+)
 
 
 __all__ = ["DocumentDiffTreeWidget"]
 
 
-# Tree rows use a 22px control box so text-only and icon rows stay the same height.
-TREE_ITEM_HEIGHT = 22
-# Icon stays 16px inside that 22px box, leaving 3px visual padding on each side.
-TREE_ITEM_ICON_SIZE = 16
 STAGE_BUTTON_WIDTH = 90
 STAGE_ALL_BUTTON_WIDTH = 140
 REMOVE_BUTTON_WIDTH = 90
 RESTORE_BUTTON_WIDTH = 90
-DIFF_ROW_CONTAINER_OBJECT_NAME = "diffRowContainer"
-DIFF_ROW_LABEL_OBJECT_NAME = "diffRowLabel"
-ROW_ACTION_BUTTON_STYLE = "QToolButton { padding: 0px 4px; margin: 0px; border-radius: 2px; }"
 REMOVE_REVIEWED_TOOLTIP = translate(
     "History",
     "Remove document(s) from Reviewed.\n"
@@ -102,37 +103,36 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._changed_label.setStyleSheet("font-weight: bold;")
         summary_layout.addWidget(self._changed_label)
 
-        self._stage_all_button = QtWidgets.QToolButton()
-        self._stage_all_button.setText(translate("History", "+ Mark All Reviewed"))
-        self._stage_all_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
-        self._stage_all_button.setFixedSize(STAGE_ALL_BUTTON_WIDTH, TREE_ITEM_HEIGHT)
+        self._stage_all_button = make_tool_button(
+            text=translate("History", "+ Mark All Reviewed"),
+            width=STAGE_ALL_BUTTON_WIDTH,
+            height=TREE_ITEM_HEIGHT,
+        )
         self._stage_all_button.hide()
         self._stage_all_button.clicked.connect(self._on_stage_all_clicked)
         summary_layout.addWidget(self._stage_all_button)
 
-        self._restore_all_button = QtWidgets.QToolButton()
-        self._restore_all_button.setText(translate("History", "Restore All"))
-        self._restore_all_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
-        self._restore_all_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        self._restore_all_button.setFixedHeight(TREE_ITEM_HEIGHT)
-        self._restore_all_button.setToolTip(
-            translate(
+        self._restore_all_button = make_tool_button(
+            text=translate("History", "Restore All"),
+            tooltip=translate(
                 "History",
                 "Choose which files to restore from the selected iteration.\n"
                 "Current files on disk can be overwritten or removed.\n"
                 "Saved history is not affected.",
-            )
+            ),
+            height=TREE_ITEM_HEIGHT,
         )
+        self._restore_all_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
         self._restore_all_button.hide()
         self._restore_all_button.clicked.connect(self._on_restore_all_clicked)
         summary_layout.addWidget(self._restore_all_button)
 
-        self._remove_all_button = QtWidgets.QToolButton()
-        self._remove_all_button.setText(translate("History", "Remove All"))
-        self._remove_all_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
+        self._remove_all_button = make_tool_button(
+            text=translate("History", "Remove All"),
+            tooltip=REMOVE_REVIEWED_TOOLTIP,
+            height=TREE_ITEM_HEIGHT,
+        )
         self._remove_all_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        self._remove_all_button.setFixedHeight(TREE_ITEM_HEIGHT)
-        self._remove_all_button.setToolTip(REMOVE_REVIEWED_TOOLTIP)
         self._remove_all_button.hide()
         self._remove_all_button.clicked.connect(self._on_remove_all_clicked)
         summary_layout.addWidget(self._remove_all_button)
@@ -144,13 +144,12 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         tree_header_layout.addWidget(QtWidgets.QLabel(translate("History", "Tree")))
         tree_header_layout.addStretch()
 
-        self._collapse_all_button = QtWidgets.QToolButton()
-        set_themed_icon(self._collapse_all_button, "Collapse.svg")
-        self._collapse_all_button.setIconSize(QtCore.QSize(TREE_ITEM_ICON_SIZE, TREE_ITEM_ICON_SIZE))
-        self._collapse_all_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly)
-        self._collapse_all_button.setAccessibleName(translate("History", "Collapse All"))
-        self._collapse_all_button.setToolTip(translate("History", "Collapse all tree nodes."))
-        self._collapse_all_button.setFixedSize(TREE_ITEM_HEIGHT, TREE_ITEM_HEIGHT)
+        self._collapse_all_button = make_icon_tool_button(
+            icon_name="Collapse.svg",
+            tooltip=translate("History", "Collapse All"),
+            accessible_name=translate("History", "Collapse All"),
+            size=TREE_ITEM_HEIGHT,
+        )
         self._collapse_all_button.clicked.connect(self.collapse_all_tree_items)
         tree_header_layout.addWidget(self._collapse_all_button)
 
@@ -346,27 +345,23 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
     def _add_stage_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation) -> None:
         """Add + Reviewed button for one document row."""
-        add_button = QtWidgets.QToolButton()
-        add_button.setText(translate("History", "+ Reviewed"))
-        add_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
-        add_button.setStyleSheet(ROW_ACTION_BUTTON_STYLE)
+        add_button = make_row_action_button(
+            text=translate("History", "+ Reviewed"),
+            width=STAGE_BUTTON_WIDTH,
+            on_clicked=partial(self._on_add_button_clicked, diff.git_path),
+        )
         add_button.setEnabled(diff.stage_button_enabled)
-        add_button.setFixedSize(STAGE_BUTTON_WIDTH, TREE_ITEM_HEIGHT)
-        add_button.clicked.connect(lambda checked, gp=diff.git_path: self._on_add_button_clicked(gp))
         layout.addWidget(add_button)
         if diff.git_path:
             self._stage_buttons[diff.git_path] = add_button
 
     def _add_remove_from_reviewed_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation) -> None:
         """Add Remove button for one reviewed document row."""
-        remove_button = QtWidgets.QToolButton()
-        remove_button.setText(translate("History", "Remove"))
-        remove_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
-        remove_button.setStyleSheet(ROW_ACTION_BUTTON_STYLE)
-        remove_button.setFixedSize(REMOVE_BUTTON_WIDTH, TREE_ITEM_HEIGHT)
-        remove_button.setToolTip(REMOVE_REVIEWED_TOOLTIP)
-        remove_button.clicked.connect(
-            lambda checked, gp=diff.git_path: self._on_remove_from_reviewed_button_clicked(gp)
+        remove_button = make_row_action_button(
+            text=translate("History", "Remove"),
+            tooltip=REMOVE_REVIEWED_TOOLTIP,
+            width=REMOVE_BUTTON_WIDTH,
+            on_clicked=partial(self._on_remove_from_reviewed_button_clicked, diff.git_path),
         )
         layout.addWidget(remove_button)
         if diff.git_path:
@@ -376,11 +371,6 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         return self._current_selection is not None and self._current_selection.item_kind == "COMMIT"
 
     def _add_restore_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation, file_name: str) -> None:
-        restore_button = QtWidgets.QToolButton()
-        restore_button.setText(translate("History", "Restore"))
-        restore_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
-        restore_button.setStyleSheet(ROW_ACTION_BUTTON_STYLE)
-        restore_button.setFixedSize(RESTORE_BUTTON_WIDTH, TREE_ITEM_HEIGHT)
         tooltip = translate(
             "History",
             "Restore the selected file.\n"
@@ -388,8 +378,12 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
             "THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.\n"
             "Saved history is not affected.",
         ).replace("%1", file_name)
-        restore_button.setToolTip(tooltip)
-        restore_button.clicked.connect(lambda checked, gp=diff.git_path: self._on_restore_button_clicked(gp))
+        restore_button = make_row_action_button(
+            text=translate("History", "Restore"),
+            tooltip=tooltip,
+            width=RESTORE_BUTTON_WIDTH,
+            on_clicked=partial(self._on_restore_button_clicked, diff.git_path),
+        )
         layout.addWidget(restore_button)
 
     def clear_doc_diffs(self) -> None:
@@ -541,27 +535,16 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
         icon_size = QtCore.QSize(TREE_ITEM_ICON_SIZE, TREE_ITEM_ICON_SIZE)
 
-        button = QtWidgets.QToolButton()
-        button.setIcon(QtGui.QIcon(str(get_icon_path("VisualDiff.svg"))))
-        button.setIconSize(icon_size)
-        button.setToolTip(translate("History", "Open 3D comparison"))
-        button.setAutoRaise(True)
-        button.setStyleSheet(
-            """
-            QToolButton {
-                background-color: transparent;
-                border: none;
-                border-radius: 3px;
-            }
-            QToolButton:hover {
-                background-color: rgba(128, 128, 128, 35);
-            }
-            QToolButton:pressed {
-                background-color: rgba(128, 128, 128, 60);
-            }
-            """
+        button = make_tool_button(
+            tooltip=translate("History", "Open 3D comparison"),
+            icon=QtGui.QIcon(str(get_icon_path("VisualDiff.svg"))),
+            width=TREE_ITEM_HEIGHT,
+            height=TREE_ITEM_HEIGHT,
+            style=VISUAL_DIFF_ICON_BUTTON_STYLE,
+            auto_raise=True,
+            icon_size=icon_size,
+            tool_button_style=QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly,
         )
-        button.setFixedSize(TREE_ITEM_HEIGHT, TREE_ITEM_HEIGHT)
         button.clicked.connect(
             lambda checked=False, item=item, gp=git_path, np=node.path: self._on_visual_diff_clicked(item, gp, np)
         )
@@ -570,28 +553,17 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
     def _apply_diff_state(self, item: QtWidgets.QTreeWidgetItem, state: DiffState) -> None:
         """Apply semantic diff coloring data to a tree item."""
-        if state == DiffState.UNCHANGED:
-            return
-        item.setData(0, DIFF_STATE_ROLE, state)
-        background = background_for_state(state, self._tree_widget.palette())
-        if background is None:
-            return
-        item.setBackground(0, QtGui.QBrush(background))
-        item.setForeground(0, QtGui.QBrush(foreground_for_background(background, self._tree_widget.palette())))
+        apply_diff_state_to_item(item, state, self._tree_widget.palette())
 
     def _apply_diff_state_to_widget(self, widget: QtWidgets.QWidget, state: DiffState) -> None:
         """Apply diff state colors to custom row widgets."""
-        background = background_for_state(state, self._tree_widget.palette())
-        if background is None:
-            widget.setStyleSheet("")
-            return
-
-        foreground = foreground_for_background(background, self._tree_widget.palette())
-        widget_style = (
-            f"QWidget#{DIFF_ROW_CONTAINER_OBJECT_NAME} {{ background-color: {background.name()}; }} "
-            f"QLabel#{DIFF_ROW_LABEL_OBJECT_NAME} {{ color: {foreground.name()}; }}"
+        apply_diff_state_to_widget(
+            widget,
+            state,
+            self._tree_widget.palette(),
+            container_object_name=DIFF_ROW_CONTAINER_OBJECT_NAME,
+            label_object_name=DIFF_ROW_LABEL_OBJECT_NAME,
         )
-        widget.setStyleSheet(widget_style)
 
     def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
         """Display per-status document counts.

@@ -736,7 +736,7 @@ class TestCollapseTreeItem:
         """Collapse All action uses icon-only button with tooltip."""
         assert widget.collapse_all_button.text() == ""
         assert not widget.collapse_all_button.icon().isNull()
-        assert "Collapse all tree nodes" in widget.collapse_all_button.toolTip()
+        assert "Collapse All" in widget.collapse_all_button.toolTip()
 
     def test_collapse_tree_item_collapses_root(self, widget) -> None:  # type: ignore[no-untyped-def]
         """collapse_tree_item() collapses the root item for given git_path."""

@@ -1,0 +1,117 @@
+"""File responsibility: Shared Qt button factory helpers for view widgets."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+
+from ....qt import QtCore, QtGui, QtWidgets
+from ..theme.icons import set_themed_icon
+from .styles import HEADER_ICON_BUTTON_STYLE, ROW_ACTION_BUTTON_STYLE, TREE_ITEM_HEIGHT, TREE_ITEM_ICON_SIZE
+
+
+def make_tool_button(
+    *,
+    text: str = "",
+    tooltip: str = "",
+    icon: QtGui.QIcon | None = None,
+    icon_name: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    style: str = "",
+    auto_raise: bool = False,
+    accessible_name: str = "",
+    icon_size: QtCore.QSize | None = None,
+    tool_button_style: QtCore.Qt.ToolButtonStyle = QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly,
+) -> QtWidgets.QToolButton:
+    """Create configured QToolButton for History Workbench views."""
+    button = QtWidgets.QToolButton()
+    button.setText(text)
+    button.setToolTip(tooltip)
+    button.setToolButtonStyle(tool_button_style)
+    button.setAutoRaise(auto_raise)
+
+    if accessible_name:
+        button.setAccessibleName(accessible_name)
+
+    if icon is not None:
+        button.setIcon(icon)
+
+    if icon_name is not None:
+        set_themed_icon(button, icon_name)
+
+    if icon_size is not None:
+        button.setIconSize(icon_size)
+
+    if style:
+        button.setStyleSheet(style)
+
+    if width is not None and height is not None:
+        button.setFixedSize(width, height)
+    elif width is not None:
+        button.setFixedWidth(width)
+    elif height is not None:
+        button.setFixedHeight(height)
+
+    return button
+
+
+def make_row_action_button(
+    *,
+    text: str,
+    tooltip: str = "",
+    width: int | None = None,
+    on_clicked: Callable[[], None] | None = None,
+) -> QtWidgets.QToolButton:
+    """Create text-only row action button matching diff tree rows."""
+    button = make_tool_button(
+        text=text,
+        tooltip=tooltip,
+        width=width,
+        height=TREE_ITEM_HEIGHT,
+        style=ROW_ACTION_BUTTON_STYLE,
+        tool_button_style=QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly,
+    )
+
+    if on_clicked is not None:
+        button.clicked.connect(lambda checked=False: on_clicked())
+
+    return button
+
+
+def make_icon_tool_button(
+    *,
+    icon_name: str,
+    tooltip: str,
+    accessible_name: str,
+    size: int,
+    on_clicked: Callable[[], None] | None = None,
+    style: str = HEADER_ICON_BUTTON_STYLE,
+    auto_raise: bool = False,
+) -> QtWidgets.QToolButton:
+    """Create square icon-only tool button with themed icon."""
+    button = make_tool_button(
+        tooltip=tooltip,
+        icon_name=icon_name,
+        width=size,
+        height=size,
+        style=style,
+        auto_raise=auto_raise,
+        accessible_name=accessible_name,
+        icon_size=QtCore.QSize(TREE_ITEM_ICON_SIZE, TREE_ITEM_ICON_SIZE),
+        tool_button_style=QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly,
+    )
+
+    if on_clicked is not None:
+        button.clicked.connect(lambda checked=False: on_clicked())
+
+    return button
+
+
+def make_dialog_button_box(*, accept_text: str, reject_text: str) -> QtWidgets.QDialogButtonBox:
+    """Create dialog button box with explicit translated button labels."""
+    button_box = QtWidgets.QDialogButtonBox()
+    accept_button = button_box.addButton(accept_text, QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole)
+    reject_button = button_box.addButton(reject_text, QtWidgets.QDialogButtonBox.ButtonRole.RejectRole)
+    accept_button.setAutoDefault(True)
+    reject_button.setAutoDefault(False)
+    return button_box
