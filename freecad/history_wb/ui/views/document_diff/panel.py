@@ -1,43 +1,29 @@
-"""File responsibility: Document diff tree widget with summary and staging controls."""
+"""File responsibility: Document diff panel facade with extracted summary, status, and document-row components."""
+
+from __future__ import annotations
 
 from collections.abc import Callable
-from functools import partial
 
-from ...domain.diff.models import DiffState
-from ...qt import QtCore, QtGui, QtWidgets
-from ...resources import get_icon_path
-from ...utils import translate
-from ..presenters.presentation_models import (
-    DiffTreePresentation,
-    DocumentStatusIndicator,
-    NodePresentation,
-    WorkingTreeDocumentClosedIndicator,
-)
-from .history.models import HistorySelection
-from .theme.diff import DiffItemDelegate, apply_diff_state_to_item, apply_diff_state_to_widget
-from .widgets.buttons import make_icon_tool_button, make_row_action_button, make_tool_button
-from .widgets.styles import (
+from ....domain.diff.models import DiffState
+from ....qt import QtCore, QtGui, QtWidgets
+from ....resources import get_icon_path
+from ....utils import translate
+from ...presenters.presentation_models import DiffTreePresentation, NodePresentation
+from ..history.models import HistorySelection
+from ..theme.diff import DiffItemDelegate, apply_diff_state_to_item, apply_diff_state_to_widget
+from ..widgets.buttons import make_icon_tool_button, make_tool_button
+from ..widgets.styles import (
     DIFF_ROW_CONTAINER_OBJECT_NAME,
     DIFF_ROW_LABEL_OBJECT_NAME,
     TREE_ITEM_HEIGHT,
     TREE_ITEM_ICON_SIZE,
     VISUAL_DIFF_ICON_BUTTON_STYLE,
 )
+from .document_row import REMOVE_REVIEWED_TOOLTIP, DocumentDiffRowWidget
+from .summary_bar import DocumentDiffSummaryBar
 
 
 __all__ = ["DocumentDiffTreeWidget"]
-
-
-STAGE_BUTTON_WIDTH = 90
-STAGE_ALL_BUTTON_WIDTH = 140
-REMOVE_BUTTON_WIDTH = 90
-RESTORE_BUTTON_WIDTH = 90
-REMOVE_REVIEWED_TOOLTIP = translate(
-    "History",
-    "Remove document(s) from Reviewed.\n"
-    "The current file(s) stay unchanged.\n"
-    "They will not be saved in the next iteration until reviewed again.",
-)
 
 
 class DocumentDiffTreeWidget(QtWidgets.QWidget):
@@ -60,82 +46,11 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._diff_item_delegate: DiffItemDelegate | None = None
         self._setup_ui()
 
-    @property
-    def tree_widget(self) -> QtWidgets.QTreeWidget:
-        """Expose underlying tree for facade compatibility and focused tests."""
-        return self._tree_widget
-
-    @property
-    def summary_label(self) -> QtWidgets.QLabel:
-        """Expose summary label for observable tests and facade integrations."""
-        return self._changed_label
-
-    @property
-    def stage_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Mark All Reviewed button for observable tests and facade integrations."""
-        return self._stage_all_button
-
-    @property
-    def remove_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Remove All button for observable tests and facade integrations."""
-        return self._remove_all_button
-
-    @property
-    def collapse_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Collapse All button for observable tests and facade integrations."""
-        return self._collapse_all_button
-
-    def get_stage_button(self, git_path: str) -> QtWidgets.QToolButton | None:
-        """Return stage button for document path when rendered."""
-        return self._stage_buttons.get(git_path)
-
-    def get_remove_from_reviewed_button(self, git_path: str) -> QtWidgets.QToolButton | None:
-        """Return remove-from-reviewed button for document path when rendered."""
-        return self._remove_from_reviewed_buttons.get(git_path)
-
     def _setup_ui(self) -> None:
-        summary_container = QtWidgets.QWidget(self)
-        summary_layout = QtWidgets.QHBoxLayout(summary_container)
-        summary_layout.setContentsMargins(0, 0, 0, 0)
-        summary_layout.setSpacing(16)
-
-        self._changed_label = QtWidgets.QLabel("")
-        self._changed_label.setStyleSheet("font-weight: bold;")
-        summary_layout.addWidget(self._changed_label)
-
-        self._stage_all_button = make_tool_button(
-            text=translate("History", "+ Mark All Reviewed"),
-            width=STAGE_ALL_BUTTON_WIDTH,
-            height=TREE_ITEM_HEIGHT,
-        )
-        self._stage_all_button.hide()
-        self._stage_all_button.clicked.connect(self._on_stage_all_clicked)
-        summary_layout.addWidget(self._stage_all_button)
-
-        self._restore_all_button = make_tool_button(
-            text=translate("History", "Restore All"),
-            tooltip=translate(
-                "History",
-                "Choose which files to restore from the selected iteration.\n"
-                "Current files on disk can be overwritten or removed.\n"
-                "Saved history is not affected.",
-            ),
-            height=TREE_ITEM_HEIGHT,
-        )
-        self._restore_all_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        self._restore_all_button.hide()
-        self._restore_all_button.clicked.connect(self._on_restore_all_clicked)
-        summary_layout.addWidget(self._restore_all_button)
-
-        self._remove_all_button = make_tool_button(
-            text=translate("History", "Remove All"),
-            tooltip=REMOVE_REVIEWED_TOOLTIP,
-            height=TREE_ITEM_HEIGHT,
-        )
-        self._remove_all_button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
-        self._remove_all_button.hide()
-        self._remove_all_button.clicked.connect(self._on_remove_all_clicked)
-        summary_layout.addWidget(self._remove_all_button)
+        self._summary_bar = DocumentDiffSummaryBar(REMOVE_REVIEWED_TOOLTIP, self)
+        self._summary_bar.stage_all_requested.connect(self._on_stage_all_clicked)
+        self._summary_bar.restore_all_requested.connect(self._on_restore_all_clicked)
+        self._summary_bar.remove_all_requested.connect(self._on_remove_all_clicked)
 
         tree_header = QtWidgets.QWidget()
         tree_header_layout = QtWidgets.QHBoxLayout(tree_header)
@@ -154,6 +69,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         tree_header_layout.addWidget(self._collapse_all_button)
 
         self._tree_widget = QtWidgets.QTreeWidget()
+        self._tree_widget.setObjectName("documentDiffTree")
         self._tree_widget.header().hide()
         self._tree_widget.setColumnCount(1)
         self._tree_widget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -163,7 +79,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(summary_container)
+        layout.addWidget(self._summary_bar)
         layout.addWidget(tree_header)
         layout.addWidget(self._tree_widget)
 
@@ -176,11 +92,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._tree_widget.collapseAll()
 
     def set_node_selection_callback(self, callback: Callable[[str, str], None]) -> None:
-        """Set callback for node selection with (git_path, node_path).
-
-        Args:
-            callback: A callable receiving (git_path, node_path) when a node is clicked.
-        """
+        """Set callback for node selection with (git_path, node_path)."""
         self._on_node_selection_callback = callback
 
     def set_visual_diff_callback(self, callback: Callable[[str, str], None]) -> None:
@@ -192,20 +104,11 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._on_open_document_for_comparison_callback = callback
 
     def set_add_button_callback(self, callback: Callable[[str], None]) -> None:
-        """Set the callback for when the '+ Reviewed' button is clicked.
-
-        Args:
-            callback: A callable that receives the git_path (str) of the
-                      document whose '+ Reviewed' button was clicked.
-        """
+        """Set callback for per-document + Reviewed button clicks."""
         self._on_add_button_callback = callback
 
     def set_stage_all_callback(self, callback: Callable[[], None]) -> None:
-        """Set the callback for Mark All Reviewed button.
-
-        Args:
-            callback: A no-argument callable to invoke on click.
-        """
+        """Set callback for Mark All Reviewed button."""
         self._on_stage_all_callback = callback
 
     def set_remove_from_reviewed_button_callback(self, callback: Callable[[str], None]) -> None:
@@ -213,28 +116,20 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._on_remove_from_reviewed_button_callback = callback
 
     def set_stage_all_button_visible(self, visible: bool) -> None:
-        """Show or hide the Mark All Reviewed button.
-
-        Args:
-            visible: Whether the button should be visible.
-        """
-        self._stage_all_button.setVisible(visible)
+        """Show or hide Mark All Reviewed button."""
+        self._summary_bar.set_stage_all_button_visible(visible)
 
     def set_stage_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable the Mark All Reviewed button.
-
-        Args:
-            enabled: Whether the button should be enabled.
-        """
-        self._stage_all_button.setEnabled(enabled)
+        """Enable or disable Mark All Reviewed button."""
+        self._summary_bar.set_stage_all_button_enabled(enabled)
 
     def set_remove_all_button_visible(self, visible: bool) -> None:
         """Show or hide Remove All button for Reviewed selection."""
-        self._remove_all_button.setVisible(visible)
+        self._summary_bar.set_remove_all_button_visible(visible)
 
     def set_remove_all_button_enabled(self, enabled: bool) -> None:
         """Enable or disable Remove All button for Reviewed selection."""
-        self._remove_all_button.setEnabled(enabled)
+        self._summary_bar.set_remove_all_button_enabled(enabled)
 
     def set_remove_all_button_callback(self, callback: Callable[[], None]) -> None:
         """Set callback used by summary-bar Remove All button."""
@@ -250,21 +145,17 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
     def set_restore_all_button_visible(self, visible: bool) -> None:
         """Show or hide Restore All button."""
-        self._restore_all_button.setVisible(visible)
+        self._summary_bar.set_restore_all_button_visible(visible)
 
     def set_restore_all_button_enabled(self, enabled: bool) -> None:
         """Enable or disable Restore All button."""
-        self._restore_all_button.setEnabled(enabled)
+        self._summary_bar.set_restore_all_button_enabled(enabled)
 
     def show_doc_diff(self, nodes: list[NodePresentation], git_path: str = "") -> None:
-        """Display the diff tree with color-coded nodes.
-
-        Args:
-            nodes: List of root-level NodePresentation objects with nested children.
-            git_path: The git path to display as top-level item
-        """
+        """Display the diff tree with color-coded nodes."""
         self._tree_widget.clear()
 
+        # Empty node lists mean no displayable document tree for selection.
         if not nodes:
             return
 
@@ -281,16 +172,12 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._tree_widget.show()
 
     def show_doc_diffs(self, diffs: list[DiffTreePresentation]) -> None:
-        """Display multiple diff trees in the tree widget.
-
-        Args:
-            diffs: List of DiffTreePresentation objects, each representing
-                  a diff tree for one document with its metadata.
-        """
+        """Display multiple diff trees in the tree widget."""
         self._tree_widget.clear()
         self._stage_buttons.clear()
         self._remove_from_reviewed_buttons.clear()
 
+        # Empty document lists mean presenter wants a cleared middle column.
         if not diffs:
             return
 
@@ -314,82 +201,26 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
 
         self._tree_widget.show()
 
-    def _create_doc_row_widget(self, diff: DiffTreePresentation, top_level_text: str) -> QtWidgets.QWidget:
+    def _create_doc_row_widget(self, diff: DiffTreePresentation, top_level_text: str) -> DocumentDiffRowWidget:
         """Create top-level row widget for one document diff."""
-        container = QtWidgets.QWidget()
-        container.setObjectName(DIFF_ROW_CONTAINER_OBJECT_NAME)
-        layout = QtWidgets.QHBoxLayout(container)
-        layout.setContentsMargins(4, 2, 4, 2)
+        container = DocumentDiffRowWidget(diff, top_level_text, self._current_selection, self)
+        container.stage_requested.connect(self._on_add_button_clicked)
+        container.remove_from_reviewed_requested.connect(self._on_remove_from_reviewed_button_clicked)
+        container.restore_requested.connect(self._on_restore_button_clicked)
+        container.open_document_requested.connect(self._on_open_document_for_comparison_clicked)
 
-        label = QtWidgets.QLabel(top_level_text)
-        label.setObjectName(DIFF_ROW_LABEL_OBJECT_NAME)
-        layout.addWidget(label)
-        layout.addStretch()
+        if diff.git_path and container.stage_button is not None:
+            self._stage_buttons[diff.git_path] = container.stage_button
 
-        self._add_status_indicators(layout, diff.indicators, diff.git_path)
-        if self._is_staging_selected() or self._is_commit_selected():
-            self._add_restore_button(layout, diff, top_level_text)
-        if self._is_working_tree_selected():
-            self._add_stage_button(layout, diff)
-        if self._is_staging_selected():
-            self._add_remove_from_reviewed_button(layout, diff)
+        if diff.git_path and container.remove_from_reviewed_button is not None:
+            self._remove_from_reviewed_buttons[diff.git_path] = container.remove_from_reviewed_button
+
         return container
-
-    def _is_working_tree_selected(self) -> bool:
-        """Return True when Current Files history row selected."""
-        return self._current_selection is not None and self._current_selection.item_kind == "WORKING_TREE"
-
-    def _is_staging_selected(self) -> bool:
-        """Return True when Reviewed history row selected."""
-        return self._current_selection is not None and self._current_selection.item_kind == "STAGING"
-
-    def _add_stage_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation) -> None:
-        """Add + Reviewed button for one document row."""
-        add_button = make_row_action_button(
-            text=translate("History", "+ Reviewed"),
-            width=STAGE_BUTTON_WIDTH,
-            on_clicked=partial(self._on_add_button_clicked, diff.git_path),
-        )
-        add_button.setEnabled(diff.stage_button_enabled)
-        layout.addWidget(add_button)
-        if diff.git_path:
-            self._stage_buttons[diff.git_path] = add_button
-
-    def _add_remove_from_reviewed_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation) -> None:
-        """Add Remove button for one reviewed document row."""
-        remove_button = make_row_action_button(
-            text=translate("History", "Remove"),
-            tooltip=REMOVE_REVIEWED_TOOLTIP,
-            width=REMOVE_BUTTON_WIDTH,
-            on_clicked=partial(self._on_remove_from_reviewed_button_clicked, diff.git_path),
-        )
-        layout.addWidget(remove_button)
-        if diff.git_path:
-            self._remove_from_reviewed_buttons[diff.git_path] = remove_button
-
-    def _is_commit_selected(self) -> bool:
-        return self._current_selection is not None and self._current_selection.item_kind == "COMMIT"
-
-    def _add_restore_button(self, layout: QtWidgets.QHBoxLayout, diff: DiffTreePresentation, file_name: str) -> None:
-        tooltip = translate(
-            "History",
-            "Restore the selected file.\n"
-            "This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.\n"
-            "THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.\n"
-            "Saved history is not affected.",
-        ).replace("%1", file_name)
-        restore_button = make_row_action_button(
-            text=translate("History", "Restore"),
-            tooltip=tooltip,
-            width=RESTORE_BUTTON_WIDTH,
-            on_clicked=partial(self._on_restore_button_clicked, diff.git_path),
-        )
-        layout.addWidget(restore_button)
 
     def clear_doc_diffs(self) -> None:
         """Clear document diff tree and related controls."""
         self._tree_widget.clear()
-        self._changed_label.setText(translate("History", "No changes"))
+        self._summary_bar.show_summary(0, 0, 0)
         self.set_stage_all_button_visible(False)
         self.set_stage_all_button_enabled(False)
         self.set_remove_all_button_visible(False)
@@ -399,68 +230,22 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self._stage_buttons.clear()
         self._remove_from_reviewed_buttons.clear()
 
-    def _add_status_indicators(
-        self,
-        layout: QtWidgets.QHBoxLayout,
-        indicators: list[DocumentStatusIndicator],
-        git_path: str,
-    ) -> None:
-        """Add status indicators with tooltip to the layout.
-
-        Args:
-            layout: The QHBoxLayout to add widgets to.
-            indicators: List of document status indicators to display.
-        """
-        if not indicators:
-            return
-
-        for indicator in indicators:
-            if isinstance(indicator, WorkingTreeDocumentClosedIndicator):
-                self._add_open_document_indicator_button(layout, indicator, git_path)
-                continue
-            icon_label = QtWidgets.QLabel()
-            icon_label.setPixmap(indicator.icon.pixmap(16, 16))
-            icon_label.setToolTip(translate("History", indicator.tooltip))
-            layout.addWidget(icon_label)
-
-    def _add_open_document_indicator_button(
-        self,
-        layout: QtWidgets.QHBoxLayout,
-        indicator: WorkingTreeDocumentClosedIndicator,
-        git_path: str,
-    ) -> None:
-        """Add clickable status icon that opens missing working-tree document."""
-        button = QtWidgets.QPushButton()
-        button.setIcon(indicator.icon)
-        button.setText(translate("History", "Open"))
-        button.setIconSize(QtCore.QSize(TREE_ITEM_ICON_SIZE, TREE_ITEM_ICON_SIZE))
-        button.setToolTip(translate("History", indicator.tooltip))
-        button.setFixedHeight(TREE_ITEM_HEIGHT)
-        button.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
-        button.setStyleSheet("QPushButton { padding: 0px 4px; margin: 0px; border-radius: 2px; }")
-        button.clicked.connect(lambda checked=False, gp=git_path: self._on_open_document_for_comparison_clicked(gp))
-        layout.addWidget(button)
-
     def _on_open_document_for_comparison_clicked(self, git_path: str) -> None:
         """Invoke callback for open-document indicator click."""
+
+        # Missing callback means presenter did not enable this affordance yet.
         if self._on_open_document_for_comparison_callback is not None:
             self._on_open_document_for_comparison_callback(git_path)
 
     def _on_add_button_clicked(self, git_path: str) -> None:
-        """Handle '+ Reviewed' button click by invoking the callback.
+        """Handle + Reviewed button click by invoking callback."""
 
-        Args:
-            git_path: The git_path of the document whose button was clicked.
-        """
+        # Row widgets always emit git_path; callback presence stays optional during wiring transition.
         if self._on_add_button_callback:
             self._on_add_button_callback(git_path)
 
     def _expand_nodes_with_changes(self, item: QtWidgets.QTreeWidgetItem) -> None:
-        """Recursively expand nodes that have descendants with changes.
-
-        Args:
-            item: The tree item to check and expand if needed
-        """
+        """Recursively expand nodes that have descendants with changes."""
         child_count = item.childCount()
         has_changed_descendants = False
 
@@ -471,6 +256,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
                 has_changed_descendants = True
             self._expand_nodes_with_changes(child)
 
+        # Expand only ancestor branches that lead to changed descendants.
         if has_changed_descendants:
             item.setExpanded(True)
 
@@ -486,14 +272,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         node: NodePresentation,
         git_path: str,
     ) -> tuple[QtWidgets.QTreeWidgetItem, QtWidgets.QWidget | None]:
-        """Recursively create a QTreeWidgetItem from NodePresentation.
-
-        Args:
-            node: The NodePresentation to convert.
-
-        Returns:
-            QTreeWidgetItem with text, color, and children populated.
-        """
+        """Recursively create a QTreeWidgetItem from NodePresentation."""
         name = node.path.split("/")[-1] if node.path else ""
         text = node.label if node.label == name else f"{node.label} ({name})"
 
@@ -518,8 +297,11 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         self, item: QtWidgets.QTreeWidgetItem, node: NodePresentation, text: str, git_path: str
     ) -> QtWidgets.QWidget | None:
         """Create optional custom row widget with right-floating visual diff icon."""
+
+        # Phase 4a keeps visual-diff node rows owned by panel until 4b extraction.
         if not node.visual_diff_enabled:
             return None
+
         container = QtWidgets.QWidget()
         container.setObjectName(DIFF_ROW_CONTAINER_OBJECT_NAME)
         container.setFixedHeight(TREE_ITEM_HEIGHT)
@@ -566,23 +348,8 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         )
 
     def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
-        """Display per-status document counts.
-
-        Args:
-            modified_docs: Number of modified documents.
-            deleted_docs: Number of deleted documents.
-            added_docs: Number of added documents.
-        """
-        if (modified_docs + deleted_docs + added_docs) == 0:
-            self._changed_label.setText(translate("History", "No changes"))
-            return
-
-        modified_text = translate("History", "Modified:")
-        deleted_text = translate("History", "Deleted:")
-        added_text = translate("History", "Added:")
-        self._changed_label.setText(
-            f"{modified_text} {modified_docs}  {deleted_text} {deleted_docs}  {added_text} {added_docs}"
-        )
+        """Display per-status document counts."""
+        self._summary_bar.show_summary(modified_docs, deleted_docs, added_docs)
 
     def _on_stage_all_clicked(self) -> None:
         """Handle Stage All button click by invoking the callback."""
@@ -600,20 +367,17 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
             self._on_remove_from_reviewed_button_callback(git_path)
 
     def _on_restore_button_clicked(self, git_path: str) -> None:
+        """Handle Restore button click by invoking callback."""
         if self._on_restore_button_callback is not None:
             self._on_restore_button_callback(git_path)
 
     def _on_restore_all_clicked(self) -> None:
+        """Handle Restore All button click by invoking callback."""
         if self._on_restore_all_callback is not None:
             self._on_restore_all_callback()
 
     def _on_tree_item_clicked(self, item: QtWidgets.QTreeWidgetItem, column: int) -> None:
-        """Extract git_path from root and node_path from clicked item, then invoke callback.
-
-        Args:
-            item: The clicked tree item
-            column: The column that was clicked
-        """
+        """Extract git_path from root and node_path from clicked item, then invoke callback."""
         if self._on_node_selection_callback is None:
             return
 
@@ -624,21 +388,19 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
             root = root.parent()
         git_path = root.data(0, QtCore.Qt.ItemDataRole.UserRole)
 
+        # Root rows have git_path but no node_path. Ignore them for property selection routing.
         if git_path and node_path:
             self._on_node_selection_callback(git_path, node_path)
 
     def _on_visual_diff_clicked(self, item: QtWidgets.QTreeWidgetItem, git_path: str, node_path: str) -> None:
+        """Select clicked node row, emit normal selection, then emit visual diff request."""
         self._tree_widget.setCurrentItem(item)
         self._on_tree_item_clicked(item, 0)
         if self._on_visual_diff_callback is not None:
             self._on_visual_diff_callback(git_path, node_path)
 
     def collapse_tree_item(self, git_path: str) -> None:
-        """Collapse the root tree item for the given git_path.
-
-        Args:
-            git_path: The git_path of the root tree item to collapse.
-        """
+        """Collapse the root tree item for the given git_path."""
         for i in range(self._tree_widget.topLevelItemCount()):
             item = self._tree_widget.topLevelItem(i)
             item_git_path = item.data(0, QtCore.Qt.ItemDataRole.UserRole)
@@ -647,11 +409,6 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
                 break
 
     def set_stage_button_enabled(self, git_path: str, enabled: bool) -> None:
-        """Enable or disable the '+ Reviewed' button for a given git_path.
-
-        Args:
-            git_path: The git_path of the document whose button to update.
-            enabled: Whether the reviewed button should be enabled.
-        """
+        """Enable or disable the + Reviewed button for a given git_path."""
         if git_path in self._stage_buttons:
             self._stage_buttons[git_path].setEnabled(enabled)

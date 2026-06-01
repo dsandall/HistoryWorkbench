@@ -10,7 +10,7 @@ from ...presenters.presentation_models import (
     NodePresentation,
     PropertyPresentation,
 )
-from ..document_diff_tree_widget import DocumentDiffTreeWidget
+from ..document_diff.panel import DocumentDiffTreeWidget
 from ..history.models import HistorySelection
 from ..history.panel import HistoryPanelWidget
 from ..property_diff_tree_widget import PropertyDiffTreeWidget

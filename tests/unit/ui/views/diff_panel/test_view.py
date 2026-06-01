@@ -6,7 +6,7 @@ from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtWidgets
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation
 from freecad.history_wb.ui.views.diff_panel.view import DiffPanelView
-from freecad.history_wb.ui.views.document_diff_tree_widget import DocumentDiffTreeWidget
+from freecad.history_wb.ui.views.document_diff.panel import DocumentDiffTreeWidget
 from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
 
 
@@ -39,8 +39,10 @@ def _sample_diff_tree() -> DiffTreePresentation:
 
 def _document_row_button_texts(widget: DocumentDiffTreeWidget) -> list[str]:
     """Return visible action-button texts from first document row."""
-    root_item = widget.tree_widget.topLevelItem(0)
+    tree_widget = widget.findChild(QtWidgets.QTreeWidget, "documentDiffTree")
+    assert tree_widget is not None
+    root_item = tree_widget.topLevelItem(0)
     assert root_item is not None
-    row_widget = widget.tree_widget.itemWidget(root_item, 0)
+    row_widget = tree_widget.itemWidget(root_item, 0)
     assert row_widget is not None
     return [button.text() for button in row_widget.findChildren(QtWidgets.QToolButton) if button.text()]
