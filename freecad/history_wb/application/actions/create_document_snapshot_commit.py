@@ -2,6 +2,8 @@
 # File responsibility: Application action for creating snapshot from git commit or index.
 """Application action for creating snapshot from a git commit or index."""
 
+from yaml import YAMLError
+
 from ...domain.git.git_service import GitService
 from ...domain.git.models import GitRepository
 from ...domain.git.paths import to_git_path
@@ -75,6 +77,6 @@ class CreateDocumentSnapshotForCommitAction:
             snapshot = self._snapshot_deserializer.from_yaml(yaml_contents)
             snapshot = snapshot.with_identity(fcstd_git_path)
             return Result.success(SnapshotLoadResult(snapshot=snapshot, status=SnapshotLoadStatus.FOUND))
-        except (ValueError, TypeError, KeyError) as e:
+        except (YAMLError, ValueError, TypeError, KeyError) as e:
             Log.exception(f"Failed to deserialize snapshot for {yaml_git_path}: {e}")
             return Result.success(SnapshotLoadResult(snapshot=None, status=SnapshotLoadStatus.INVALID_SNAPSHOT))
