@@ -69,7 +69,7 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
                 "History",
                 "Choose which files to restore from the selected iteration.\n"
                 "Current files on disk can be overwritten or removed.\n"
-                "Saved history is not affected.",
+                "Saved history will not be affected.",
             ),
             height=TREE_ITEM_HEIGHT,
         )

@@ -16,7 +16,6 @@ from typing import Protocol
 from ...domain.git.models import GitCommit, GitRepository
 from ..presenters.presentation_models import (
     DiffTreePresentation,
-    NodePresentation,
     PropertyPresentation,
 )
 from ..views.diff_panel.dialogs import GitConfigDialogResult
@@ -34,14 +33,6 @@ class DiffView(Protocol):
     The view is responsible for translating messages and substituting
     parameters. Presenters pass raw data only.
     """
-
-    def show_doc_diff(self, nodes: list[NodePresentation], git_path: str = "") -> None:
-        """Display the diff tree.
-
-        Args:
-            nodes: List of node presentation models to display.
-            git_path: The git path to display as top-level item (falls back to document name).
-        """
 
     def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
         """Display per-status document counts.

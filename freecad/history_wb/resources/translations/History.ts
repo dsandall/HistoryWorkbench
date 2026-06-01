@@ -328,6 +328,13 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="68"/>
+        <source>Choose which files to restore from the selected iteration.
+Current files on disk can be overwritten or removed.
+Saved history will not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../ui/views/document_diff/summary_bar.py" line="83"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
@@ -340,26 +347,19 @@ They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="68"/>
-        <source>Choose which files to restore from the selected iteration.
-Current files on disk can be overwritten or removed.
-Saved history is not affected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff/panel.py" line="59"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="91"/>
         <source>Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/panel.py" line="64"/>
-        <location filename="../../ui/views/document_diff/panel.py" line="65"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="96"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="97"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/panel.py" line="162"/>
-        <location filename="../../ui/views/document_diff/panel.py" line="185"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="53"/>
+        <location filename="../../ui/views/document_diff/tree_items.py" line="24"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -378,7 +378,7 @@ Saved history is not affected.</source>
         <source>Restore the selected file.
 This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.
 THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.
-Saved history is not affected.</source>
+Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -392,7 +392,7 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/panel.py" line="321"/>
+        <location filename="../../ui/views/document_diff/node_row.py" line="57"/>
         <source>Open 3D comparison</source>
         <translation type="unfinished"></translation>
     </message>

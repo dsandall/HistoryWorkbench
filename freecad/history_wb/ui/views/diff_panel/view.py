@@ -7,7 +7,6 @@ from ....domain.settings import SettingsRepository
 from ....qt import QtCore, QtWidgets
 from ...presenters.presentation_models import (
     DiffTreePresentation,
-    NodePresentation,
     PropertyPresentation,
 )
 from ..document_diff.panel import DocumentDiffTreeWidget
@@ -41,7 +40,7 @@ class DiffPanelView(QtWidgets.QWidget):
         metaclass conflicts between QWidget and Protocol classes.
 
         Implemented protocols:
-        - DiffView (freecad.history_wb.ui.protocols.diff_view): show_doc_diff,
+        - DiffView (freecad.history_wb.ui.protocols.diff_view): show_doc_diffs,
           show_summary, show_property_diff, show_repository
 
     """
@@ -277,18 +276,6 @@ class DiffPanelView(QtWidgets.QWidget):
         window.setFocus()
 
     # DiffView protocol methods
-    def show_doc_diff(self, nodes: list[NodePresentation], git_path: str = "") -> None:
-        """Display the diff tree with color-coded nodes.
-
-        Delegates to DocumentDiffTreeWidget.
-
-        Args:
-            nodes: List of root-level NodePresentation objects with nested children.
-            git_path: The git path to display as top-level item
-        """
-        self._document_diff_tree.set_current_history_selection(self._current_selection)
-        self._document_diff_tree.show_doc_diff(nodes, git_path)
-
     def show_doc_diffs(self, diffs: list[DiffTreePresentation]) -> None:
         """Display multiple diff trees in the tree widget.
 

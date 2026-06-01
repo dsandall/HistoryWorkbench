@@ -6,7 +6,6 @@ from typing import Any
 from freecad.history_wb.domain.git.models import GitCommit, GitRepository
 from freecad.history_wb.ui.presenters.presentation_models import (
     DiffTreePresentation,
-    NodePresentation,
     PropertyPresentation,
 )
 from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
@@ -42,10 +41,6 @@ class FakeDiffView:
     def show_loading(self) -> None:
         """Capture loading call instead of showing UI."""
         self._record_call("show_loading")
-
-    def show_doc_diff(self, nodes: list[NodePresentation], git_path: str = "") -> None:
-        """Capture diff tree call instead of showing UI."""
-        self._record_call("show_doc_diff", nodes=nodes, git_path=git_path)
 
     def show_doc_diffs(self, diff_trees: list[DiffTreePresentation]) -> None:
         """Capture multiple diff trees call instead of showing UI.

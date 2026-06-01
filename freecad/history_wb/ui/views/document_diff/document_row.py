@@ -122,7 +122,7 @@ class DocumentDiffRowWidget(QtWidgets.QWidget):
             "Restore the selected file.\n"
             "This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.\n"
             "THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.\n"
-            "Saved history is not affected.",
+            "Saved history will not be affected.",
         ).replace("%1", self._top_level_text)
         restore_button = make_row_action_button(
             text=translate("History", "Restore"),
