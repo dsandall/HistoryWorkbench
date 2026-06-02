@@ -45,7 +45,7 @@ freecad/history_wb/
 ├── entrypoints/       # FreeCAD workbench and command integration
 ├── infrastructure/    # FreeCAD, git, and persistence adapters
 ├── resources/         # Icons, translations, UI resources
-└── ui/                # Qt views, presenters, UI state, and protocols
+└── ui/                # Qt views, presenters, UI state, and signal wiring
 
 tests/
 ├── unit/              # Fast tests using fakes and pure Python behavior
@@ -113,10 +113,11 @@ Guidelines:
 
 - Application actions receive services and ports in constructors.
 - Domain services receive protocols or value objects, not concrete infrastructure classes.
-- UI presenters receive actions, view protocols, and UI state.
+- UI presenters receive the specific view objects, action objects, and UI state they need.
 - Infrastructure adapters wrap external APIs.
 - `ApplicationContainer` wires application actions and domain services.
-- `compose_and_register_ui()` wires views, presenters, and `UIState`.
+- `compose_and_register_ui()` wires views, presenters, `DialogView`, and `UIState`.
+- `ui/wiring.py` binds public component signals to presenter listener methods.
 
 ## Classes And Functions
 
@@ -229,7 +230,7 @@ Each behavior should have one owning layer. Duplicate tests across layers create
 - **Domain tests** own pure business behavior and algorithms: models, services, diff logic, snapshot extraction rules, git workflow rules.
 - **Application tests** own orchestration, result contracts, and dependency forwarding only when forwarding is part of the action contract.
 - **Infrastructure tests** own adapter parsing, command construction, subprocess invocation shape, and external error mapping.
-- **UI tests** own observable presenter/view behavior, state updates, and callback wiring. Do not test private Qt styling details unless styling is an explicit product contract.
+- **UI tests** own observable presenter/view behavior, state updates, and signal wiring. Do not test private Qt styling details unless styling is an explicit product contract.
 - **Integration tests** own behavior that requires real FreeCAD, Qt runtime, real document structure, workbench activation, or real runtime wiring.
 
 Integration tests run with FreeCAD's Python interpreter and real App runtime. In CLI/headless runs where `FreeCADGui` is unavailable, integration fixtures provide a `GuiLike` mock adapter that implements the required port surface (`getDocument()`, `isModified()`, `getViewProvider()`) against real App documents. This keeps integration coverage stable without requiring a full interactive GUI session.

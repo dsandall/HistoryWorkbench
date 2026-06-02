@@ -77,17 +77,24 @@ Entry points integrate with FreeCAD's workbench and command APIs. They are drivi
 
 Location: `freecad/history_wb/ui/`
 
-The UI layer owns presenter state, Qt views, dialog flow, display feedback, and view protocols.
+The UI layer owns presenter state, Qt views, dialog flow, display feedback, signal wiring, and UI-only session state.
 
-- `composer.py` is the UI composition root. It creates views, presenters, and `UIState`.
-- `state.py` stores UI-only state such as the detected `GitRepository`.
+- `composer.py` is UI composition root. Creates views, presenters, `DialogView`, and `UIState`.
+- `wiring.py` binds public widget/component signals to presenter listener methods.
+- `state.py` stores UI-only state such as detected `GitRepository`.
 - `registry.py` stores globally reachable UI objects needed by FreeCAD commands.
-- `presenters/` transforms application results into view updates and presentation feedback.
-- `protocols/` defines presenter-facing view contracts.
-- `views/` contains Qt widgets and preferences UI.
+- `presenters/` coordinates application actions, owns UI session flow, and maps domain/application results into presentation models.
+- `views/` contains Qt widgets, child view components, dialog helpers, theme helpers, and preferences UI.
 - User-facing UI text is translated at display sites with literal `translate("History", "...")` calls, or defined with `QT_TRANSLATE_NOOP` when deferred.
 
-Presenters depend on view protocols and application actions. Views render Qt widgets and perform translation. Presenters should pass raw data, not translated UI strings. Dialogs and message boxes are presentation concerns even when they are launched from FreeCAD command entry points.
+Presenter responsibilities are split by kind:
+
+- `DiffPresenter` is top-level diff coordinator. Owns current history selection, triggers load/stage/restore/open flows, and updates document/property views.
+- `GitRepositoryPresenter` owns repository detection, commit loading, save-iteration flow, and git-identity dialog flow.
+- `presenters/document_diff/` contains focused helpers for diff loading, staging, restore, visual diff, cached results, document/node mapping, status indicators, and summary-button state.
+- `presenters/property_diff/` contains property presentation mapping and nested property-path tree helpers.
+
+Presenters receive only the specific view objects and action objects they need from the UI composer, not sibling child widgets or Qt gesture details. Views render Qt widgets and perform translation. Presenters pass raw data and intent, not translated UI strings. Dialogs and message boxes stay in view layer even when launched from FreeCAD command entry points.
 
 ### Application Layer
 
@@ -169,8 +176,8 @@ freecad/history_wb/
     ├── composer.py
     ├── registry.py
     ├── state.py
+    ├── wiring.py
     ├── presenters/
-    ├── protocols/
     └── views/
 ```
 
@@ -245,17 +252,19 @@ It then registers UI objects in `ui_registry` for command access. UI composition
 
 ## UI Composition Rules
 
-Composite Qt views may be split into focused child widgets, but presenter-facing APIs should remain stable through view protocols.
+Composite Qt views may be split into focused child widgets, but event flow stays explicit and top-down.
 
-- Presenters call view protocols, not concrete child widgets.
-- The UI composer wires presenters to top-level views only.
+- Composer wires presenters to public top-level view/component signals.
+- `wiring.py` is single place for presenter event binding tables.
 - Top-level views act as facades for composed child widgets.
 - Child widgets do not import, instantiate, or call sibling child widgets.
-- Child widgets expose callbacks/events upward and narrow setter methods downward.
-- Cross-widget side effects are coordinated by the top-level facade.
-- Cross-widget coordination is tested at the facade level.
+- Child widgets emit signals upward. Facades coordinate cross-widget state such as history-selection propagation into document diff state.
+- Presenters listen with intent/use-case method names such as `save_iteration`, `select_history_item`, `stage_document`, `restore_all_from_history`, and `open_visual_diff`.
+- Widget/component signals use event or state names such as `refresh_requested`, `history_selection_changed`, `node_selection_requested`, and `visual_diff_requested`.
+- Avoid widget-gesture names such as `on_*_clicked` in public presenter-facing API.
+- Cross-widget coordination is tested at facade level; child rendering and mapping behavior is tested at owning component/helper level.
 
-Example: `DiffPanelView` composes `HistoryPanelWidget`, `DocumentDiffTreeWidget`, and `PropertyDiffTreeWidget`. Selecting history in `HistoryPanelWidget` should not directly mutate `DocumentDiffTreeWidget`; `DiffPanelView` or a presenter coordinates the behavior.
+Example: `DiffPanelView` composes `HistoryPanelWidget`, `DocumentDiffTreeWidget`, and `PropertyDiffTreeWidget`. Selecting history in `HistoryPanelWidget` does not directly mutate `PropertyDiffTreeWidget`; facade state and presenter listeners coordinate the resulting document/property updates.
 
 ## Snapshot And Diff Pipeline
 
