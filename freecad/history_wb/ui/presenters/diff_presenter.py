@@ -1,8 +1,7 @@
 # File responsibility: Diff result presenter for UI.
 #
-# Transforms domain-level diff results into UI-friendly presentation models.
-# Builds nested sub-path trees from PropertyPathDiff and maps them to
-# PropertyPresentation objects for view rendering.
+# Coordinates diff loading, action handling, and view updates.
+# Delegates pure presentation mapping to focused presenter helper modules.
 """Diff result presenter for UI.
 
 This module provides the DiffPresenter class that transforms domain-level
@@ -10,9 +9,7 @@ diff results into UI-friendly presentation models.
 """
 
 from collections.abc import Callable
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
 
 from ...application.actions.create_document_diffs import CreateDocumentDiffsAction
 from ...application.actions.get_committed_file_paths import GetCommittedFilePathsAction
@@ -32,350 +29,28 @@ from ...application.actions.restore_documents import (
 )
 from ...application.actions.result_models import (
     CreateDocumentDiffsRequest,
-    DiffIssues,
     DocumentDiffMode,
     DocumentDiffResult,
-    GeneralDiffIssue,
-    SnapshotIssue,
 )
 from ...application.actions.stage_documents import StageDocumentsAction
 from ...application.actions.unstage_documents import UnstageDocumentsAction
 from ...domain.diff.engine import DiffResult
-from ...domain.diff.models import DiffState, NodeDiff, PropertyDiff, PropertyPathDiff
+from ...domain.diff.models import DiffState
 from ...domain.freecad_ports import DocumentLike
 from ...domain.git.models import GitRepository
 from ...domain.settings import SettingsRepository
 from ...domain.snapshots.models import Snapshot
-from ...domain.tree import Property
-from ...domain.tree.data_path import PropertyPathType
-from ...utils import Log, format_float, translate
+from ...utils import Log, translate
 from ..protocols.diff_view import DiffView
 from ..state import UIState
 from ..views.history.models import HistorySelection
-from .presentation_models import (
-    DiffComputationFailedIndicator,
-    DiffTreePresentation,
-    DocumentStatusIndicator,
-    FileChangedOnlyIndicator,
-    NewInvalidSnapshotIndicator,
-    NewSnapshotMissingIndicator,
-    NodePresentation,
-    OldInvalidSnapshotIndicator,
-    OldSnapshotMissingIndicator,
-    PropertyPresentation,
-    WorkingTreeDocumentClosedIndicator,
+from .document_diff.document_mapper import build_document_presentations, compute_stage_button_state
+from .document_diff.summary_state import (
+    SummaryButtonState,
+    build_summary_button_state,
+    count_summary_counts,
 )
-
-
-if TYPE_CHECKING:
-    pass
-
-
-@dataclass
-class _PathTreeNode:
-    """Internal tree node for building hierarchical path diffs.
-
-    Attributes:
-        name: The path segment name (e.g. "Base", "[0]", "Value", "Expression").
-        state: Aggregated diff state for this node and its descendants.
-        old_value: Old value at this path, or None if not present.
-        new_value: New value at this path, or None if not present.
-        children: Child nodes keyed by segment name.
-    """
-
-    name: str
-    state: DiffState = DiffState.UNCHANGED
-    old_value: Any = None
-    new_value: Any = None
-    children: dict[str, "_PathTreeNode"] = field(default_factory=dict)
-
-
-def _split_rel_path(path: str) -> list[str]:
-    """Convert flattened path strings into hierarchical segments.
-
-    Rules:
-    - "." means property-root (no extra segments).
-    - Dot separators split named segments ("Base.x" -> ["Base", "x"]).
-    - Bracket indices are standalone segments and preserve numeric identity
-      ("Constraints[10].Value" -> ["Constraints", "[10]", "Value"]).
-
-    Why this parser exists:
-    - A naive split('.') loses index structure.
-    - Treating "Constraints[0]" as one segment prevents desired nesting.
-
-    Args:
-        path: A flattened path string from ``PropertyPathDiff.path``.
-
-    Returns:
-        A list of hierarchical segment names.
-    """
-    if path == ".":
-        return []
-    if not path:
-        return []
-    tokens: list[str] = []
-    segment_buf: list[str] = []
-    i = 0
-    while i < len(path):
-        ch = path[i]
-        if ch == ".":
-            if segment_buf:
-                tokens.append("".join(segment_buf))
-                segment_buf = []
-            i += 1
-            continue
-        if ch == "[":
-            if segment_buf:
-                tokens.append("".join(segment_buf))
-                segment_buf = []
-            j = path.find("]", i)
-            if j == -1:
-                # Malformed bracket - treat as regular text
-                segment_buf.append(ch)
-                i += 1
-                continue
-            tokens.append(path[i : j + 1])
-            i = j + 1
-            continue
-        segment_buf.append(ch)
-        i += 1
-    if segment_buf:
-        tokens.append("".join(segment_buf))
-    return tokens
-
-
-def _format_pv(pv: Any, precision: int) -> Any:
-    """Format a PropertyPathValue for UI display.
-
-    FLOAT and QUANTITY types use precision-based float formatting.
-    QUANTITY returns bracketed string like "[10.00 mm]".
-    Non-PropertyPathValue inputs (strings from container summaries or
-    expression rows) are returned unchanged.
-
-    Args:
-        pv: A PropertyPathValue instance, a pre-formatted string, or None.
-        precision: Number of decimal places for float formatting.
-
-    Returns:
-        Formatted display value, or the input unchanged if not a PropertyPathValue.
-    """
-    if pv is None:
-        return None
-    if getattr(pv, "type_", None) == PropertyPathType.FLOAT:
-        return format_float(float(pv.value), precision)
-    if getattr(pv, "type_", None) == PropertyPathType.QUANTITY:
-        num = format_float(float(pv.value), precision)
-        unit = pv.unit if pv.unit else ""
-        return num + " " + unit
-    if hasattr(pv, "value"):
-        return pv.value
-    return pv
-
-
-def _insert_path_diff(root: _PathTreeNode, pd: PropertyPathDiff) -> None:
-    """Insert a single path diff into the tree at the correct position.
-
-    Walks the path segments to find/create the leaf node, then sets
-    its value and expression state. If an expression exists on either
-    side, a nested "Expression" child is created.
-
-    Args:
-        root: The root node of the tree.
-        pd: A ``PropertyPathDiff`` to insert.
-    """
-    segments = _split_rel_path(pd.path)
-    node = root
-    for seg in segments:
-        node = node.children.setdefault(seg, _PathTreeNode(name=seg))
-
-    # Leaf value row (store PropertyPathValue for type-aware formatting later)
-    node.old_value = pd.old_value
-    node.new_value = pd.new_value
-    node.state = pd.value_state
-
-    # Nested expression row under leaf, if expression exists on either side
-    if pd.old_value is not None or pd.new_value is not None:
-        old_expr = pd.old_value.expression if pd.old_value is not None else None
-        new_expr = pd.new_value.expression if pd.new_value is not None else None
-        if old_expr is not None or new_expr is not None:
-            expr_node = _PathTreeNode(
-                name="Expression",
-                state=pd.expression_state,
-                old_value=old_expr,
-                new_value=new_expr,
-            )
-            node.children["__expr__"] = expr_node
-
-
-def _set_subtree_state(node: _PathTreeNode, state: DiffState) -> None:
-    """Set one state on a whole path tree."""
-    node.state = state
-    for child in node.children.values():
-        _set_subtree_state(child, state)
-
-
-def _collect_leaf_values(node: _PathTreeNode, include_expr: bool = False) -> tuple[list[Any], list[Any]]:
-    """Recursively collect leaf values from all descendants.
-
-    Excludes expression rows (names starting with '__') by default.
-    Only leaf nodes (nodes with direct old_value or new_value) contribute.
-
-    Args:
-        node: The node to collect values from.
-        include_expr: Whether to include expression row values.
-
-    Returns:
-        Tuple of (old_values, new_values) from leaf nodes.
-    """
-    old_values: list[Any] = []
-    new_values: list[Any] = []
-    for name, child in node.children.items():
-        if not include_expr and name.startswith("__"):
-            continue
-        # If this node has a direct value, it's a leaf - collect it
-        if child.old_value is not None:
-            old_values.append(child.old_value)
-        if child.new_value is not None:
-            new_values.append(child.new_value)
-        # Recurse into children regardless (intermediate nodes may have no value)
-        child_old, child_new = _collect_leaf_values(child, include_expr)
-        old_values.extend(child_old)
-        new_values.extend(child_new)
-    return old_values, new_values
-
-
-def _derive_container_summary(values: list[Any], precision: int) -> str | None:
-    """Create a bracketed summary string from child values.
-
-    Used for container rows (e.g. Placement) where no direct value
-    exists but children do. Produces output like "[0.00 0.00 0.00]".
-
-    Accepts PropertyPathValue instances and formats them with the given
-    precision. QUANTITY types are formatted as "10.00 mm" within the
-    summary brackets.
-
-    Args:
-        values: List of PropertyPathValue or raw values from child nodes.
-        precision: Number of decimal places for float formatting.
-
-    Returns:
-        A bracketed string like "[0.00 0.00 0.00]", or None if no values.
-    """
-    non_null_values = [v for v in values if v is not None]
-    non_null = [_format_pv(v, precision) for v in non_null_values]
-    non_null = [str(v) for v in non_null if v is not None]
-    if not non_null:
-        return None
-    return "[" + " ".join(non_null) + "]"
-
-
-def _child_sort_key(name: str) -> tuple:
-    """Return a sort key for deterministic child ordering.
-
-    Names sort before indices, indices sort numerically.
-    This keeps [2] before [10] and prevents lexicographic jitter.
-
-    Args:
-        name: A child node name (e.g. "Base", "[0]", "Value", "Unit").
-
-    Returns:
-        A tuple suitable for sorting.
-    """
-    if name.startswith("[") and name.endswith("]"):
-        try:
-            return (1, int(name[1:-1]))
-        except ValueError:
-            return (0, name)
-    return (0, name)
-
-
-def _path_tree_to_presentations(node: _PathTreeNode, precision: int) -> list[PropertyPresentation]:
-    """Convert internal tree nodes to UI presentation rows.
-
-    Value policy:
-    - If a node has direct old/new values, show them.
-    - If it has no direct value but has children, derive FreeCAD-style
-      bracket summary from child values for collapsed display.
-
-    Child rows still carry full per-path detail when expanded.
-
-    Args:
-        node: The root node to convert (typically the root of a path tree).
-        precision: Number of decimal places for float formatting.
-
-    Returns:
-        A list of ``PropertyPresentation`` objects.
-    """
-    out: list[PropertyPresentation] = []
-    for key in sorted(node.children.keys(), key=_child_sort_key):
-        child = node.children[key]
-        grandchildren = _path_tree_to_presentations(child, precision)
-
-        old_value = child.old_value
-        new_value = child.new_value
-        if old_value is None and new_value is None and grandchildren:
-            # FreeCAD-like container summary when there is no direct value row.
-            old_value = _derive_container_summary([gc.old_value for gc in grandchildren], precision)
-            new_value = _derive_container_summary([gc.new_value for gc in grandchildren], precision)
-
-        # Format PropertyPathValue to display values
-        old_value = _format_pv(old_value, precision)
-        new_value = _format_pv(new_value, precision)
-
-        out.append(
-            PropertyPresentation(
-                name=child.name,
-                state=child.state,
-                old_value=old_value,
-                new_value=new_value,
-                children=grandchildren,
-            )
-        )
-    return out
-
-
-def _build_property_presentation(
-    prop_diff: PropertyDiff,
-    precision: int,
-    group: str | None,
-) -> PropertyPresentation:
-    """Build UI presentation for one property diff."""
-    root_path = next((pd for pd in prop_diff.path_diffs if pd.path == "."), None)
-    root_state = _property_root_state(prop_diff, root_path)
-    root = _PathTreeNode(name=prop_diff.property_name, state=root_state)
-    for pd in prop_diff.path_diffs:
-        _insert_path_diff(root, pd)
-
-    if prop_diff.state in (DiffState.ADDED, DiffState.DELETED):
-        _set_subtree_state(root, prop_diff.state)
-
-    prop_old_value, prop_new_value = _property_root_values(root, precision)
-    return PropertyPresentation(
-        name=prop_diff.property_name,
-        state=root.state,
-        old_value=prop_old_value,
-        new_value=prop_new_value,
-        children=_path_tree_to_presentations(root, precision),
-        group=group,
-    )
-
-
-def _property_root_state(prop_diff: PropertyDiff, root_path: PropertyPathDiff | None) -> DiffState:
-    """Return state for property root without inheriting child path changes."""
-    if prop_diff.state in (DiffState.ADDED, DiffState.DELETED):
-        return prop_diff.state
-    return root_path.value_state if root_path else DiffState.UNCHANGED
-
-
-def _property_root_values(root: _PathTreeNode, precision: int) -> tuple[Any, Any]:
-    """Return formatted old and new values for a property root row."""
-    old_value = root.old_value
-    new_value = root.new_value
-    if old_value is None and new_value is None and root.children:
-        old_leaf_values, new_leaf_values = _collect_leaf_values(root, include_expr=False)
-        old_value = _derive_container_summary(old_leaf_values, precision)
-        new_value = _derive_container_summary(new_leaf_values, precision)
-    return _format_pv(old_value, precision), _format_pv(new_value, precision)
+from .property_diff.property_mapper import transform_property_diffs
 
 
 class DiffPresenter:
@@ -709,7 +384,7 @@ class DiffPresenter:
         deleted_paths: list[str] = []
 
         for document_result in self._document_results_by_path.values():
-            if not self._compute_stage_button_state(document_result, True):
+            if not compute_stage_button_state(document_result, True):
                 # Not stage-able -- skip.
                 continue
 
@@ -886,182 +561,25 @@ class DiffPresenter:
             self._current_history_selection is not None and self._current_history_selection.item_kind == "WORKING_TREE"
         )
 
-        presentations = self._build_presentations(
-            document_results,
-            is_working_tree,
-        )
+        presentations = build_document_presentations(document_results, is_working_tree)
 
         presentations.sort(key=lambda p: p.git_path)
 
         self._view.show_doc_diffs(presentations)
-        self._configure_summary_buttons(presentations)
-        self._show_summary(document_results)
+        state: SummaryButtonState = build_summary_button_state(self._current_history_selection, presentations)
+        self._view.set_stage_all_button_visible(state.stage_all_visible)
+        self._view.set_stage_all_button_enabled(state.stage_all_enabled)
+        self._view.set_remove_all_button_visible(state.remove_all_visible)
+        self._view.set_remove_all_button_enabled(state.remove_all_enabled)
+        self._view.set_restore_all_button_visible(state.restore_all_visible)
+        self._view.set_restore_all_button_enabled(state.restore_all_enabled)
 
-    def _build_presentations(
-        self,
-        document_results: list[DocumentDiffResult],
-        is_working_tree: bool,
-    ) -> list[DiffTreePresentation]:
-        """Build document presentations from diff results."""
-        presentations: list[DiffTreePresentation] = []
-        for document_result in document_results:
-            if not self._should_display_document_result(document_result):
-                continue
-            git_path = document_result.git_path
-            indicators = self._get_document_indicators(document_result.issues)
-            nodes: list[NodePresentation] = []
-            if document_result.snapshot_diff is not None:
-                nodes = [self._format_node(node) for node in document_result.snapshot_diff.hierarchy.roots]
-            stage_button_enabled = self._compute_stage_button_state(document_result, is_working_tree)
-
-            presentations.append(
-                DiffTreePresentation(
-                    nodes=nodes,
-                    git_path=git_path,
-                    indicators=indicators,
-                    document_state=document_result.document_state,
-                    stage_button_enabled=stage_button_enabled,
-                )
-            )
-        return presentations
-
-    def _should_display_document_result(self, document_result: DocumentDiffResult) -> bool:
-        """Return whether one document result should be shown in the document tree."""
-        if document_result.document_state != DiffState.UNCHANGED:
-            return True
-        if document_result.snapshot_diff is not None and document_result.snapshot_diff.has_changes:
-            return True
-        return document_result.issues.has_any()
-
-    def _compute_stage_button_state(
-        self,
-        document_result: DocumentDiffResult | None,
-        is_working_tree: bool,
-    ) -> bool:
-        """Compute whether stage button should be enabled.
-
-        Stage writes new-side snapshot. Enabled when:
-        - Document is DELETED (staging the deletion is always allowed)
-        - Document has changes or old snapshot issue, with a valid new snapshot
-        - Closed modified/added docs with missing new snapshot are blocked
-        """
-        if not is_working_tree or document_result is None:
-            return False
-
-        # Deleted documents can always be staged (deletion is safe).
-        if document_result.document_state == DiffState.DELETED:
-            return True
-
-        has_changes = document_result.document_state != DiffState.UNCHANGED
-        needs_snapshot = document_result.issues.old_snapshot is not None
-
-        # Block staging when new snapshot is missing (closed dirty file).
-        return (has_changes or needs_snapshot) and document_result.issues.new_snapshot is None
-
-    def _configure_summary_buttons(self, presentations: list[DiffTreePresentation]) -> None:
-        """Configure summary-bar bulk action buttons by current history selection."""
-        current = self._current_history_selection
-        is_working_tree = current is not None and current.item_kind == "WORKING_TREE"
-        is_staging = current is not None and current.item_kind == "STAGING"
-        is_commit = current is not None and current.item_kind == "COMMIT"
-
-        if is_working_tree:
-            any_stagable = any(p.stage_button_enabled for p in presentations)
-            self._view.set_stage_all_button_visible(True)
-            self._view.set_stage_all_button_enabled(any_stagable)
-            self._view.set_remove_all_button_visible(False)
-            self._view.set_remove_all_button_enabled(False)
-            self._view.set_restore_all_button_visible(False)
-            self._view.set_restore_all_button_enabled(False)
-            return
-
-        if is_staging:
-            self._view.set_stage_all_button_visible(False)
-            self._view.set_stage_all_button_enabled(False)
-            self._view.set_remove_all_button_visible(True)
-            self._view.set_remove_all_button_enabled(bool(presentations))
-            self._view.set_restore_all_button_visible(bool(presentations))
-            self._view.set_restore_all_button_enabled(bool(presentations))
-            return
-
-        if is_commit:
-            self._view.set_stage_all_button_visible(False)
-            self._view.set_stage_all_button_enabled(False)
-            self._view.set_remove_all_button_visible(False)
-            self._view.set_remove_all_button_enabled(False)
-            self._view.set_restore_all_button_visible(bool(presentations))
-            self._view.set_restore_all_button_enabled(bool(presentations))
-            return
-
-        self._view.set_stage_all_button_visible(False)
-        self._view.set_stage_all_button_enabled(False)
-        self._view.set_remove_all_button_visible(False)
-        self._view.set_remove_all_button_enabled(False)
-        self._view.set_restore_all_button_visible(False)
-        self._view.set_restore_all_button_enabled(False)
-
-    def _show_summary(self, document_results: list[DocumentDiffResult]) -> None:
-        """Show per-status summary counts derived from document status."""
-        modified_docs = 0
-        deleted_docs = 0
-        added_docs = 0
-        for document_result in document_results:
-            if document_result.document_state == DiffState.MODIFIED:
-                modified_docs += 1
-            elif document_result.document_state == DiffState.DELETED:
-                deleted_docs += 1
-            elif document_result.document_state == DiffState.ADDED:
-                added_docs += 1
-        self._view.show_summary(modified_docs=modified_docs, deleted_docs=deleted_docs, added_docs=added_docs)
-
-    def _get_document_indicators(self, issues: DiffIssues) -> list[DocumentStatusIndicator]:
-        """Build UI indicators for categorized document issues."""
-        indicators: list[DocumentStatusIndicator] = []
-        if issues.old_snapshot == SnapshotIssue.MISSING:
-            indicators.append(OldSnapshotMissingIndicator())
-        elif issues.old_snapshot == SnapshotIssue.INVALID:
-            indicators.append(OldInvalidSnapshotIndicator())
-
-        if issues.new_snapshot == SnapshotIssue.MISSING:
-            if (
-                self._current_history_selection is not None
-                and self._current_history_selection.item_kind == "WORKING_TREE"
-            ):
-                indicators.append(WorkingTreeDocumentClosedIndicator())
-            else:
-                indicators.append(NewSnapshotMissingIndicator())
-        elif issues.new_snapshot == SnapshotIssue.INVALID:
-            indicators.append(NewInvalidSnapshotIndicator())
-
-        for issue in issues.general:
-            if issue == GeneralDiffIssue.DIFF_COMPUTATION_FAILED:
-                indicators.append(DiffComputationFailedIndicator())
-            elif issue == GeneralDiffIssue.GIT_CHANGED_NO_PARAMETRIC_DIFF:
-                indicators.append(FileChangedOnlyIndicator())
-        return indicators
-
-    def _format_node(self, node_diff: NodeDiff) -> NodePresentation:
-        """Transform domain NodeDiff to presentation model.
-
-        Args:
-            node_diff: Domain NodeDiff from diff engine
-
-        Returns:
-            NodePresentation suitable for UI display
-        """
-        return NodePresentation(
-            path=node_diff.path,
-            type_id=node_diff.type_id,
-            label=node_diff.label,
-            state=node_diff.state,
-            has_changes=node_diff.has_deep_changes,
-            visual_diff_enabled=self._is_visual_diff_enabled(node_diff.type_id),
-            children=[self._format_node(child) for child in node_diff.children],
+        counts = count_summary_counts(document_results)
+        self._view.show_summary(
+            modified_docs=counts.modified_docs,
+            deleted_docs=counts.deleted_docs,
+            added_docs=counts.added_docs,
         )
-
-    def _is_visual_diff_enabled(self, type_id: str) -> bool:
-        """Return True when node type is eligible for visual diff."""
-        return type_id.startswith("Part::") or type_id.startswith("PartDesign::") or type_id == "Sketcher::SketchObject"
 
     def on_visual_diff_clicked(self, git_path: str, node_path: str) -> None:
         """Open visual diff for one node in current history mode."""
@@ -1151,38 +669,6 @@ class DiffPresenter:
             return
 
         # Transform property diffs to presentations
-        properties = self._transform_property_diffs(node_diff)
+        properties = transform_property_diffs(node_diff, self._get_precision())
         Log.debug(f"[PRESENTER] Transformed to {len(properties)} PropertyPresentation")
         self._view.show_property_diff(properties)
-
-    def _transform_property_diffs(self, node_diff: NodeDiff) -> list[PropertyPresentation]:
-        """Transform domain PropertyDiff to presentation format.
-
-        Uses ``prop_diff.path_diffs`` to build a nested sub-path tree.
-        Root "." path values are mapped to the property top row.
-        Expression rows are nested under their corresponding path row.
-        Each node's state reflects only its own value changes — expression
-        and child path changes do not propagate upward.
-
-        Args:
-            node_diff: Domain NodeDiff with property_diffs
-
-        Returns:
-            List of PropertyPresentation for UI display
-        """
-        precision = self._get_precision()
-        presentations: list[PropertyPresentation] = []
-
-        for prop_diff in node_diff.property_diffs:
-            # Determine group from the property value
-            group = self._extract_property_group(
-                prop_diff.new_value if prop_diff.new_value is not None else prop_diff.old_value
-            )
-
-            presentations.append(_build_property_presentation(prop_diff, precision, group))
-
-        return presentations
-
-    def _extract_property_group(self, prop: Property | None) -> str | None:
-        """Extract the group attribute from a Property object."""
-        return getattr(prop, "group", None) if prop is not None else None
