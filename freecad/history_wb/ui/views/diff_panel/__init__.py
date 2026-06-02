@@ -1,5 +1,6 @@
 """Module responsibility: Diff panel view facade and modal UI helpers."""
 
+from .dialog_view import DialogView
 from .dialogs import (
     GitConfigDialogResult,
     show_configure_author_dialog,
@@ -13,6 +14,7 @@ from .view import DiffPanelView
 
 __all__ = [
     "DiffPanelView",
+    "DialogView",
     "GitConfigDialogResult",
     "show_configure_author_dialog",
     "show_error_message",

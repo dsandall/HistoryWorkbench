@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# File responsibility: Composes UI components and registers them in UIRegistry.
-# This module is responsible for creating UI views, UIState, wiring presenters
-# to views and state, registering presenters globally, and connecting callbacks.
+# File responsibility: Composes UI components, registers them, and triggers UI activation.
+# This module is responsible for creating UI views, UIState, presenters,
+# registering them globally, and delegating signal binding to ui.wiring helpers.
 """UI Composer - Composes and registers UI components."""
 
 from ..application.di.container import ApplicationContainer
 from ..ui.registry import ui_registry
 from ..ui.state import UIState
-from ..ui.views.diff_panel import DiffPanelView
+from ..ui.views.diff_panel import DialogView, DiffPanelView
+from ..ui.wiring import bind_ui_events
 from .presenters.diff_presenter import DiffPresenter
 from .presenters.git_repository_presenter import GitRepositoryPresenter
 
@@ -40,10 +41,13 @@ def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
 
     # Create view with settings repo for runtime precision
     view = DiffPanelView(settings_repo=container.settings_repo)
+    dialog_view = DialogView(view)
 
     # Create and register diff_presenter (needs ui_state for git_repository)
     diff_presenter = DiffPresenter(
-        view=view,
+        document_view=view.document_diff_panel,
+        property_view=view.property_diff_panel,
+        dialog_view=dialog_view,
         ui_state=ui_state,
         get_eligible_docs_action=container.get_open_eligible_docs_action,
         create_document_diffs_action=container.create_document_diffs_action,
@@ -58,19 +62,10 @@ def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
     )
     ui_registry.register_diff_presenter(diff_presenter)
 
-    # Connect tree widget callback using the new callback method
-    view.set_node_selection_callback(diff_presenter.on_node_selected)
-    view.set_visual_diff_callback(diff_presenter.on_visual_diff_clicked)
-
-    # Connect add button callback
-    view.set_add_button_callback(diff_presenter.on_add_button_clicked)
-    view.set_remove_from_reviewed_button_callback(diff_presenter.on_remove_from_reviewed_button_clicked)
-    view.set_remove_all_from_reviewed_callback(diff_presenter.on_remove_all_from_reviewed_clicked)
-    view.set_mark_all_reviewed_from_in_progress_callback(diff_presenter.on_stage_all_clicked)
-
     # Lifecycle presenter - creates git detection + refresh behavior
     git_repo_presenter = GitRepositoryPresenter(
-        view=view,
+        history_view=view.history_panel,
+        dialog_view=dialog_view,
         find_git_repo_action=container.find_active_git_repository_action,
         get_commits_action=container.get_commits_action,
         get_staged_file_paths_action=container.get_staged_file_paths_action,
@@ -82,6 +77,9 @@ def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
         clear_doc_diffs=diff_presenter.clear_doc_diff,
     )
     ui_registry.register_git_repository_presenter(git_repo_presenter)
+
+    bind_ui_events(view, diff_presenter, git_repo_presenter)
+
     # Trigger git repository detection on workbench activation
     git_repo_presenter.on_workbench_activated()
 

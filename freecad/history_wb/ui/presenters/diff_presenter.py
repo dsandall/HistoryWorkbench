@@ -25,9 +25,11 @@ from ...application.actions.stage_documents import StageDocumentsAction
 from ...application.actions.unstage_documents import UnstageDocumentsAction
 from ...domain.settings import SettingsRepository
 from ...utils import Log
-from ..protocols.diff_view import DiffView
 from ..state import UIState
+from ..views.diff_panel.dialog_view import DialogView
+from ..views.document_diff.panel import DocumentDiffTreeWidget
 from ..views.history.models import HistorySelection
+from ..views.property_diff.tree import PropertyDiffTreeWidget
 from .document_diff.diff_loader import DocumentDiffLoader
 from .document_diff.document_mapper import build_document_presentations
 from .document_diff.restore_handler import DocumentDiffRestoreHandler
@@ -46,7 +48,7 @@ class DiffPresenter:
     """Transform DiffResult into presentation models and call view methods.
 
     This presenter transforms domain-level diff results into UI-friendly
-    presentation models, then calls view protocol methods to trigger
+    presentation models, then calls concrete view collaborators to trigger
     the actual UI rendering.
 
     Dependencies are injected for testability.
@@ -54,7 +56,9 @@ class DiffPresenter:
 
     def __init__(
         self,
-        view: DiffView,
+        document_view: DocumentDiffTreeWidget,
+        property_view: PropertyDiffTreeWidget,
+        dialog_view: DialogView,
         ui_state: UIState,
         get_eligible_docs_action: GetOpenEligibleDocumentsAction,
         create_document_diffs_action: CreateDocumentDiffsAction,
@@ -70,7 +74,9 @@ class DiffPresenter:
         """Initialize with required dependencies.
 
         Args:
-            view: DiffView implementation to display diff results
+            document_view: Document-diff view collaborator
+            property_view: Property-diff view collaborator
+            dialog_view: Modal dialog and message collaborator
             ui_state: UI state holder containing git repository info
             get_eligible_docs_action: Action to get eligible open documents
             create_document_diffs_action: Action to orchestrate document diffs by mode
@@ -79,7 +85,9 @@ class DiffPresenter:
         """
         from ...domain.config import FLOAT_PRECISION as DEFAULT_FLOAT_PRECISION
 
-        self._view = view
+        self._document_view = document_view
+        self._property_view = property_view
+        self._dialog_view = dialog_view
         self._ui_state = ui_state
         self._open_document = open_document_action
         self._settings_repo = settings_repo
@@ -95,30 +103,20 @@ class DiffPresenter:
             restore_documents_action,
             get_committed_file_paths_action,
             get_staged_file_paths_action,
-            self._view.show_restore_file_confirmation_dialog,
-            self._view.show_restore_scope_dialog,
-            self._view.show_info_message,
-            self._view.show_error_message,
+            self._dialog_view.show_restore_file_confirmation_dialog,
+            self._dialog_view.show_restore_scope_dialog,
+            self._dialog_view.show_info_message,
+            self._dialog_view.show_error_message,
         )
         self._visual_diff_handler = DocumentVisualDiffHandler(open_visual_feature_diff_action)
         self._current_history_selection: HistorySelection | None = None
         self._focus_history_window_callback: Callable[[], None] | None = None
 
-        # Wire up the callback for history selection
-        self._view.set_user_history_selection_requested_callback(self.on_history_item_selected)
+    def track_history_selection(self, selection: HistorySelection | None) -> None:
+        """Track effective history selection state for non-click refresh paths."""
+        self._current_history_selection = selection
 
-        # Wire Stage All callback
-        self._view.set_stage_all_callback(self.on_stage_all_clicked)
-        self._view.set_remove_all_button_callback(self.on_remove_all_from_reviewed_clicked)
-        self._view.set_remove_from_reviewed_button_callback(self.on_remove_from_reviewed_button_clicked)
-        self._view.set_remove_all_from_reviewed_callback(self.on_remove_all_from_reviewed_clicked)
-        self._view.set_mark_all_reviewed_from_in_progress_callback(self.on_stage_all_clicked)
-        self._view.set_restore_button_callback(self.on_restore_document_clicked)
-        self._view.set_restore_all_button_callback(self.on_restore_all_clicked)
-        self._view.set_restore_all_from_history_context_callback(self.on_restore_all_from_history_context)
-        self._view.set_open_document_for_comparison_callback(self.on_open_document_for_comparison_clicked)
-
-    def on_open_document_for_comparison_clicked(self, git_path: str) -> None:
+    def open_document_for_comparison(self, git_path: str) -> None:
         """Open missing working-tree document in FreeCAD, then recompute Current Files diff."""
         repo = self._ui_state.git_repository
         if repo is None:
@@ -154,7 +152,7 @@ class DiffPresenter:
                 pass
         return self._default_precision
 
-    def on_history_item_selected(self, selection: HistorySelection) -> None:
+    def select_history_item(self, selection: HistorySelection) -> None:
         """Handle single item selection from history list.
 
         Args:
@@ -170,12 +168,12 @@ class DiffPresenter:
 
     def clear_property_diff(self) -> None:
         """Clear property diff panel content."""
-        self._view.clear_property_diff()
+        self._property_view.clear_property_diff()
 
     def clear_doc_diff(self) -> None:
         """Clear document diff data and document/property diff panels."""
         self._result_store.clear()
-        self._view.clear_doc_diffs()
+        self._document_view.clear_doc_diffs()
 
         # Property panel belongs to selected document tree node and must clear with the tree.
         self.clear_property_diff()
@@ -214,8 +212,8 @@ class DiffPresenter:
         Displays resulting diffs. For paths where index snapshot is missing,
         creates flat warning items (no tree below).
         """
-        self._view.set_stage_all_button_visible(False)
-        self._view.set_remove_all_button_visible(False)
+        self._document_view.set_stage_all_button_visible(False)
+        self._document_view.set_remove_all_button_visible(False)
 
         repo = self._ui_state.git_repository
         if repo is None:
@@ -238,8 +236,8 @@ class DiffPresenter:
         Requests document-level commit diffs via CreateDocumentDiffsAction,
         then stores results and presents them to the view.
         """
-        self._view.set_stage_all_button_visible(False)
-        self._view.set_remove_all_button_visible(False)
+        self._document_view.set_stage_all_button_visible(False)
+        self._document_view.set_remove_all_button_visible(False)
 
         if commit_hash is None:
             Log.warning("Commit selection received without commit hash")
@@ -261,7 +259,7 @@ class DiffPresenter:
             Log.info(f"No FCStd files changed in commit {commit_hash}")
             self.clear_doc_diff()
 
-    def on_add_button_clicked(self, git_path: str) -> None:
+    def stage_document(self, git_path: str) -> None:
         """Handle '+ Stage' button click for staging.
 
         For deleted documents, stages the deletion with no snapshots.
@@ -274,7 +272,7 @@ class DiffPresenter:
 
         self._apply_staging_display_state(self._staging_handler.stage_document(repo, git_path))
 
-    def on_stage_all_clicked(self) -> None:
+    def stage_all_documents(self) -> None:
         """Handle 'Stage All' button click.
 
         Collects snapshots for non-deleted stage-able documents and deleted paths
@@ -287,7 +285,7 @@ class DiffPresenter:
 
         self._apply_staging_display_state(self._staging_handler.stage_all(repo))
 
-    def on_remove_from_reviewed_button_clicked(self, git_path: str) -> None:
+    def remove_document_from_reviewed(self, git_path: str) -> None:
         """Unstage one reviewed document unit (FCStd + snapshot yaml)."""
         repo = self._ui_state.git_repository
         if repo is None:
@@ -296,17 +294,18 @@ class DiffPresenter:
 
         self._apply_staging_display_state(self._staging_handler.remove_document_from_reviewed(repo, git_path))
 
-    def on_remove_all_from_reviewed_clicked(self) -> None:
+    def remove_all_from_reviewed(self) -> None:
         """Unstage all reviewed staged paths from index."""
         repo = self._ui_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
 
-        current_selection = self._view.get_current_history_selection()
-        self._apply_staging_display_state(self._staging_handler.remove_all_from_reviewed(repo, current_selection))
+        self._apply_staging_display_state(
+            self._staging_handler.remove_all_from_reviewed(repo, self._current_history_selection)
+        )
 
-    def on_restore_document_clicked(self, git_path: str) -> None:
+    def restore_document(self, git_path: str) -> None:
         """Restore one document for current staging/commit source."""
         current = self._current_history_selection
         repo = self._ui_state.git_repository
@@ -323,14 +322,14 @@ class DiffPresenter:
         ):
             self._on_working_tree_selected()
 
-    def on_restore_all_clicked(self) -> None:
+    def restore_all_documents(self) -> None:
         """Restore listed/all files for current staging/commit source."""
         current = self._current_history_selection
         if current is None:
             return
-        self.on_restore_all_from_history_context(current)
+        self.restore_all_from_history(current)
 
-    def on_restore_all_from_history_context(self, selection: HistorySelection) -> None:
+    def restore_all_from_history(self, selection: HistorySelection) -> None:
         """Restore from history context selection without changing selected row."""
         repo = self._ui_state.git_repository
         if repo is None:
@@ -370,23 +369,23 @@ class DiffPresenter:
 
         presentations.sort(key=lambda p: p.git_path)
 
-        self._view.show_doc_diffs(presentations)
+        self._document_view.show_doc_diffs(presentations)
         state: SummaryButtonState = build_summary_button_state(self._current_history_selection, presentations)
-        self._view.set_stage_all_button_visible(state.stage_all_visible)
-        self._view.set_stage_all_button_enabled(state.stage_all_enabled)
-        self._view.set_remove_all_button_visible(state.remove_all_visible)
-        self._view.set_remove_all_button_enabled(state.remove_all_enabled)
-        self._view.set_restore_all_button_visible(state.restore_all_visible)
-        self._view.set_restore_all_button_enabled(state.restore_all_enabled)
+        self._document_view.set_stage_all_button_visible(state.stage_all_visible)
+        self._document_view.set_stage_all_button_enabled(state.stage_all_enabled)
+        self._document_view.set_remove_all_button_visible(state.remove_all_visible)
+        self._document_view.set_remove_all_button_enabled(state.remove_all_enabled)
+        self._document_view.set_restore_all_button_visible(state.restore_all_visible)
+        self._document_view.set_restore_all_button_enabled(state.restore_all_enabled)
 
         counts = count_summary_counts(document_results)
-        self._view.show_summary(
+        self._document_view.show_summary(
             modified_docs=counts.modified_docs,
             deleted_docs=counts.deleted_docs,
             added_docs=counts.added_docs,
         )
 
-    def on_visual_diff_clicked(self, git_path: str, node_path: str) -> None:
+    def open_visual_diff(self, git_path: str, node_path: str) -> None:
         """Open visual diff for one node in current history mode."""
         current_selection = self._current_history_selection
         if current_selection is None:
@@ -399,7 +398,7 @@ class DiffPresenter:
 
         self._visual_diff_handler.open_visual_diff(current_selection, repo, git_path, node_path)
 
-    def on_node_selected(self, git_path: str, node_path: str) -> None:
+    def select_node(self, git_path: str, node_path: str) -> None:
         """Handle tree node selection to display property diffs.
 
         Called by view when user clicks a node in the diff tree.
@@ -433,7 +432,7 @@ class DiffPresenter:
         # Transform property diffs to presentations
         properties = transform_property_diffs(node_diff, self._get_precision())
         Log.debug(f"[PRESENTER] Transformed to {len(properties)} PropertyPresentation")
-        self._view.show_property_diff(properties)
+        self._property_view.show_property_diff(properties)
 
     def _apply_staging_display_state(self, state: StagingDisplayState) -> None:
         """Apply handler-produced staging display updates to view and selection flows."""

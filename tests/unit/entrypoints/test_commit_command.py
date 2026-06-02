@@ -25,7 +25,7 @@ class TestCommitCommand:
         command = _CommitCommand()
         command.Activated()
 
-        mock_presenter.on_save_iteration_requested.assert_called_once_with()
+        mock_presenter.save_iteration.assert_called_once_with()
 
     @patch("freecad.history_wb.entrypoints.commands._ensure_git_repository_presenter_available", return_value=None)
     @patch("freecad.history_wb.qt.QtWidgets.QMessageBox")
@@ -82,7 +82,7 @@ class TestConfigureAuthorCommand:
         command = _ConfigureAuthorCommand()
         command.Activated()
 
-        mock_presenter.on_configure_author_requested.assert_called_once_with()
+        mock_presenter.configure_author.assert_called_once_with()
 
     @patch("freecad.history_wb.entrypoints.commands._ensure_git_repository_presenter_available", return_value=None)
     @patch("freecad.history_wb.qt.QtWidgets.QMessageBox")

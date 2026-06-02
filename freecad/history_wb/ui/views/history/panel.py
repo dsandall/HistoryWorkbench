@@ -1,6 +1,4 @@
 """File responsibility: History panel facade composing repository header and history list."""
-
-from collections.abc import Callable
 from datetime import datetime
 
 from ....application.actions.result_models import SnapshotSummary
@@ -20,14 +18,18 @@ __all__ = ["HistoryPanelWidget"]
 class HistoryPanelWidget(QtWidgets.QWidget):
     """Left-column widget for repository header and history list."""
 
+    refresh_requested = QtCore.Signal()
+    save_iteration_requested = QtCore.Signal()
+    history_selection_requested = QtCore.Signal(object)
+    history_selection_changed = QtCore.Signal(object)
+    history_scroll_bottom_requested = QtCore.Signal()
+    remove_all_from_reviewed_requested = QtCore.Signal()
+    mark_all_reviewed_from_in_progress_requested = QtCore.Signal()
+    restore_all_from_history_context_requested = QtCore.Signal(object)
+
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
         self._current_selection: HistorySelection | None = None
-        self._on_user_history_selection_requested_callback: Callable[[HistorySelection], None] | None = None
-        self._on_history_scroll_bottom_callback: Callable[[], None] | None = None
-        self._on_refresh_callback: Callable[[], None] | None = None
-        self._on_save_iteration_callback: Callable[[], None] | None = None
-        self._on_effective_selection_changed_callback: Callable[[HistorySelection | None], None] | None = None
         self._setup_ui()
         self._connect_internal_signals()
 
@@ -36,21 +38,9 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         """Expose list widget for facade compatibility and tests."""
         return self._history_list
 
-    def set_effective_selection_changed_callback(self, callback: Callable[[HistorySelection | None], None]) -> None:
-        """Set callback for effective history-selection state changes."""
-        self._on_effective_selection_changed_callback = callback
-
     def get_current_history_selection(self) -> HistorySelection | None:
         """Return currently selected history entry."""
         return self._current_selection
-
-    def set_refresh_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback invoked when refresh button is clicked."""
-        self._on_refresh_callback = callback
-
-    def set_save_iteration_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback invoked when Save Iteration button is clicked."""
-        self._on_save_iteration_callback = callback
 
     def show_snapshots(self, snapshots: list[SnapshotSummary]) -> None:
         """Display list of available snapshots."""
@@ -92,27 +82,6 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         self.append_commits(commits)
         self._restore_history_selection(previous_selection)
 
-    def set_user_history_selection_requested_callback(self, callback: Callable[[HistorySelection], None]) -> None:
-        """Set callback for direct user-driven history selection requests."""
-        self._on_user_history_selection_requested_callback = callback
-
-    def set_history_scroll_bottom_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback invoked when history list is near scroll bottom."""
-        self._history_list.reset_bottom_scroll_arming()
-        self._on_history_scroll_bottom_callback = callback
-
-    def set_remove_all_from_reviewed_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback for Remove All from Reviewed context action."""
-        self._history_list.set_remove_all_from_reviewed_callback(callback)
-
-    def set_mark_all_reviewed_from_in_progress_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback for Mark All Reviewed context action on Current Files row."""
-        self._history_list.set_mark_all_reviewed_from_in_progress_callback(callback)
-
-    def set_restore_all_from_history_context_callback(self, callback: Callable[[HistorySelection], None]) -> None:
-        """Set callback for history-row restore actions."""
-        self._history_list.set_restore_all_from_history_context_callback(callback)
-
     def append_commits(self, commits: list[GitCommit]) -> None:
         """Append commit entries after existing history rows."""
         for commit in commits:
@@ -141,38 +110,36 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         self._history_list.user_selection_requested.connect(self._on_user_history_selection_requested)
         self._history_list.effective_selection_changed.connect(self._on_effective_history_selection_changed)
         self._history_list.near_bottom_requested.connect(self._on_history_scroll_bottom_requested)
+        self._history_list.remove_all_from_reviewed_requested.connect(self.remove_all_from_reviewed_requested.emit)
+        self._history_list.mark_all_reviewed_from_in_progress_requested.connect(
+            self.mark_all_reviewed_from_in_progress_requested.emit
+        )
+        self._history_list.restore_all_from_history_context_requested.connect(
+            self.restore_all_from_history_context_requested.emit
+        )
         self._repository_header.refresh_requested.connect(self._on_refresh_requested)
         self._repository_header.save_iteration_requested.connect(self._on_save_iteration_requested)
 
     def _on_user_history_selection_requested(self, selection: HistorySelection) -> None:
         """Forward user-driven history selection requests to facade callback."""
-
-        # Presenter still expects selection callback on explicit user clicks.
-        if self._on_user_history_selection_requested_callback is not None:
-            self._on_user_history_selection_requested_callback(selection)
+        self.history_selection_requested.emit(selection)
 
     def _on_effective_history_selection_changed(self, selection: HistorySelection | None) -> None:
         """Store and forward effective selection-state changes."""
         self._current_selection = selection
-
-        # DiffPanelView depends on null and restored selections for sync.
-        if self._on_effective_selection_changed_callback is not None:
-            self._on_effective_selection_changed_callback(selection)
+        self.history_selection_changed.emit(selection)
 
     def _on_history_scroll_bottom_requested(self) -> None:
         """Forward near-bottom history scrolling to facade callback."""
-        if self._on_history_scroll_bottom_callback is not None:
-            self._on_history_scroll_bottom_callback()
+        self.history_scroll_bottom_requested.emit()
 
     def _on_refresh_requested(self) -> None:
         """Forward refresh button clicks to facade callback."""
-        if self._on_refresh_callback is not None:
-            self._on_refresh_callback()
+        self.refresh_requested.emit()
 
     def _on_save_iteration_requested(self) -> None:
         """Forward save-iteration button clicks to facade callback."""
-        if self._on_save_iteration_callback is not None:
-            self._on_save_iteration_callback()
+        self.save_iteration_requested.emit()
 
     def _add_special_items(self) -> None:
         """Insert Current Files and Reviewed pseudo-rows."""
@@ -209,5 +176,4 @@ class HistoryPanelWidget(QtWidgets.QWidget):
             return
 
         # Restored selection must still notify presenter-facing selection path.
-        if self._on_user_history_selection_requested_callback is not None:
-            self._on_user_history_selection_requested_callback(previous_selection)
+        self.history_selection_requested.emit(previous_selection)

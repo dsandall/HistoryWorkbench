@@ -1,7 +1,5 @@
 """File responsibility: History list widget, selection routing, context menus, and scroll-bottom detection."""
 
-from collections.abc import Callable
-
 from ....qt import QtCore, QtGui, QtWidgets
 from ....utils import translate
 from .models import HistorySelection
@@ -18,26 +16,14 @@ class HistoryList(QtWidgets.QListWidget):
     effective_selection_changed = QtCore.Signal(object)
 
     near_bottom_requested = QtCore.Signal()
+    remove_all_from_reviewed_requested = QtCore.Signal()
+    mark_all_reviewed_from_in_progress_requested = QtCore.Signal()
+    restore_all_from_history_context_requested = QtCore.Signal(object)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
-        self._on_remove_all_from_reviewed_callback: Callable[[], None] | None = None
-        self._on_mark_all_reviewed_from_in_progress_callback: Callable[[], None] | None = None
-        self._on_restore_all_from_history_context_callback: Callable[[HistorySelection], None] | None = None
         self._history_scroll_bottom_armed = True
         self._setup_ui()
-
-    def set_remove_all_from_reviewed_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback for Reviewed context action."""
-        self._on_remove_all_from_reviewed_callback = callback
-
-    def set_mark_all_reviewed_from_in_progress_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback for Current Files context action."""
-        self._on_mark_all_reviewed_from_in_progress_callback = callback
-
-    def set_restore_all_from_history_context_callback(self, callback: Callable[[HistorySelection], None]) -> None:
-        """Set callback for restore actions from history context menu."""
-        self._on_restore_all_from_history_context_callback = callback
 
     def reset_bottom_scroll_arming(self) -> None:
         """Re-arm near-bottom detection after history rebuild."""
@@ -153,8 +139,8 @@ class HistoryList(QtWidgets.QListWidget):
         action = menu.addAction(translate("History", "Mark All Reviewed"))
         selected_action = menu.exec(self.mapToGlobal(pos))
 
-        if selected_action == action and self._on_mark_all_reviewed_from_in_progress_callback is not None:
-            self._on_mark_all_reviewed_from_in_progress_callback()
+        if selected_action == action:
+            self.mark_all_reviewed_from_in_progress_requested.emit()
 
     def _show_reviewed_context_menu(self, pos: QtCore.QPoint, selection: HistorySelection) -> None:
         """Show Reviewed context menu actions."""
@@ -171,11 +157,11 @@ class HistoryList(QtWidgets.QListWidget):
         action.setStatusTip(tooltip)
         selected_action = menu.exec(self.mapToGlobal(pos))
 
-        if selected_action == restore_action and self._on_restore_all_from_history_context_callback is not None:
-            self._on_restore_all_from_history_context_callback(selection)
+        if selected_action == restore_action:
+            self.restore_all_from_history_context_requested.emit(selection)
 
-        if selected_action == action and self._on_remove_all_from_reviewed_callback is not None:
-            self._on_remove_all_from_reviewed_callback()
+        if selected_action == action:
+            self.remove_all_from_reviewed_requested.emit()
 
     def _show_commit_context_menu(self, pos: QtCore.QPoint, selection: HistorySelection) -> None:
         """Show commit-row restore action."""
@@ -183,5 +169,5 @@ class HistoryList(QtWidgets.QListWidget):
         restore_action = menu.addAction(translate("History", "Restore all files from iteration"))
         selected_action = menu.exec(self.mapToGlobal(pos))
 
-        if selected_action == restore_action and self._on_restore_all_from_history_context_callback is not None:
-            self._on_restore_all_from_history_context_callback(selection)
+        if selected_action == restore_action:
+            self.restore_all_from_history_context_requested.emit(selection)

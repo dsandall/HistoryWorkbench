@@ -16,7 +16,13 @@ from freecad.history_wb.ui.presenters.git_repository_presenter import GitConfigD
 
 @pytest.fixture
 def mock_view() -> MagicMock:
-    """Create a mock DiffPanelView."""
+    """Create a mock HistoryView."""
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_dialog_view() -> MagicMock:
+    """Create a mock DialogView."""
     return MagicMock()
 
 
@@ -71,6 +77,7 @@ def mock_ui_state() -> MagicMock:
 @pytest.fixture
 def presenter(
     mock_view: MagicMock,
+    mock_dialog_view: MagicMock,
     mock_find_action: MagicMock,
     mock_get_commits_action: MagicMock,
     mock_get_staged_file_paths_action: MagicMock,
@@ -82,7 +89,8 @@ def presenter(
 ) -> GitRepositoryPresenter:
     """Create a GitRepositoryPresenter instance with mocked dependencies."""
     return GitRepositoryPresenter(
-        view=mock_view,
+        history_view=mock_view,
+        dialog_view=mock_dialog_view,
         find_git_repo_action=mock_find_action,
         get_commits_action=mock_get_commits_action,
         get_staged_file_paths_action=mock_get_staged_file_paths_action,
@@ -169,6 +177,7 @@ class TestGitRepositoryPresenter:
     def test_presenter_initialization_stores_dependencies(
         self,
         mock_view: MagicMock,
+        mock_dialog_view: MagicMock,
         mock_find_action: MagicMock,
         mock_get_commits_action: MagicMock,
         mock_get_staged_file_paths_action: MagicMock,
@@ -181,7 +190,8 @@ class TestGitRepositoryPresenter:
         """Presenter stores all dependencies correctly on initialization."""
         # Act
         presenter = GitRepositoryPresenter(
-            view=mock_view,
+            history_view=mock_view,
+            dialog_view=mock_dialog_view,
             find_git_repo_action=mock_find_action,
             get_commits_action=mock_get_commits_action,
             get_staged_file_paths_action=mock_get_staged_file_paths_action,
@@ -194,19 +204,20 @@ class TestGitRepositoryPresenter:
         )
 
         # Assert
-        assert presenter._view is mock_view
+        assert presenter._history_view is mock_view
+        assert presenter._dialog_view is mock_dialog_view
         assert presenter._find_git_repo_action is mock_find_action
         assert presenter._get_commits_action is mock_get_commits_action
         assert presenter._ui_state is mock_ui_state
 
-    def test_on_refresh_clicked_with_successful_detection(
+    def test_refresh_repository_and_commits_with_successful_detection(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
         mock_find_action: MagicMock,
         mock_ui_state: MagicMock,
     ) -> None:
-        """on_refresh_clicked() updates state and view when detection succeeds."""
+        """refresh_repository_and_commits() updates state and view when detection succeeds."""
         # Arrange
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
         mock_result = MagicMock()
@@ -215,21 +226,21 @@ class TestGitRepositoryPresenter:
         mock_find_action.execute.return_value = mock_result
 
         # Act
-        presenter.on_refresh_clicked()
+        presenter.refresh_repository_and_commits()
 
         # Assert
         mock_find_action.execute.assert_called_once()
         mock_ui_state.git_repository = repo
         mock_view.show_repository.assert_called_once_with(repo)
 
-    def test_on_refresh_clicked_with_failed_detection(
+    def test_refresh_repository_and_commits_with_failed_detection(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
         mock_find_action: MagicMock,
         mock_ui_state: MagicMock,
     ) -> None:
-        """on_refresh_clicked() sets state to None and shows no repo message on failure."""
+        """refresh_repository_and_commits() sets state to None and shows no repo message on failure."""
         # Arrange
         mock_result = MagicMock()
         mock_result.is_success = False
@@ -237,7 +248,7 @@ class TestGitRepositoryPresenter:
         mock_find_action.execute.return_value = mock_result
 
         # Act
-        presenter.on_refresh_clicked()
+        presenter.refresh_repository_and_commits()
 
         # Assert
         mock_find_action.execute.assert_called_once()
@@ -245,14 +256,14 @@ class TestGitRepositoryPresenter:
         mock_view.show_repository.assert_called_once_with(None)
         mock_view.show_commits.assert_called_once_with([], show_special_items=False)
 
-    def test_on_refresh_clicked_with_none_repository(
+    def test_refresh_repository_and_commits_with_none_repository(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
         mock_find_action: MagicMock,
         mock_ui_state: MagicMock,
     ) -> None:
-        """on_refresh_clicked() handles case where action returns None repository."""
+        """refresh_repository_and_commits() handles case where action returns None repository."""
         # Arrange
         mock_result = MagicMock()
         mock_result.is_success = True
@@ -260,44 +271,12 @@ class TestGitRepositoryPresenter:
         mock_find_action.execute.return_value = mock_result
 
         # Act
-        presenter.on_refresh_clicked()
+        presenter.refresh_repository_and_commits()
 
         # Assert
         mock_find_action.execute.assert_called_once()
         mock_ui_state.git_repository = None
         mock_view.show_repository.assert_called_once_with(None)
-
-    def test_presenter_initialization_registers_refresh_callback(
-        self,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_get_commits_action: MagicMock,
-        mock_get_staged_file_paths_action: MagicMock,
-        mock_commit_staging_action: MagicMock,
-        mock_get_git_identity_action: MagicMock,
-        mock_save_git_identity_action: MagicMock,
-        mock_can_write_global_git_identity_action: MagicMock,
-        mock_ui_state: MagicMock,
-    ) -> None:
-        """Presenter registers its on_refresh_clicked method as the refresh callback on initialization."""
-        # Act
-        presenter = GitRepositoryPresenter(
-            view=mock_view,
-            find_git_repo_action=mock_find_action,
-            get_commits_action=mock_get_commits_action,
-            get_staged_file_paths_action=mock_get_staged_file_paths_action,
-            commit_staging_action=mock_commit_staging_action,
-            get_git_identity_action=mock_get_git_identity_action,
-            save_git_identity_action=mock_save_git_identity_action,
-            can_write_global_git_identity_action=mock_can_write_global_git_identity_action,
-            ui_state=mock_ui_state,
-            clear_doc_diffs=MagicMock(),
-        )
-
-        # Assert
-        mock_view.set_refresh_callback.assert_called_once_with(presenter.on_refresh_clicked)
-        mock_view.set_save_iteration_callback.assert_called_once_with(presenter.on_save_iteration_button_clicked)
-        mock_view.set_history_scroll_bottom_callback.assert_called_once_with(presenter.on_history_scroll_near_bottom)
 
     def test_on_workbench_activated_delegates_to_refresh_repository_and_commits(
         self,
@@ -309,21 +288,10 @@ class TestGitRepositoryPresenter:
 
         mock_refresh.assert_called_once_with()
 
-    def test_on_refresh_clicked_delegates_to_refresh_repository_and_commits(
-        self,
-        presenter: GitRepositoryPresenter,
-    ) -> None:
-        """on_refresh_clicked() delegates to refresh_repository_and_commits()."""
-        with patch.object(presenter, "refresh_repository_and_commits") as mock_refresh:
-            presenter.on_refresh_clicked()
-
-        mock_refresh.assert_called_once_with()
-
-
 class TestSaveIterationFlow:
     """Tests for save-iteration orchestration in GitRepositoryPresenter."""
 
-    def test_on_save_iteration_requested_warns_when_no_repository(
+    def test_save_iteration_warns_when_no_repository(
         self,
         presenter: GitRepositoryPresenter,
         mock_ui_state: MagicMock,
@@ -331,23 +299,12 @@ class TestSaveIterationFlow:
         """No repository shows warning and exits early."""
         mock_ui_state.git_repository = None
 
-        presenter.on_save_iteration_requested()
+        presenter.save_iteration()
 
-        presenter._view.show_warning_message.assert_called_once()
+        presenter._dialog_view.show_warning_message.assert_called_once()
         presenter._get_staged_file_paths_action.execute.assert_not_called()
 
-    def test_on_save_iteration_button_clicked_delegates_to_save_flow(
-        self,
-        presenter: GitRepositoryPresenter,
-    ) -> None:
-        """Panel save button delegates to main save flow."""
-
-        with patch.object(presenter, "on_save_iteration_requested") as save_requested:
-            presenter.on_save_iteration_button_clicked()
-
-        save_requested.assert_called_once_with()
-
-    def test_on_save_iteration_requested_shows_info_when_no_reviewed_files(
+    def test_save_iteration_shows_info_when_no_reviewed_files(
         self,
         presenter: GitRepositoryPresenter,
         mock_ui_state: MagicMock,
@@ -358,12 +315,12 @@ class TestSaveIterationFlow:
         presenter._get_staged_file_paths_action.execute.return_value.is_success = True
         presenter._get_staged_file_paths_action.execute.return_value.data = []
 
-        presenter.on_save_iteration_requested()
+        presenter.save_iteration()
 
-        presenter._view.show_info_message.assert_called_once()
+        presenter._dialog_view.show_info_message.assert_called_once()
         presenter._commit_staging_action.execute.assert_not_called()
 
-    def test_on_save_iteration_requested_commits_trimmed_message_and_refreshes(
+    def test_save_iteration_commits_trimmed_message_and_refreshes(
         self,
         presenter: GitRepositoryPresenter,
         mock_ui_state: MagicMock,
@@ -377,15 +334,15 @@ class TestSaveIterationFlow:
         presenter._commit_staging_action.execute.return_value.is_success = True
 
         with (
-            patch.object(presenter._view, "show_save_iteration_dialog", return_value="  message with spaces  "),
+            patch.object(presenter._dialog_view, "show_save_iteration_dialog", return_value="  message with spaces  "),
             patch.object(presenter, "refresh_repository_and_commits") as refresh,
         ):
-            presenter.on_save_iteration_requested()
+            presenter.save_iteration()
 
         presenter._commit_staging_action.execute.assert_called_once_with(repo, "message with spaces")
         refresh.assert_called_once_with()
 
-    def test_on_save_iteration_requested_shows_error_when_commit_fails(
+    def test_save_iteration_shows_error_when_commit_fails(
         self,
         presenter: GitRepositoryPresenter,
         mock_ui_state: MagicMock,
@@ -399,16 +356,16 @@ class TestSaveIterationFlow:
         presenter._commit_staging_action.execute.return_value.is_success = False
         presenter._commit_staging_action.execute.return_value.message = "git failed"
 
-        with patch.object(presenter._view, "show_save_iteration_dialog", return_value="message"):
-            presenter.on_save_iteration_requested()
+        with patch.object(presenter._dialog_view, "show_save_iteration_dialog", return_value="message"):
+            presenter.save_iteration()
 
-        presenter._view.show_error_message.assert_called_once()
+        presenter._dialog_view.show_error_message.assert_called_once()
 
 
 class TestConfigureAuthorFlow:
     """Tests for configure-author orchestration in GitRepositoryPresenter."""
 
-    def test_on_configure_author_requested_warns_when_no_repository(
+    def test_configure_author_warns_when_no_repository(
         self,
         presenter: GitRepositoryPresenter,
         mock_ui_state: MagicMock,
@@ -416,9 +373,9 @@ class TestConfigureAuthorFlow:
         """No repository shows warning and exits early."""
         mock_ui_state.git_repository = None
 
-        presenter.on_configure_author_requested()
+        presenter.configure_author()
 
-        presenter._view.show_warning_message.assert_called_once()
+        presenter._dialog_view.show_warning_message.assert_called_once()
 
     def test_configure_repository_saves_identity(
         self,
@@ -435,7 +392,7 @@ class TestConfigureAuthorFlow:
             should_save_globally=True,
         )
 
-        with patch.object(presenter._view, "show_configure_author_dialog", return_value=dialog_result):
+        with patch.object(presenter._dialog_view, "show_configure_author_dialog", return_value=dialog_result):
             result = presenter._configure_repository_identity(mock_repo)
 
         assert result is True
@@ -444,8 +401,8 @@ class TestConfigureAuthorFlow:
             GitIdentity(name="Test User", email="test@example.com"),
             True,
         )
-        presenter._view.show_warning_message.assert_not_called()
-        presenter._view.show_error_message.assert_not_called()
+        presenter._dialog_view.show_warning_message.assert_not_called()
+        presenter._dialog_view.show_error_message.assert_not_called()
 
     def test_configure_repository_requires_name_and_email(
         self,
@@ -461,11 +418,11 @@ class TestConfigureAuthorFlow:
             should_save_globally=False,
         )
 
-        with patch.object(presenter._view, "show_configure_author_dialog", return_value=dialog_result):
+        with patch.object(presenter._dialog_view, "show_configure_author_dialog", return_value=dialog_result):
             result = presenter._configure_repository_identity(mock_repo)
 
         assert result is False
-        presenter._view.show_warning_message.assert_called_once()
+        presenter._dialog_view.show_warning_message.assert_called_once()
         presenter._save_git_identity_action.execute.assert_not_called()
 
 
@@ -562,7 +519,7 @@ class TestCommitLoading:
         mock_get_commits_action.execute.assert_called_once_with(repo)
         mock_view.show_commits.assert_called_once()
 
-    def test_on_history_scroll_near_bottom_loads_next_page(self, presenter: GitRepositoryPresenter) -> None:
+    def test_load_more_commits_loads_next_page(self, presenter: GitRepositoryPresenter) -> None:
         """Scroll near bottom loads next commit page with skip offset."""
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
         presenter._ui_state.git_repository = repo
@@ -583,23 +540,23 @@ class TestCommitLoading:
         result.data = commits
         presenter._get_commits_action.execute.return_value = result
 
-        presenter.on_history_scroll_near_bottom()
+        presenter.load_more_commits()
 
         presenter._get_commits_action.execute.assert_called_once_with(repo, limit=20, skip=20)
-        presenter._view.append_commits.assert_called_once_with(commits)
+        presenter._history_view.append_commits.assert_called_once_with(commits)
 
-    def test_on_history_scroll_near_bottom_skips_when_no_more(self, presenter: GitRepositoryPresenter) -> None:
+    def test_load_more_commits_skips_when_no_more(self, presenter: GitRepositoryPresenter) -> None:
         """Scroll near bottom does nothing when no further pages exist."""
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
         presenter._ui_state.git_repository = repo
         presenter._active_repo_path = repo.absolute_path
         presenter._has_more_commits = False
 
-        presenter.on_history_scroll_near_bottom()
+        presenter.load_more_commits()
 
         presenter._get_commits_action.execute.assert_not_called()
 
-    def test_on_history_scroll_near_bottom_throttles_rapid_calls(self, presenter: GitRepositoryPresenter) -> None:
+    def test_load_more_commits_throttles_rapid_calls(self, presenter: GitRepositoryPresenter) -> None:
         """Rapid bottom-scroll callbacks are throttled to one load call."""
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
         presenter._ui_state.git_repository = repo
@@ -613,7 +570,7 @@ class TestCommitLoading:
         presenter._get_commits_action.execute.return_value = result
 
         with patch("freecad.history_wb.ui.presenters.git_repository_presenter.monotonic", return_value=10.0):
-            presenter.on_history_scroll_near_bottom()
-            presenter.on_history_scroll_near_bottom()
+            presenter.load_more_commits()
+            presenter.load_more_commits()
 
         presenter._get_commits_action.execute.assert_called_once_with(repo, limit=20, skip=20)

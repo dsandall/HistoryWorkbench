@@ -6,36 +6,36 @@
     <message>
         <location filename="../../entrypoints/commands.py" line="337"/>
         <location filename="../../entrypoints/commands.py" line="375"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="111"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="159"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="108"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="152"/>
         <source>No Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="112"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="160"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="109"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="153"/>
         <source>No project detected. Please open a document from a project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="146"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="195"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="210"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="143"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="188"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="203"/>
         <source>Save Iteration Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="196"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="189"/>
         <source>Name and email are required to save iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="211"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="204"/>
         <source>Git identity could not be saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="215"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="208"/>
         <source>Could not save git identity for all projects. Uncheck the global option to save it only for this project.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -144,27 +144,27 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="119"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="116"/>
         <source>No Reviewed Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="120"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="117"/>
         <source>There are no reviewed files to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="147"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="144"/>
         <source>Git commit failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="134"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="131"/>
         <source>Empty Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="135"/>
+        <location filename="../../ui/presenters/git_repository_presenter.py" line="132"/>
         <source>Iteration notes cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,7 +318,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="161"/>
+        <location filename="../../ui/views/history/history_list.py" line="147"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -412,7 +412,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="131"/>
+        <location filename="../../ui/views/history/panel.py" line="100"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
@@ -422,37 +422,37 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="180"/>
+        <location filename="../../ui/views/history/panel.py" line="147"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="186"/>
+        <location filename="../../ui/views/history/panel.py" line="153"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="81"/>
+        <location filename="../../ui/views/history/panel.py" line="71"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="153"/>
+        <location filename="../../ui/views/history/history_list.py" line="139"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="168"/>
+        <location filename="../../ui/views/history/history_list.py" line="154"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="169"/>
+        <location filename="../../ui/views/history/history_list.py" line="155"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="183"/>
+        <location filename="../../ui/views/history/history_list.py" line="169"/>
         <source>Restore all files from iteration</source>
         <translation type="unfinished"></translation>
     </message>

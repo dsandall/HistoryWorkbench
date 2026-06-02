@@ -59,14 +59,16 @@ def test_clear_effective_selection_clears_current_item_and_emits_none(history_li
     assert changed == [None]
 
 
-def test_reviewed_context_menu_triggers_remove_all_callback(history_list_widget) -> None:  # type: ignore[no-untyped-def]
-    """Reviewed context menu routes remove-all callback."""
+def test_reviewed_context_menu_emits_remove_all_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
+    """Reviewed context menu emits remove-all signal."""
     selection = HistorySelection(item_kind="STAGING", commit_hash=None)
     item, widget = create_special_history_item("Reviewed", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     called = {"count": 0}
-    history_list_widget.set_remove_all_from_reviewed_callback(lambda: called.__setitem__("count", called["count"] + 1))
+    history_list_widget.remove_all_from_reviewed_requested.connect(
+        lambda: called.__setitem__("count", called["count"] + 1)
+    )
     fake_menu = build_fake_menu_class()
     pos = history_list_widget.visualItemRect(item).center()
 
@@ -78,14 +80,14 @@ def test_reviewed_context_menu_triggers_remove_all_callback(history_list_widget)
     assert called["count"] == 1
 
 
-def test_commit_context_menu_triggers_restore_callback(history_list_widget) -> None:  # type: ignore[no-untyped-def]
-    """Commit context menu routes restore callback with commit selection."""
+def test_commit_context_menu_emits_restore_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
+    """Commit context menu emits restore signal with commit selection."""
     commit_selection = HistorySelection(item_kind="COMMIT", commit_hash="abc1234")
     item, widget = create_commit_history_item(make_commit(commit_id="abc1234", author="a", message="m"))
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     received: list[HistorySelection] = []
-    history_list_widget.set_restore_all_from_history_context_callback(received.append)
+    history_list_widget.restore_all_from_history_context_requested.connect(received.append)
     fake_menu = build_fake_menu_class()
     pos = history_list_widget.visualItemRect(item).center()
 
@@ -97,14 +99,14 @@ def test_commit_context_menu_triggers_restore_callback(history_list_widget) -> N
     assert received == [commit_selection]
 
 
-def test_working_tree_context_menu_triggers_mark_all_reviewed_callback(history_list_widget) -> None:  # type: ignore[no-untyped-def]
-    """Current Files context menu routes mark-all-reviewed callback."""
+def test_working_tree_context_menu_emits_mark_all_reviewed_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
+    """Current Files context menu emits mark-all-reviewed signal."""
     selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
     item, widget = create_special_history_item("Current Files", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     called = {"count": 0}
-    history_list_widget.set_mark_all_reviewed_from_in_progress_callback(
+    history_list_widget.mark_all_reviewed_from_in_progress_requested.connect(
         lambda: called.__setitem__("count", called["count"] + 1)
     )
     fake_menu = build_fake_menu_class()

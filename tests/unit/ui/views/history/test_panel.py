@@ -52,8 +52,8 @@ def test_show_commits_refresh_restores_valid_selection_and_reemits_once(history_
 
     selection_requests: list[HistorySelection] = []
     selection_changes: list[HistorySelection | None] = []
-    history_panel_widget.set_user_history_selection_requested_callback(selection_requests.append)
-    history_panel_widget.set_effective_selection_changed_callback(selection_changes.append)
+    history_panel_widget.history_selection_requested.connect(selection_requests.append)
+    history_panel_widget.history_selection_changed.connect(selection_changes.append)
 
     history_panel_widget.show_commits([make_commit(commit_id=selected_commit_hash, message="Selected commit updated")])
 
@@ -73,7 +73,7 @@ def test_show_commits_refresh_clears_missing_selection_and_propagates_none(histo
     history_panel_widget.show_commits([make_commit(commit_id=removed_commit_hash, message="Will be removed")])
     history_panel_widget.history_list.itemClicked.emit(history_panel_widget.history_list.item(2))
     selection_changes: list[HistorySelection | None] = []
-    history_panel_widget.set_effective_selection_changed_callback(selection_changes.append)
+    history_panel_widget.history_selection_changed.connect(selection_changes.append)
 
     history_panel_widget.show_commits(
         [make_commit(commit_id="b2c3d4e5f6789012", message="Different commit", timestamp="2024-01-16T10:30:00+00:00")]
@@ -84,10 +84,10 @@ def test_show_commits_refresh_clears_missing_selection_and_propagates_none(histo
     assert selection_changes == [None]
 
 
-def test_set_refresh_callback_forwards_repository_header_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
-    """Facade refresh callback forwards child signal without exposing child internals."""
+def test_refresh_requested_signal_forwards_repository_header_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
+    """Facade refresh signal forwards child signal without exposing child internals."""
     called = []
-    history_panel_widget.set_refresh_callback(lambda: called.append("refresh"))
+    history_panel_widget.refresh_requested.connect(lambda: called.append("refresh"))
     repository_header = history_panel_widget.findChild(RepositoryHeader)
 
     assert repository_header is not None
@@ -96,10 +96,10 @@ def test_set_refresh_callback_forwards_repository_header_signal(history_panel_wi
     assert called == ["refresh"]
 
 
-def test_set_save_iteration_callback_forwards_repository_header_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
-    """Facade save callback forwards child signal without exposing child internals."""
+def test_save_iteration_requested_signal_forwards_repository_header_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
+    """Facade save signal forwards child signal without exposing child internals."""
     called = []
-    history_panel_widget.set_save_iteration_callback(lambda: called.append("save"))
+    history_panel_widget.save_iteration_requested.connect(lambda: called.append("save"))
     repository_header = history_panel_widget.findChild(RepositoryHeader)
 
     assert repository_header is not None
@@ -108,10 +108,10 @@ def test_set_save_iteration_callback_forwards_repository_header_signal(history_p
     assert called == ["save"]
 
 
-def test_set_history_scroll_bottom_callback_forwards_list_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
-    """Facade bottom-scroll callback forwards list near-bottom signal."""
+def test_history_scroll_bottom_requested_signal_forwards_list_signal(history_panel_widget) -> None:  # type: ignore[no-untyped-def]
+    """Facade bottom-scroll signal forwards list near-bottom signal."""
     called = []
-    history_panel_widget.set_history_scroll_bottom_callback(lambda: called.append("bottom"))
+    history_panel_widget.history_scroll_bottom_requested.connect(lambda: called.append("bottom"))
 
     history_panel_widget.history_list.near_bottom_requested.emit()
 

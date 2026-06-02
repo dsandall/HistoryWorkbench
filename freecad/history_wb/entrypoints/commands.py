@@ -97,7 +97,7 @@ class _ConfigureAuthorCommand:
                 translate("History", "Open History Panel before configuring author."),
             )
             return
-        presenter.on_configure_author_requested()
+        presenter.configure_author()
 
 
 class _CommitCommand:
@@ -129,7 +129,7 @@ class _CommitCommand:
             )
             return
 
-        presenter.on_save_iteration_requested()
+        presenter.save_iteration()
 
 
 class _RefreshRepositoryCommand:

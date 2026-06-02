@@ -101,10 +101,10 @@ def test_show_doc_diffs_with_empty_list_clears_tree(panel) -> None:  # type: ign
     assert _tree_widget(panel).topLevelItemCount() == 0
 
 
-def test_set_node_selection_callback_routes_tree_selection(panel) -> None:  # type: ignore[no-untyped-def]
-    """Panel forwards extracted tree selection through stable callback setter."""
+def test_node_selection_requested_signal_routes_tree_selection(panel) -> None:  # type: ignore[no-untyped-def]
+    """Panel forwards extracted tree selection through facade signal."""
     captured: list[tuple[str, str]] = []
-    panel.set_node_selection_callback(lambda git_path, node_path: captured.append((git_path, node_path)))
+    panel.node_selection_requested.connect(lambda git_path, node_path: captured.append((git_path, node_path)))
     panel.show_doc_diffs([_diff(nodes=[_node(path="Body", type_id="PartDesign::Body", label="Body")])])
 
     tree = _tree_widget(panel)
@@ -118,10 +118,10 @@ def test_set_node_selection_callback_routes_tree_selection(panel) -> None:  # ty
     assert captured == [("parts/A.FCStd", "Body")]
 
 
-def test_visual_diff_callback_routes_extracted_tree_signal(panel) -> None:  # type: ignore[no-untyped-def]
-    """Panel forwards extracted visual-diff node action through stable callback setter."""
+def test_visual_diff_requested_signal_routes_extracted_tree_signal(panel) -> None:  # type: ignore[no-untyped-def]
+    """Panel forwards extracted visual-diff node action through facade signal."""
     captured: list[tuple[str, str]] = []
-    panel.set_visual_diff_callback(lambda git_path, node_path: captured.append((git_path, node_path)))
+    panel.visual_diff_requested.connect(lambda git_path, node_path: captured.append((git_path, node_path)))
     panel.show_doc_diffs([_diff(nodes=[_node(visual_diff_enabled=True)])])
 
     tree = _tree_widget(panel)

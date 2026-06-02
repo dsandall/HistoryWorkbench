@@ -18,8 +18,9 @@ from freecad.history_wb.application.actions.get_staged_file_paths import GetStag
 from freecad.history_wb.application.actions.save_git_identity import SaveGitIdentityAction
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.ui.state import UIState
-from freecad.history_wb.ui.views.diff_panel import DiffPanelView
+from freecad.history_wb.ui.views.diff_panel.dialog_view import DialogView
 from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
+from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
 from freecad.history_wb.utils import Log, translate
 
 
@@ -41,7 +42,8 @@ class GitRepositoryPresenter:
 
     def __init__(
         self,
-        view: DiffPanelView,
+        history_view: HistoryPanelWidget,
+        dialog_view: DialogView,
         find_git_repo_action: FindActiveGitRepositoryAction,
         get_commits_action: GetCommitsAction,
         get_staged_file_paths_action: GetStagedFilePathsAction,
@@ -55,12 +57,14 @@ class GitRepositoryPresenter:
         """Initialize the presenter with required dependencies.
 
         Args:
-            view: The DiffPanelView instance for displaying repository info.
+            history_view: History-column view implementation.
+            dialog_view: Dialog and message view implementation.
             find_git_repo_action: The action for finding the active git repository.
             get_commits_action: The action for getting git commits.
             ui_state: The UI state holder for storing repository.
         """
-        self._view = view
+        self._history_view = history_view
+        self._dialog_view = dialog_view
         self._find_git_repo_action = find_git_repo_action
         self._get_commits_action = get_commits_action
         self._get_staged_file_paths_action = get_staged_file_paths_action
@@ -77,9 +81,6 @@ class GitRepositoryPresenter:
         self._active_repo_path: str | None = None
         self._last_scroll_load_ts = 0.0
         self._scroll_load_interval_seconds = 0.2
-        self._view.set_refresh_callback(self.on_refresh_clicked)
-        self._view.set_save_iteration_callback(self.on_save_iteration_button_clicked)
-        self._view.set_history_scroll_bottom_callback(self.on_history_scroll_near_bottom)
 
     def on_workbench_activated(self) -> None:
         """Detect and display git repository when workbench activates.
@@ -98,16 +99,12 @@ class GitRepositoryPresenter:
         """
         self._detect_git_repository()
 
-    def on_refresh_clicked(self) -> None:
-        """Re-detect and display git repository when refresh is clicked."""
-        self.refresh_repository_and_commits()
-
-    def on_save_iteration_requested(self) -> None:
+    def save_iteration(self) -> None:
         """Execute save-iteration flow from toolbar or panel button."""
         repo = self._ui_state.git_repository
 
         if repo is None:
-            self._view.show_warning_message(
+            self._dialog_view.show_warning_message(
                 translate("History", "No Project"),
                 translate("History", "No project detected. Please open a document from a project."),
             )
@@ -115,7 +112,7 @@ class GitRepositoryPresenter:
 
         staged_result = self._get_staged_file_paths_action.execute(repo)
         if not staged_result.is_success or not staged_result.data:
-            self._view.show_info_message(
+            self._dialog_view.show_info_message(
                 translate("History", "No Reviewed Files"),
                 translate("History", "There are no reviewed files to save."),
             )
@@ -124,13 +121,13 @@ class GitRepositoryPresenter:
         if self._identity_missing_after_configuration(repo):
             return
 
-        commit_message = self._view.show_save_iteration_dialog()
+        commit_message = self._dialog_view.show_save_iteration_dialog()
         if commit_message is None:
             return
 
         trimmed_message = commit_message.strip()
         if not trimmed_message:
-            self._view.show_warning_message(
+            self._dialog_view.show_warning_message(
                 translate("History", "Empty Notes"),
                 translate("History", "Iteration notes cannot be empty"),
             )
@@ -142,20 +139,16 @@ class GitRepositoryPresenter:
             self.refresh_repository_and_commits()
             return
 
-        self._view.show_error_message(
+        self._dialog_view.show_error_message(
             translate("History", "Save Iteration Failed"),
             result.message or translate("History", "Git commit failed"),
         )
 
-    def on_save_iteration_button_clicked(self) -> None:
-        """Handle save-iteration button click by delegating to command path."""
-        self.on_save_iteration_requested()
-
-    def on_configure_author_requested(self) -> None:
+    def configure_author(self) -> None:
         """Open author configuration flow from toolbar command."""
         repo = self._ui_state.git_repository
         if repo is None:
-            self._view.show_warning_message(
+            self._dialog_view.show_warning_message(
                 translate("History", "No Project"),
                 translate("History", "No project detected. Please open a document from a project."),
             )
@@ -182,7 +175,7 @@ class GitRepositoryPresenter:
         initial_values = self._configured_identity_dialog_values(repo)
         global_config_writable = self._can_write_global_identity()
         while True:
-            dialog_result = self._view.show_configure_author_dialog(
+            dialog_result = self._dialog_view.show_configure_author_dialog(
                 message=retry_message,
                 initial_values=initial_values,
                 global_config_writable=global_config_writable,
@@ -191,7 +184,7 @@ class GitRepositoryPresenter:
                 return False
 
             if not dialog_result.author_name or not dialog_result.author_email:
-                self._view.show_warning_message(
+                self._dialog_view.show_warning_message(
                     translate("History", "Save Iteration Failed"),
                     translate("History", "Name and email are required to save iteration"),
                 )
@@ -206,7 +199,7 @@ class GitRepositoryPresenter:
                 return True
 
             if not dialog_result.should_save_globally:
-                self._view.show_error_message(
+                self._dialog_view.show_error_message(
                     translate("History", "Save Iteration Failed"),
                     translate("History", "Git identity could not be saved"),
                 )
@@ -252,7 +245,7 @@ class GitRepositoryPresenter:
         if result.is_success:
             repo = result.data
             self._ui_state.git_repository = repo
-            self._view.show_repository(repo)
+            self._history_view.show_repository(repo)
             self._reset_commit_pagination(repo)
 
             # After detecting repository, load commits
@@ -261,8 +254,8 @@ class GitRepositoryPresenter:
         else:
             self._ui_state.git_repository = None
             self._reset_commit_pagination(None)
-            self._view.show_repository(None)
-            self._view.show_commits([], show_special_items=False)
+            self._history_view.show_repository(None)
+            self._history_view.show_commits([], show_special_items=False)
             self._clear_doc_diffs()
             Log.info(f"Git detection failed: {result.message}")
 
@@ -283,20 +276,20 @@ class GitRepositoryPresenter:
             self._loaded_commit_count = len(commits)
             self._has_more_commits = len(commits) == self._page_size
             self._clear_doc_diffs()
-            self._view.show_commits(commits)
+            self._history_view.show_commits(commits)
         else:
             self._loaded_commit_count = 0
             self._has_more_commits = False
             self._clear_doc_diffs()
             # Show empty list on failure
-            self._view.show_commits([])
+            self._history_view.show_commits([])
             Log.warning(f"Failed to load commits: {result.message}")
 
     def _load_commits(self, repo: GitRepository) -> None:
         """Backward-compatible wrapper for tests and callers."""
         self._load_initial_commits(repo)
 
-    def on_history_scroll_near_bottom(self) -> None:
+    def load_more_commits(self) -> None:
         """Load next commit page when history scroll reaches bottom area."""
         now = monotonic()
         if now - self._last_scroll_load_ts < self._scroll_load_interval_seconds:
@@ -329,7 +322,7 @@ class GitRepositoryPresenter:
             self._has_more_commits = False
             return
 
-        self._view.append_commits(commits)
+        self._history_view.append_commits(commits)
         self._loaded_commit_count += len(commits)
         self._has_more_commits = len(commits) == self._page_size
 
