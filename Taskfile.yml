@@ -107,7 +107,7 @@ tasks:
   translations:verify-clean:
     desc: Fail if translation artifacts are stale after refresh
     cmds:
-      - task: translations:refresh
+      - task: translate
       - |
           git diff --exit-code -- \
             freecad/history_wb/resources/translations/History.ts \
@@ -135,7 +135,7 @@ tasks:
           fi
           lrelease "$@"
 
-  translations:refresh:
+  translate:
     desc: Extract template, update locales, and compile translations
     cmds:
       - task: translations:update
