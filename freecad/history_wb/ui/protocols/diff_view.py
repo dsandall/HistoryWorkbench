@@ -230,7 +230,7 @@ class DiffView(Protocol):
         """Show configure-author dialog and return entered values or None."""
 
     def show_restore_file_confirmation_dialog(self, git_path: str) -> bool:
-        """Show destructive confirmation for one file restore."""
+        """Show destructive confirmation for restore action, optionally including file path context."""
 
     def show_restore_scope_dialog(self) -> str | None:
         """Show bulk restore scope picker. Returns listed_fcstd, all_fcstd, or None."""

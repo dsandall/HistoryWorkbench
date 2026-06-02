@@ -135,16 +135,20 @@ def show_configure_author_dialog(
 
 
 def show_restore_file_confirmation_dialog(parent: QtWidgets.QWidget, git_path: str) -> bool:
-    """Show destructive confirmation dialog for single-file restore."""
-    del git_path
+    """Show destructive confirmation dialog for restore actions."""
 
     title = translate("History", "Restore")
     message = translate(
         "History",
-        "This operation will overwrite the current files on disk with the selected saved copies.\n\nOpen FreeCAD "
+        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\nOpen FreeCAD "
         "documents will be closed and reopened to ensure links are updated.\n\n"
-        "Unsaved in-memory changes in open files will be lost.\n\nSaved history is not affected.",
+        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected.",
     )
+
+    # Bulk restore uses empty path and should keep the generic warning text.
+    if git_path:
+        message = f"{git_path}\n\n{message}"
+
     restore_button_text = translate("History", "Restore")
     cancel_button_text = translate("History", "Cancel")
     dialog = QtWidgets.QMessageBox(parent)
@@ -172,8 +176,7 @@ def show_restore_scope_dialog(parent: QtWidgets.QWidget) -> str | None:
     listed_desc = QtWidgets.QLabel(
         translate(
             "History",
-            "Restore only the FreeCAD files changed in the selected iteration. "
-            "Other files on disk are left unchanged.",
+            "Restore only the FreeCAD files changed in the selected iteration. Other files on disk are left unchanged.",
         )
     )
     listed_desc.setWordWrap(True)

@@ -16,40 +16,29 @@ from ...application.actions.get_committed_file_paths import GetCommittedFilePath
 from ...application.actions.get_open_eligible_documents import GetOpenEligibleDocumentsAction
 from ...application.actions.get_staged_file_paths import GetStagedFilePathsAction
 from ...application.actions.open_document import OpenDocumentAction
-from ...application.actions.open_visual_diff import (
-    OpenVisualDiffAction,
-    OpenVisualDiffRequest,
-    VisualDiffRequestType,
-)
-from ...application.actions.restore_documents import (
-    RestoreDocumentsAction,
-    RestoreDocumentsRequest,
-    RestoreScope,
-    RestoreSource,
-)
+from ...application.actions.open_visual_diff import OpenVisualDiffAction
+from ...application.actions.restore_documents import RestoreDocumentsAction
 from ...application.actions.result_models import (
-    CreateDocumentDiffsRequest,
-    DocumentDiffMode,
     DocumentDiffResult,
 )
 from ...application.actions.stage_documents import StageDocumentsAction
 from ...application.actions.unstage_documents import UnstageDocumentsAction
-from ...domain.diff.engine import DiffResult
-from ...domain.diff.models import DiffState
-from ...domain.freecad_ports import DocumentLike
-from ...domain.git.models import GitRepository
 from ...domain.settings import SettingsRepository
-from ...domain.snapshots.models import Snapshot
-from ...utils import Log, translate
+from ...utils import Log
 from ..protocols.diff_view import DiffView
 from ..state import UIState
 from ..views.history.models import HistorySelection
-from .document_diff.document_mapper import build_document_presentations, compute_stage_button_state
+from .document_diff.diff_loader import DocumentDiffLoader
+from .document_diff.document_mapper import build_document_presentations
+from .document_diff.restore_handler import DocumentDiffRestoreHandler
+from .document_diff.result_store import DocumentDiffResultStore
+from .document_diff.staging_handler import DocumentDiffStagingHandler, StagingDisplayState
 from .document_diff.summary_state import (
     SummaryButtonState,
     build_summary_button_state,
     count_summary_counts,
 )
+from .document_diff.visual_diff_handler import DocumentVisualDiffHandler
 from .property_diff.property_mapper import transform_property_diffs
 
 
@@ -92,19 +81,26 @@ class DiffPresenter:
 
         self._view = view
         self._ui_state = ui_state
-        self._get_eligible_docs = get_eligible_docs_action
-        self._create_document_diffs = create_document_diffs_action
-        self._stage_documents = stage_documents_action
-        self._unstage_documents = unstage_documents_action
-        self._open_visual_feature_diff = open_visual_feature_diff_action
         self._open_document = open_document_action
-        self._restore_documents = restore_documents_action
-        self._get_staged_file_paths = get_staged_file_paths_action
-        self._get_committed_file_paths = get_committed_file_paths_action
         self._settings_repo = settings_repo
         self._default_precision = DEFAULT_FLOAT_PRECISION
-        self._diff_results_by_path: dict[str, DiffResult] = {}
-        self._document_results_by_path: dict[str, DocumentDiffResult] = {}
+        self._result_store = DocumentDiffResultStore()
+        self._diff_loader = DocumentDiffLoader(get_eligible_docs_action, create_document_diffs_action)
+        self._staging_handler = DocumentDiffStagingHandler(
+            self._result_store,
+            stage_documents_action,
+            unstage_documents_action,
+        )
+        self._restore_handler = DocumentDiffRestoreHandler(
+            restore_documents_action,
+            get_committed_file_paths_action,
+            get_staged_file_paths_action,
+            self._view.show_restore_file_confirmation_dialog,
+            self._view.show_restore_scope_dialog,
+            self._view.show_info_message,
+            self._view.show_error_message,
+        )
+        self._visual_diff_handler = DocumentVisualDiffHandler(open_visual_feature_diff_action)
         self._current_history_selection: HistorySelection | None = None
         self._focus_history_window_callback: Callable[[], None] | None = None
 
@@ -178,8 +174,11 @@ class DiffPresenter:
 
     def clear_doc_diff(self) -> None:
         """Clear document diff data and document/property diff panels."""
-        self._diff_results_by_path.clear()
+        self._result_store.clear()
         self._view.clear_doc_diffs()
+
+        # Property panel belongs to selected document tree node and must clear with the tree.
+        self.clear_property_diff()
 
     def _on_working_tree_selected(self) -> None:
         """Handle Working Tree item selection.
@@ -195,50 +194,14 @@ class DiffPresenter:
             self.clear_doc_diff()
             return
 
-        eligible_docs = self._get_eligible_documents(repo)
-
-        # Explicitly check None, because empty list is valid
-        if eligible_docs is None:
-            self.clear_doc_diff()
-            return
-
-        document_results = self._compute_working_tree_diffs(repo, eligible_docs)
-        self._store_results(document_results)
+        document_results = self._diff_loader.load_working_tree(repo)
+        self._result_store.store_results(document_results)
 
         if document_results:
             self.present_diffs(document_results)
         else:
             Log.info("No diff results to display")
             self.clear_doc_diff()
-
-    def _get_eligible_documents(self, repo: GitRepository) -> list[DocumentLike] | None:
-        """Get eligible open documents for repository."""
-        docs_result = self._get_eligible_docs.execute(repo)
-
-        if not docs_result.is_success:
-            Log.warning(f"Failed to get eligible documents: {docs_result.message}")
-            return None
-
-        return docs_result.data
-
-    def _compute_working_tree_diffs(
-        self, repo: GitRepository, eligible_docs: list[DocumentLike]
-    ) -> list[DocumentDiffResult]:
-        """Compute diffs for working tree mode."""
-        doc_diff_results_result = self._create_document_diffs.execute(
-            CreateDocumentDiffsRequest(mode=DocumentDiffMode.WORKING_TREE, repo=repo, eligible_docs=eligible_docs)
-        )
-        if doc_diff_results_result.is_success and doc_diff_results_result.data:
-            return doc_diff_results_result.data
-        return []
-
-    def _store_results(self, document_results: list[DocumentDiffResult]) -> None:
-        """Store action results and diff payloads for later use."""
-        self._diff_results_by_path.clear()
-        self._document_results_by_path = {result.git_path: result for result in document_results}
-        for result in document_results:
-            if result.snapshot_diff is not None:
-                self._diff_results_by_path[result.git_path] = result.snapshot_diff
 
     def _on_staging_selected(self) -> None:
         """Handle Staging item selection.
@@ -260,23 +223,14 @@ class DiffPresenter:
             self.clear_doc_diff()
             return
 
-        document_results = self._compute_staging_diffs(repo)
-        self._store_results(document_results)
+        document_results = self._diff_loader.load_staging(repo)
+        self._result_store.store_results(document_results)
 
         if document_results:
             self.present_diffs(document_results)
         else:
             Log.info("No diff results to display for staging")
             self.clear_doc_diff()
-
-    def _compute_staging_diffs(self, repo: GitRepository) -> list[DocumentDiffResult]:
-        """Compute diffs for staging mode."""
-        doc_diff_results_result = self._create_document_diffs.execute(
-            CreateDocumentDiffsRequest(mode=DocumentDiffMode.STAGING, repo=repo)
-        )
-        if doc_diff_results_result.is_success and doc_diff_results_result.data:
-            return doc_diff_results_result.data
-        return []
 
     def _on_commit_selected(self, commit_hash: str | None) -> None:
         """Handle commit item selection.
@@ -298,23 +252,14 @@ class DiffPresenter:
             self.clear_doc_diff()
             return
 
-        document_results = self._compute_commit_diffs(repo, commit_hash)
-        self._store_results(document_results)
+        document_results = self._diff_loader.load_commit(repo, commit_hash)
+        self._result_store.store_results(document_results)
 
         if document_results:
             self.present_diffs(document_results)
         else:
             Log.info(f"No FCStd files changed in commit {commit_hash}")
             self.clear_doc_diff()
-
-    def _compute_commit_diffs(self, repo: GitRepository, commit_hash: str) -> list[DocumentDiffResult]:
-        """Compute diffs for commit mode."""
-        doc_diff_results_result = self._create_document_diffs.execute(
-            CreateDocumentDiffsRequest(mode=DocumentDiffMode.COMMIT, repo=repo, commit_hash=commit_hash)
-        )
-        if doc_diff_results_result.is_success and doc_diff_results_result.data:
-            return doc_diff_results_result.data
-        return []
 
     def on_add_button_clicked(self, git_path: str) -> None:
         """Handle '+ Stage' button click for staging.
@@ -327,47 +272,7 @@ class DiffPresenter:
             Log.warning("No git repository detected")
             return
 
-        # Use document result to determine staging strategy.
-        document_result = self._document_results_by_path.get(git_path)
-        if document_result is None:
-            Log.warning(f"No document result found for {git_path}")
-            return
-
-        # Deleted document -- stage deletion, no snapshot to persist.
-        if document_result.document_state == DiffState.DELETED:
-            result = self._stage_documents.execute(repo, [], deleted_paths=[git_path])
-            if not result.is_success:
-                Log.warning(f"Failed to stage deleted document: {result.message}")
-                return
-
-            Log.info(f"Successfully staged deletion of {git_path}")
-            self.clear_property_diff()
-            self._remove_path_from_cached_working_tree_results(git_path)
-            return
-
-        # Normal document -- require a snapshot diff to stage.
-        diff_result = self._diff_results_by_path.get(git_path)
-        if diff_result is None:
-            Log.warning(f"No diff result found for {git_path}")
-            return
-
-        # Get the working tree snapshot (new_snapshot) from the diff
-        # Since we're in working tree view, old_snapshot may be None
-        working_snapshot = diff_result.new_snapshot
-
-        # Stage the document
-        result = self._stage_documents.execute(repo, [working_snapshot], deleted_paths=[])
-        if not result.is_success:
-            Log.warning(f"Failed to stage document: {result.message}")
-            return
-
-        Log.info(f"Successfully staged {git_path}")
-
-        # Clear stale property view tied to prior node selection
-        self.clear_property_diff()
-
-        # Remove staged path from cached Current Files results and re-present remainder.
-        self._remove_path_from_cached_working_tree_results(git_path)
+        self._apply_staging_display_state(self._staging_handler.stage_document(repo, git_path))
 
     def on_stage_all_clicked(self) -> None:
         """Handle 'Stage All' button click.
@@ -380,54 +285,7 @@ class DiffPresenter:
             Log.warning("No git repository detected")
             return
 
-        snapshots: list[Snapshot] = []
-        deleted_paths: list[str] = []
-
-        for document_result in self._document_results_by_path.values():
-            if not compute_stage_button_state(document_result, True):
-                # Not stage-able -- skip.
-                continue
-
-            if document_result.document_state == DiffState.DELETED:
-                # Deleted documents are staged by path, not snapshot.
-                deleted_paths.append(document_result.git_path)
-                continue
-
-            # Non-deleted documents need a snapshot diff to stage.
-            diff_result = self._diff_results_by_path.get(document_result.git_path)
-            if diff_result is not None and diff_result.new_snapshot is not None:
-                snapshots.append(diff_result.new_snapshot)
-
-        # Nothing to stage.
-        if not snapshots and not deleted_paths:
-            # Normal no-op case (for example, Current Files context action with nothing to stage).
-            return
-
-        # Stage all documents
-        result = self._stage_documents.execute(repo, snapshots, deleted_paths=deleted_paths)
-        if not result.is_success:
-            Log.warning(f"Failed to stage documents: {result.message}")
-            return
-
-        Log.info(f"Successfully staged {len(snapshots) + len(deleted_paths)} documents")
-
-        # Clear current doc/property selection before reloading trees
-        self.clear_doc_diff()
-
-        # Refresh the working tree view to reflect staged state
-        self._on_working_tree_selected()
-
-    def _remove_path_from_cached_working_tree_results(self, git_path: str) -> None:
-        """Remove one path from cached working-tree results and refresh view from cache."""
-        self._diff_results_by_path.pop(git_path, None)
-        self._document_results_by_path.pop(git_path, None)
-
-        if not self._document_results_by_path:
-            self.clear_doc_diff()
-            return
-
-        remaining_results = sorted(self._document_results_by_path.values(), key=lambda result: result.git_path)
-        self.present_diffs(remaining_results)
+        self._apply_staging_display_state(self._staging_handler.stage_all(repo))
 
     def on_remove_from_reviewed_button_clicked(self, git_path: str) -> None:
         """Unstage one reviewed document unit (FCStd + snapshot yaml)."""
@@ -436,14 +294,7 @@ class DiffPresenter:
             Log.warning("No git repository detected")
             return
 
-        result = self._unstage_documents.execute(repo, [git_path])
-        if not result.is_success:
-            Log.warning(f"Failed to remove document from reviewed: {result.message}")
-            return
-
-        Log.info(f"Removed reviewed document: {git_path}")
-        self.clear_property_diff()
-        self._on_staging_selected()
+        self._apply_staging_display_state(self._staging_handler.remove_document_from_reviewed(repo, git_path))
 
     def on_remove_all_from_reviewed_clicked(self) -> None:
         """Unstage all reviewed staged paths from index."""
@@ -452,20 +303,8 @@ class DiffPresenter:
             Log.warning("No git repository detected")
             return
 
-        result = self._unstage_documents.execute(repo, None)
-        if not result.is_success:
-            Log.warning(f"Failed to remove all reviewed files: {result.message}")
-            return
-
-        Log.info("Removed all reviewed files")
-        self.clear_property_diff()
         current_selection = self._view.get_current_history_selection()
-        if current_selection is None:
-            return
-        if current_selection.item_kind == "STAGING":
-            self._on_staging_selected()
-        elif current_selection.item_kind == "WORKING_TREE":
-            self._on_working_tree_selected()
+        self._apply_staging_display_state(self._staging_handler.remove_all_from_reviewed(repo, current_selection))
 
     def on_restore_document_clicked(self, git_path: str) -> None:
         """Restore one document for current staging/commit source."""
@@ -475,17 +314,14 @@ class DiffPresenter:
             return
         if current.item_kind not in ("STAGING", "COMMIT"):
             return
-        source, commit_hash = self._restore_source_from_selection(current)
-        if not self._view.show_restore_file_confirmation_dialog(git_path):
-            return
-        request = RestoreDocumentsRequest(
-            repo=repo,
-            source=source,
-            scope=RestoreScope.SINGLE_PATH,
-            commit_hash=commit_hash,
-            paths=[git_path],
-        )
-        self._execute_restore(request)
+        restore_success = self._restore_handler.restore_document(repo, current, git_path)
+        self.clear_property_diff()
+        if (
+            restore_success
+            and self._current_history_selection is not None
+            and self._current_history_selection.item_kind == "WORKING_TREE"
+        ):
+            self._on_working_tree_selected()
 
     def on_restore_all_clicked(self) -> None:
         """Restore listed/all files for current staging/commit source."""
@@ -501,45 +337,14 @@ class DiffPresenter:
             return
         if selection.item_kind not in ("STAGING", "COMMIT"):
             return
-        scope_text = self._view.show_restore_scope_dialog()
-        if scope_text is None:
-            return
-        if not self._view.show_restore_file_confirmation_dialog(""):
-            return
 
-        source, commit_hash = self._restore_source_from_selection(selection)
-        listed_paths = self._listed_paths_for_selection(repo, selection)
-        scope = RestoreScope.LISTED_FCSTD if scope_text == "listed_fcstd" else RestoreScope.ALL_FCSTD
-        request = RestoreDocumentsRequest(
-            repo=repo,
-            source=source,
-            scope=scope,
-            commit_hash=commit_hash,
-            paths=listed_paths,
-        )
-        self._execute_restore(request)
-
-    def _restore_source_from_selection(self, selection: HistorySelection) -> tuple[RestoreSource, str | None]:
-        if selection.item_kind == "COMMIT":
-            return RestoreSource.COMMIT, selection.commit_hash
-        return RestoreSource.INDEX, None
-
-    def _listed_paths_for_selection(self, repo: GitRepository, selection: HistorySelection) -> list[str]:
-        if selection.item_kind == "COMMIT" and selection.commit_hash:
-            result = self._get_committed_file_paths.execute(repo, selection.commit_hash)
-            return result.data if result.is_success and result.data else []
-        result = self._get_staged_file_paths.execute(repo)
-        return result.data if result.is_success and result.data else []
-
-    def _execute_restore(self, request: RestoreDocumentsRequest) -> None:
-        result = self._restore_documents.execute(request)
+        restore_success = self._restore_handler.restore_all(repo, selection)
         self.clear_property_diff()
-        if not result.is_success:
-            self._view.show_error_message(translate("History", "Restore"), result.message or "Restore failed")
-            return
-        self._view.show_info_message(translate("History", "Restore"), translate("History", "Restoration complete."))
-        current = self._current_history_selection
-        if current is not None and current.item_kind == "WORKING_TREE":
+        if (
+            restore_success
+            and self._current_history_selection is not None
+            and self._current_history_selection.item_kind == "WORKING_TREE"
+        ):
             self._on_working_tree_selected()
 
     def present_diffs(
@@ -592,50 +397,7 @@ class DiffPresenter:
             Log.warning("No git repository detected")
             return
 
-        request = self._build_visual_diff_request(current_selection, repo, git_path, node_path)
-        if request is None:
-            return
-
-        result = self._open_visual_feature_diff.execute(request)
-        if not result.is_success and result.message:
-            Log.warning(result.message)
-
-    def _build_visual_diff_request(
-        self,
-        selection: HistorySelection,
-        repo: GitRepository,
-        git_path: str,
-        node_path: str,
-    ) -> OpenVisualDiffRequest | None:
-        """Build visual diff request for current history mode."""
-        if selection.item_kind == "WORKING_TREE":
-            return OpenVisualDiffRequest(
-                repo=repo,
-                git_path=git_path,
-                node_path=node_path,
-                type=VisualDiffRequestType.WORKING,
-            )
-
-        if selection.item_kind == "STAGING":
-            return OpenVisualDiffRequest(
-                repo=repo,
-                git_path=git_path,
-                node_path=node_path,
-                type=VisualDiffRequestType.STAGING,
-            )
-
-        if selection.item_kind == "COMMIT" and selection.commit_hash:
-            return OpenVisualDiffRequest(
-                repo=repo,
-                git_path=git_path,
-                node_path=node_path,
-                type=VisualDiffRequestType.COMMIT,
-                old_commit=f"{selection.commit_hash}~1",
-                new_commit=selection.commit_hash,
-            )
-
-        Log.warning("Commit selection missing commit hash for visual diff")
-        return None
+        self._visual_diff_handler.open_visual_diff(current_selection, repo, git_path, node_path)
 
     def on_node_selected(self, git_path: str, node_path: str) -> None:
         """Handle tree node selection to display property diffs.
@@ -644,16 +406,16 @@ class DiffPresenter:
         Looks up the property diffs for that path and displays them.
 
         Args:
-            git_path: The document path (key in _diff_results_by_path)
+            git_path: The document path used by cached diff results
             node_path: The path of the selected node within that document
         """
         # Guard: No diff results stored
-        if not self._diff_results_by_path:
+        if not self._result_store.has_diff_results():
             self.clear_property_diff()
             return
 
-        # Look up the correct DiffResult for this document
-        diff_result = self._diff_results_by_path.get(git_path)
+        # Stale tree selections can arrive after refresh; clear instead of raising.
+        diff_result = self._result_store.get_diff_result(git_path)
         if diff_result is None:
             Log.debug(f"[PRESENTER] No DiffResult found for git_path: {git_path}")
             self.clear_property_diff()
@@ -672,3 +434,20 @@ class DiffPresenter:
         properties = transform_property_diffs(node_diff, self._get_precision())
         Log.debug(f"[PRESENTER] Transformed to {len(properties)} PropertyPresentation")
         self._view.show_property_diff(properties)
+
+    def _apply_staging_display_state(self, state: StagingDisplayState) -> None:
+        """Apply handler-produced staging display updates to view and selection flows."""
+        if state.clear_doc_diff:
+            self.clear_doc_diff()
+
+        if state.clear_property_diff:
+            self.clear_property_diff()
+
+        # Cached working-tree remainder can be re-presented without reloading actions.
+        if state.remaining_document_results is not None:
+            self.present_diffs(state.remaining_document_results)
+
+        if state.refresh_mode == "working_tree":
+            self._on_working_tree_selected()
+        elif state.refresh_mode == "staging":
+            self._on_staging_selected()

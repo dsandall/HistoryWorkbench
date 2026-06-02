@@ -118,18 +118,55 @@ def test_show_restore_file_confirmation_dialog_returns_true_for_restore_button()
     _ensure_app()
 
     clicked_button = MagicMock()
+    captured_text: list[str] = []
 
     def _fake_add_button(_self: QtWidgets.QMessageBox, text: str, _role: QtWidgets.QMessageBox.ButtonRole) -> object:
         if text == "Restore":
             return clicked_button
         return MagicMock()
 
+    def _capture_text(_self: QtWidgets.QMessageBox, text: str) -> None:
+        captured_text.append(text)
+
     with (
         patch.object(QtWidgets.QMessageBox, "addButton", new=_fake_add_button),
+        patch.object(QtWidgets.QMessageBox, "setText", new=_capture_text),
         patch.object(QtWidgets.QMessageBox, "exec", return_value=0),
         patch.object(QtWidgets.QMessageBox, "clickedButton", return_value=clicked_button),
     ):
         assert show_restore_file_confirmation_dialog(QtWidgets.QWidget(), "file.FCStd") is True
+
+    assert captured_text == [
+        "file.FCStd\n\nThis operation will overwrite the current file(s) on disk with the selected saved copies.\n\n"
+        "Open FreeCAD documents will be closed and reopened to ensure links are updated.\n\n"
+        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected."
+    ]
+
+
+def test_show_restore_file_confirmation_dialog_keeps_generic_message_for_bulk_restore() -> None:
+    """Bulk restore confirmation omits file-path prefix from warning text."""
+    from freecad.history_wb.ui.views.diff_panel.dialogs import show_restore_file_confirmation_dialog
+
+    _ensure_app()
+
+    captured_text: list[str] = []
+
+    def _capture_text(_self: QtWidgets.QMessageBox, text: str) -> None:
+        captured_text.append(text)
+
+    with (
+        patch.object(QtWidgets.QMessageBox, "addButton", return_value=MagicMock()),
+        patch.object(QtWidgets.QMessageBox, "setText", new=_capture_text),
+        patch.object(QtWidgets.QMessageBox, "exec", return_value=0),
+        patch.object(QtWidgets.QMessageBox, "clickedButton", return_value=MagicMock()),
+    ):
+        show_restore_file_confirmation_dialog(QtWidgets.QWidget(), "")
+
+    assert captured_text == [
+        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\n"
+        "Open FreeCAD documents will be closed and reopened to ensure links are updated.\n\n"
+        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected."
+    ]
 
 
 def test_show_restore_scope_dialog_defaults_to_listed_scope() -> None:
