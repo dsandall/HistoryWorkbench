@@ -100,6 +100,8 @@ Presenter responsibilities are split by kind:
 
 Presenters receive only the specific view objects and action objects they need from the UI composer, not sibling child widgets or Qt gesture details. Views render Qt widgets and perform translation. Presenters pass raw data and intent, not translated UI strings. Dialogs and message boxes stay in view layer even when launched from FreeCAD command entry points.
 
+Presenters must never import Qt or call message helpers directly. They depend on `DialogView` or equivalent message protocol methods for all modal UI. `DiffPanelView` implements those protocol methods by delegating to `views/diff_panel/messages.py`. Extracted presenter collaborators (handlers, loaders) receive the narrow dialog/message protocol, not concrete view modules. This keeps modal UI in the view layer and keeps presenter tests Qt-free.
+
 Handlers are focused, stateless workflow classes inside presenter subdirectories. They own multi-step dialog flows and action orchestration for a single use case. They are owned by `WorkbenchCommandPresenter` for command-accessible flows. Panel presenters delegate shared command flows to `WorkbenchCommandPresenter` instead of constructing handlers directly.
 
 ### Application Layer
@@ -212,7 +214,7 @@ Infrastructure Layer
 
 - Entry points may call UI registries, presenters, commands, and application container accessors.
 - UI may call application actions and use domain models for display state.
-- Handlers depend on application actions and `ApplicationState`, not on presenters or concrete widgets.
+- Handlers depend on application actions, `ApplicationState`, and the dialog/message protocol, not on presenters, concrete widgets, or Qt.
 - Application may use domain services, domain models, and domain ports.
 - Application actions may coordinate desktop side effects through ports, but should not import Qt widgets or concrete FreeCAD/git/filesystem implementations.
 - Domain should not import UI or application modules.
