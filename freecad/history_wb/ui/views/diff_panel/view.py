@@ -13,10 +13,10 @@ from ..history.panel import HistoryPanelWidget
 from ..property_diff.tree import PropertyDiffTreeWidget
 
 
-__all__ = ["DiffPanelView"]
+__all__ = ["HistoryPanelView"]
 
 
-class DiffPanelView(QtWidgets.QWidget):
+class HistoryPanelView(QtWidgets.QWidget):
     """3-column diff panel view coordinating child facades and shared state.
 
     Provides a horizontal QSplitter with:

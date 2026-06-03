@@ -9,7 +9,7 @@
 from ..application.di.container import ApplicationContainer
 from ..ui.registry import ui_registry
 from ..ui.state import ApplicationState
-from ..ui.views.diff_panel import DialogView, DiffPanelView
+from ..ui.views.diff_panel import DialogView, HistoryPanelView
 from ..ui.wiring import bind_ui_events
 from .presenters.diff_presenter import DiffPresenter
 from .presenters.git_repository_presenter import GitRepositoryPresenter
@@ -45,7 +45,7 @@ def compose_and_register_workbench_commands(
 def compose_and_register_panel(
     container: ApplicationContainer,
     application_state: ApplicationState,
-) -> DiffPanelView:
+) -> HistoryPanelView:
     """Create and register the diff panel UI components.
 
     This function is the composition root for the panel-scoped UI layer.
@@ -60,7 +60,7 @@ def compose_and_register_panel(
         container: Application container with actions wired (backend only)
         application_state: Pre-created application state (survives panel close)
     Returns:
-        The configured DiffPanelView
+        The configured HistoryPanelView
 
     Side Effects:
         - Registers presenters in UIRegistry
@@ -68,7 +68,7 @@ def compose_and_register_panel(
         - Initializes git repository detection
     """
     # Create view with settings repo for runtime precision
-    view = DiffPanelView(settings_repo=container.settings_repo)
+    view = HistoryPanelView(settings_repo=container.settings_repo)
     dialog_view = DialogView(view)
 
     # Create and register diff_presenter (needs application_state for git_repository)

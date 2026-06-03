@@ -9,11 +9,11 @@ from .dialogs import (
     show_save_iteration_dialog,
 )
 from .messages import show_error_message, show_info_message, show_warning_message
-from .view import DiffPanelView
+from .view import HistoryPanelView
 
 
 __all__ = [
-    "DiffPanelView",
+    "HistoryPanelView",
     "DialogView",
     "GitConfigDialogResult",
     "show_configure_author_dialog",

@@ -1,11 +1,11 @@
-"""File responsibility: Unit tests for DiffPanelView cross-column coordination behavior."""
+"""File responsibility: Unit tests for HistoryPanelView cross-column coordination behavior."""
 
 from __future__ import annotations
 
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtWidgets
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation
-from freecad.history_wb.ui.views.diff_panel.view import DiffPanelView
+from freecad.history_wb.ui.views.diff_panel.view import HistoryPanelView
 from freecad.history_wb.ui.views.document_diff.panel import DocumentDiffTreeWidget
 from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
 
@@ -16,7 +16,7 @@ def test_history_click_updates_document_row_buttons_on_first_click() -> None:
     if app is None:
         app = QtWidgets.QApplication([])
 
-    panel = DiffPanelView()
+    panel = HistoryPanelView()
     history_panel = panel.findChild(HistoryPanelWidget)
     document_tree = panel.findChild(DocumentDiffTreeWidget)
     assert history_panel is not None

@@ -32,7 +32,7 @@ class GitRepositoryPresenter:
     duplicating handler construction and dialog lifecycle management.
 
     Attributes:
-        _view: The DiffPanelView instance for displaying repository info.
+        _view: The HistoryPanelView instance for displaying repository info.
         _find_git_repo_action: The action for finding the active git repository.
         _application_state: The application-scoped state holder for storing repository.
     """

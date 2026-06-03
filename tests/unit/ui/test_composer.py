@@ -100,7 +100,7 @@ def test_compose_creates_and_registers_ui_components() -> None:
     mock_command_presenter = MagicMock()
 
     with (
-        patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
+        patch("freecad.history_wb.ui.composer.HistoryPanelView") as MockView,
         patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
         patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
         patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
@@ -139,7 +139,7 @@ def test_compose_uses_externally_provided_application_state() -> None:
     mock_command_presenter = MagicMock()
 
     with (
-        patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
+        patch("freecad.history_wb.ui.composer.HistoryPanelView") as MockView,
         patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
         patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
         patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
@@ -175,7 +175,7 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
     mock_command_presenter = MagicMock()
 
     with (
-        patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
+        patch("freecad.history_wb.ui.composer.HistoryPanelView") as MockView,
         patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
         patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
         patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
@@ -224,16 +224,26 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         mock_view.history_panel.refresh_requested.connect.assert_called_once_with(
             mock_git_presenter.refresh_repository_and_commits
         )
-        mock_view.history_panel.save_iteration_requested.connect.assert_called_once_with(mock_git_presenter.save_iteration)
+        mock_view.history_panel.save_iteration_requested.connect.assert_called_once_with(
+            mock_git_presenter.save_iteration
+        )
         mock_view.history_panel.history_scroll_bottom_requested.connect.assert_called_once_with(
             mock_git_presenter.load_more_commits
         )
-        mock_view.history_panel.history_selection_requested.connect.assert_called_once_with(mock_diff_presenter.select_history_item)
+        mock_view.history_panel.history_selection_requested.connect.assert_called_once_with(
+            mock_diff_presenter.select_history_item
+        )
         mock_view.history_selection_changed.connect.assert_called_once_with(mock_diff_presenter.track_history_selection)
-        mock_view.document_diff_panel.node_selection_requested.connect.assert_called_once_with(mock_diff_presenter.select_node)
-        mock_view.document_diff_panel.visual_diff_requested.connect.assert_called_once_with(mock_diff_presenter.open_visual_diff)
+        mock_view.document_diff_panel.node_selection_requested.connect.assert_called_once_with(
+            mock_diff_presenter.select_node
+        )
+        mock_view.document_diff_panel.visual_diff_requested.connect.assert_called_once_with(
+            mock_diff_presenter.open_visual_diff
+        )
         mock_view.document_diff_panel.add_requested.connect.assert_called_once_with(mock_diff_presenter.stage_document)
-        mock_view.document_diff_panel.stage_all_requested.connect.assert_called_once_with(mock_diff_presenter.stage_all_documents)
+        mock_view.document_diff_panel.stage_all_requested.connect.assert_called_once_with(
+            mock_diff_presenter.stage_all_documents
+        )
         mock_view.document_diff_panel.remove_from_reviewed_requested.connect.assert_called_once_with(
             mock_diff_presenter.remove_document_from_reviewed
         )
@@ -243,9 +253,15 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         mock_view.history_panel.mark_all_reviewed_from_in_progress_requested.connect.assert_called_once_with(
             mock_diff_presenter.stage_all_documents
         )
-        mock_view.document_diff_panel.remove_all_requested.connect.assert_called_once_with(mock_diff_presenter.remove_all_from_reviewed)
-        mock_view.document_diff_panel.restore_requested.connect.assert_called_once_with(mock_diff_presenter.restore_document)
-        mock_view.document_diff_panel.restore_all_requested.connect.assert_called_once_with(mock_diff_presenter.restore_all_documents)
+        mock_view.document_diff_panel.remove_all_requested.connect.assert_called_once_with(
+            mock_diff_presenter.remove_all_from_reviewed
+        )
+        mock_view.document_diff_panel.restore_requested.connect.assert_called_once_with(
+            mock_diff_presenter.restore_document
+        )
+        mock_view.document_diff_panel.restore_all_requested.connect.assert_called_once_with(
+            mock_diff_presenter.restore_all_documents
+        )
         mock_view.history_panel.restore_all_from_history_context_requested.connect.assert_called_once_with(
             mock_diff_presenter.restore_all_from_history
         )
@@ -277,7 +293,10 @@ def test_compose_and_register_workbench_commands() -> None:
         assert wcp_kwargs["get_git_identity_action"] is mock_container.get_git_identity_action
         assert wcp_kwargs["save_git_identity_action"] is mock_container.save_git_identity_action
         assert wcp_kwargs["can_write_global_git_identity_action"] is mock_container.can_write_global_git_identity_action
-        assert wcp_kwargs["get_git_repository_init_candidates_action"] is mock_container.get_git_repository_init_candidates_action
+        assert (
+            wcp_kwargs["get_git_repository_init_candidates_action"]
+            is mock_container.get_git_repository_init_candidates_action
+        )
         assert wcp_kwargs["initialize_git_repository_action"] is mock_container.initialize_git_repository_action
         assert wcp_kwargs["get_gitignore_content_action"] is mock_container.get_gitignore_content_action
         assert wcp_kwargs["update_gitignore_action"] is mock_container.update_gitignore_action

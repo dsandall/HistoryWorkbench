@@ -10,14 +10,14 @@ from typing import Any
 
 from .presenters.diff_presenter import DiffPresenter
 from .presenters.git_repository_presenter import GitRepositoryPresenter
-from .views.diff_panel.view import DiffPanelView
+from .views.diff_panel.view import HistoryPanelView
 
 
 __all__ = ["bind_ui_events", "bind_history_events", "bind_document_diff_events"]
 
 
 def bind_ui_events(
-    view: DiffPanelView,
+    view: HistoryPanelView,
     diff_presenter: DiffPresenter,
     git_repo_presenter: GitRepositoryPresenter,
 ) -> None:
@@ -33,7 +33,7 @@ def bind_ui_events(
 
 
 def bind_history_events(
-    view: DiffPanelView,
+    view: HistoryPanelView,
     diff_presenter: DiffPresenter,
     git_repo_presenter: GitRepositoryPresenter,
 ) -> None:
@@ -53,7 +53,7 @@ def bind_history_events(
     _bind_signal_pairs(signal_bindings)
 
 
-def bind_document_diff_events(view: DiffPanelView, diff_presenter: DiffPresenter) -> None:
+def bind_document_diff_events(view: HistoryPanelView, diff_presenter: DiffPresenter) -> None:
     """Bind document-diff public signals to presenter listeners."""
     document_diff_panel = view.document_diff_panel
 

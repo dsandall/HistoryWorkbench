@@ -50,7 +50,7 @@ Workbench.Activated() or Open Diff Window command
         v
 compose_and_register_panel(container, application_state)
         |
-        |-- create DiffPanelView
+        |-- create HistoryPanelView
         |-- create presenters (consume application_state)
         |-- register presenters in UIRegistry
         |-- detect active git repository
@@ -256,7 +256,7 @@ The container is stored through `set_container()` so FreeCAD command instances c
 
 `compose_and_register_panel(container, application_state)` creates:
 
-- `DiffPanelView`
+- `HistoryPanelView`
 - `DiffPresenter`
 - `GitRepositoryPresenter`
 
@@ -278,7 +278,7 @@ Composite Qt views may be split into focused child widgets, but event flow stays
 - Avoid widget-gesture names such as `on_*_clicked` in public presenter-facing API.
 - Cross-widget coordination is tested at facade level; child rendering and mapping behavior is tested at owning component/helper level.
 
-Example: `DiffPanelView` composes `HistoryPanelWidget`, `DocumentDiffTreeWidget`, and `PropertyDiffTreeWidget`. Selecting history in `HistoryPanelWidget` does not directly mutate `PropertyDiffTreeWidget`; facade state and presenter listeners coordinate the resulting document/property updates.
+Example: `HistoryPanelView` composes `HistoryPanelWidget`, `DocumentDiffTreeWidget`, and `PropertyDiffTreeWidget`. Selecting history in `HistoryPanelWidget` does not directly mutate `PropertyDiffTreeWidget`; facade state and presenter listeners coordinate the resulting document/property updates.
 
 ## Snapshot And Diff Pipeline
 
@@ -305,7 +305,7 @@ DiffResult
 DiffPresenter
         |
         v
-DiffPanelView
+HistoryPanelView
 ```
 
 Snapshots contain normalized object payloads and occurrence paths. This allows repeated or linked objects to be represented separately from object data. Diff comparison uses settings for exclusions and numeric precision.

@@ -217,7 +217,7 @@ class TestPropertyViewerIntegration:
             app = QtWidgets.QApplication([])
 
         from freecad.history_wb.domain.snapshots.gui_extractor import SnapshotExtractor
-        from freecad.history_wb.ui import DiffPanelView
+        from freecad.history_wb.ui import HistoryPanelView
         from freecad.history_wb.ui.presenters.presentation_models import PropertyPresentation
 
         # Open BasicFile
@@ -237,8 +237,8 @@ class TestPropertyViewerIntegration:
                 if obj:
                     nodes_by_name[obj.name].append((occ, obj))
 
-            # Create DiffPanelView
-            panel = DiffPanelView()
+            # Create HistoryPanelView
+            panel = HistoryPanelView()
 
             # Get properties from first node with properties
             test_node = None
