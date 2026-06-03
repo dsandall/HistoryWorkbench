@@ -8,7 +8,7 @@ import pytest
 from freecad.history_wb.application.di.container import ApplicationContainer
 from freecad.history_wb.ui.composer import compose_and_register_ui
 from freecad.history_wb.ui.registry import ui_registry
-from freecad.history_wb.ui.state import UIState
+from freecad.history_wb.ui.state import ApplicationState
 
 
 class _SignalMock:
@@ -85,6 +85,10 @@ def _mock_container() -> MagicMock:
     mock.restore_documents_action = MagicMock()
     mock.find_active_git_repository_action = MagicMock()
     mock.get_commits_action = MagicMock()
+    mock.get_git_repository_init_candidates_action = MagicMock()
+    mock.initialize_git_repository_action = MagicMock()
+    mock.get_gitignore_content_action = MagicMock()
+    mock.update_gitignore_action = MagicMock()
     mock.commit_staging_action = MagicMock()
     mock.get_git_identity_action = MagicMock()
     mock.save_git_identity_action = MagicMock()
@@ -94,13 +98,13 @@ def _mock_container() -> MagicMock:
 
 
 def test_compose_creates_and_registers_ui_components() -> None:
-    """compose_and_register_ui returns view, creates UIState(git_repository=None), registers both presenters, calls on_workbench_activated."""  # noqa: E501
+    """compose_and_register_ui returns view, uses externally provided ApplicationState, registers both presenters, calls on_workbench_activated."""  # noqa: E501
     mock_container = _mock_container()
+    mock_application_state = ApplicationState(git_repository=None)
 
     with (
         patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
         patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
-        patch("freecad.history_wb.ui.composer.UIState") as MockUIState,
         patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
         patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
     ):
@@ -109,22 +113,16 @@ def test_compose_creates_and_registers_ui_components() -> None:
         mock_dialog_view = MagicMock()
         MockDialogView.return_value = mock_dialog_view
 
-        mock_ui_state = MagicMock(spec=UIState)
-        MockUIState.return_value = mock_ui_state
-
         mock_diff_presenter = MagicMock()
         MockDiffPresenter.return_value = mock_diff_presenter
 
         mock_git_presenter = MagicMock()
         MockGitPresenter.return_value = mock_git_presenter
 
-        result = compose_and_register_ui(mock_container)
+        result = compose_and_register_ui(mock_container, mock_application_state)
 
         # Returns the view
         assert result is mock_view
-
-        # Creates UIState with git_repository=None
-        MockUIState.assert_called_once_with(git_repository=None)
 
         # Both presenters created and registered
         assert MockDiffPresenter.call_count == 1
@@ -134,14 +132,14 @@ def test_compose_creates_and_registers_ui_components() -> None:
         mock_git_presenter.on_workbench_activated.assert_called_once()
 
 
-def test_compose_wires_action_dependencies_and_callbacks() -> None:
-    """Action dependencies and event wiring are delegated correctly."""
+def test_compose_uses_externally_provided_application_state() -> None:
+    """Composer passes the externally provided ApplicationState into both presenters."""
     mock_container = _mock_container()
+    mock_application_state = ApplicationState(git_repository=None)
 
     with (
         patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
         patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
-        patch("freecad.history_wb.ui.composer.UIState"),
         patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
         patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
     ):
@@ -156,7 +154,39 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         mock_git_presenter = MagicMock()
         MockGitPresenter.return_value = mock_git_presenter
 
-        compose_and_register_ui(mock_container)
+        compose_and_register_ui(mock_container, mock_application_state)
+
+        # Both presenters receive the same ApplicationState instance
+        diff_kwargs = MockDiffPresenter.call_args.kwargs
+        assert diff_kwargs["application_state"] is mock_application_state
+
+        git_kwargs = MockGitPresenter.call_args.kwargs
+        assert git_kwargs["application_state"] is mock_application_state
+
+
+def test_compose_wires_action_dependencies_and_callbacks() -> None:
+    """Action dependencies and event wiring are delegated correctly."""
+    mock_container = _mock_container()
+    mock_application_state = ApplicationState(git_repository=None)
+
+    with (
+        patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
+        patch("freecad.history_wb.ui.composer.DialogView") as MockDialogView,
+        patch("freecad.history_wb.ui.composer.DiffPresenter") as MockDiffPresenter,
+        patch("freecad.history_wb.ui.composer.GitRepositoryPresenter") as MockGitPresenter,
+    ):
+        mock_view = _mock_view()
+        MockView.return_value = mock_view
+        mock_dialog_view = MagicMock()
+        MockDialogView.return_value = mock_dialog_view
+
+        mock_diff_presenter = MagicMock()
+        MockDiffPresenter.return_value = mock_diff_presenter
+
+        mock_git_presenter = MagicMock()
+        MockGitPresenter.return_value = mock_git_presenter
+
+        compose_and_register_ui(mock_container, mock_application_state)
 
         # DiffPresenter receives correct concrete collaborators and actions from container
         diff_kwargs = MockDiffPresenter.call_args.kwargs

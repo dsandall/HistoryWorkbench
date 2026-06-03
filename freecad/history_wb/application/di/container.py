@@ -4,7 +4,7 @@ This module wires actions and domain services together.
 It's the composition root for the application layer (backend).
 UI layer components are composed separately in the composer module.
 
-NO UI knowledge: no presenters, no views, no UIState.
+NO UI knowledge: no presenters, no views, no ApplicationState.
 """
 
 from dataclasses import dataclass
@@ -65,7 +65,7 @@ class ApplicationContainer:
     - Domain services
     - Ports/Repositories
 
-    NO UI knowledge: no presenters, no views, no UIState.
+    NO UI knowledge: no presenters, no views, no ApplicationState.
     """
 
     # Ports (infrastructure adapters)
@@ -106,7 +106,6 @@ class ApplicationContainer:
     open_all_documents_in_repository_action: OpenAllDocumentsInRepositoryAction
     open_document_action: OpenDocumentAction
     recompute_all_open_documents_action: RecomputeAllOpenDocumentsAction
-    # NO ui_state - that's frontend state, not application state
 
     def log(self, message: str) -> None:
         """Log a message to the FreeCAD console.
@@ -139,7 +138,7 @@ def create_application_container(ctx: FreeCadContext) -> ApplicationContainer:
     """Wire ONLY application layer dependencies.
 
     No UI components are created here - this runs before GUI exists.
-    UIState is created by the composer later when GUI is available.
+    ApplicationState is created by the workbench during container initialization.
 
     Args:
         ctx: FreeCAD runtime context

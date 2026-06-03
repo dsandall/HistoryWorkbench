@@ -1,12 +1,13 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# File responsibility: Composes UI components, registers them, and triggers UI activation.
-# This module is responsible for creating UI views, UIState, presenters,
-# registering them globally, and delegating signal binding to ui.wiring helpers.
+# File responsibility: Composes UI components and registers them.
+# This module creates UI views and presenters, registers them globally,
+# and delegates signal binding to ui.wiring helpers. It consumes a
+# pre-created ApplicationState and does not own state lifecycle.
 """UI Composer - Composes and registers UI components."""
 
 from ..application.di.container import ApplicationContainer
 from ..ui.registry import ui_registry
-from ..ui.state import UIState
+from ..ui.state import ApplicationState
 from ..ui.views.diff_panel import DialogView, DiffPanelView
 from ..ui.wiring import bind_ui_events
 from .presenters.diff_presenter import DiffPresenter
@@ -16,39 +17,41 @@ from .presenters.git_repository_presenter import GitRepositoryPresenter
 __all__ = ["compose_and_register_ui"]
 
 
-def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
+def compose_and_register_ui(
+    container: ApplicationContainer,
+    application_state: ApplicationState,
+) -> DiffPanelView:
     """Create UI components and register them globally.
 
     This function is the composition root for the UI layer. It creates all
-    UI components (views, presenters, state) and wires them together,
+    UI components (views, presenters) and wires them together,
     then registers the presenters in the global UI registry for access
     by entry points (commands).
 
+    ApplicationState is created externally (workbench lifecycle) and passed
+    in. This keeps state alive across panel open/close cycles.
+
     Args:
         container: Application container with actions wired (backend only)
+        application_state: Pre-created application state (survives panel close)
     Returns:
         The configured DiffPanelView
 
     Side Effects:
-        - Creates UIState (frontend state)
         - Registers presenters in UIRegistry
         - Connects all callbacks
         - Initializes git repository detection
     """
-    # Create UI state (frontend state, like Pinia/Redux)
-    ui_state = UIState(git_repository=None)
-    ui_registry.register_ui_state(ui_state)
-
     # Create view with settings repo for runtime precision
     view = DiffPanelView(settings_repo=container.settings_repo)
     dialog_view = DialogView(view)
 
-    # Create and register diff_presenter (needs ui_state for git_repository)
+    # Create and register diff_presenter (needs application_state for git_repository)
     diff_presenter = DiffPresenter(
         document_view=view.document_diff_panel,
         property_view=view.property_diff_panel,
         dialog_view=dialog_view,
-        ui_state=ui_state,
+        application_state=application_state,
         get_eligible_docs_action=container.get_open_eligible_docs_action,
         create_document_diffs_action=container.create_document_diffs_action,
         stage_documents_action=container.stage_documents_action,
@@ -73,7 +76,11 @@ def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
         get_git_identity_action=container.get_git_identity_action,
         save_git_identity_action=container.save_git_identity_action,
         can_write_global_git_identity_action=container.can_write_global_git_identity_action,
-        ui_state=ui_state,
+        get_git_repository_init_candidates_action=container.get_git_repository_init_candidates_action,
+        initialize_git_repository_action=container.initialize_git_repository_action,
+        get_gitignore_content_action=container.get_gitignore_content_action,
+        update_gitignore_action=container.update_gitignore_action,
+        application_state=application_state,
         clear_doc_diffs=diff_presenter.clear_doc_diff,
     )
     ui_registry.register_git_repository_presenter(git_repo_presenter)

@@ -1,9 +1,12 @@
 """File responsibility: Concrete dialog view that anchors modal UI to diff panel widget."""
 
+from ....domain.git.models import GitRepositoryInitCandidate
 from ....qt import QtWidgets
 from .dialogs import (
     GitConfigDialogResult,
     show_configure_author_dialog,
+    show_gitignore_editor_dialog,
+    show_init_repository_dialog,
     show_restore_file_confirmation_dialog,
     show_restore_scope_dialog,
     show_save_iteration_dialog,
@@ -58,3 +61,14 @@ class DialogView:
     def show_restore_scope_dialog(self) -> str | None:
         """Show restore-all scope picker dialog."""
         return show_restore_scope_dialog(self._parent)
+
+    def show_init_repository_dialog(
+        self,
+        candidates: list[GitRepositoryInitCandidate],
+    ) -> str | None:
+        """Show repository initialization dialog and return selected directory."""
+        return show_init_repository_dialog(self._parent, candidates)
+
+    def show_gitignore_editor_dialog(self, content: str) -> str | None:
+        """Show gitignore editor dialog and return edited content."""
+        return show_gitignore_editor_dialog(self._parent, content)

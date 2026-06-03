@@ -25,7 +25,7 @@ from freecad.history_wb.ui.presenters.diff_presenter import DiffPresenter
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, PropertyPresentation
 from freecad.history_wb.ui.presenters.document_diff.summary_state import SummaryButtonState, SummaryCounts
 from freecad.history_wb.ui.presenters.document_diff.staging_handler import StagingDisplayState
-from freecad.history_wb.ui.state import UIState
+from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.history.models import HistorySelection
 from tests.fakes.fake_views import FakeDialogView, FakeDocumentDiffView, FakePropertyDiffView
 
@@ -38,7 +38,7 @@ def _make_presenter() -> tuple[FakeDocumentDiffView, FakePropertyDiffView, FakeD
         document_view=document_view,
         property_view=property_view,
         dialog_view=dialog_view,
-        ui_state=UIState(git_repository=None),
+        application_state=ApplicationState(git_repository=None),
         get_eligible_docs_action=MagicMock(spec=GetOpenEligibleDocumentsAction),
         create_document_diffs_action=MagicMock(spec=CreateDocumentDiffsAction),
         stage_documents_action=MagicMock(spec=StageDocumentsAction),
@@ -101,7 +101,7 @@ def test_history_item_selected_routes_commit_selection_and_tracks_current_select
 def test_open_document_click_focuses_history_window_after_refresh() -> None:
     """Successful open-document flow refreshes and refocuses history host window."""
     _, _, _, presenter = _make_presenter()
-    presenter._ui_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     presenter._open_document.execute.return_value = Result.success("/home/user/dir/repo/doc.FCStd")
     focused: list[bool] = []
     presenter.set_focus_history_window_callback(lambda: focused.append(True))
@@ -116,7 +116,7 @@ def test_open_document_click_focuses_history_window_after_refresh() -> None:
 def test_add_button_click_applies_staging_handler_remaining_results() -> None:
     """Presenter applies cached remainder returned by staging handler."""
     _, _, _, presenter = _make_presenter()
-    presenter._ui_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     presenter._current_history_selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
     remaining_result = DocumentDiffResult(git_path="b.FCStd", document_state=DiffState.MODIFIED, issues=DiffIssues())
     presenter._staging_handler = MagicMock()
@@ -135,7 +135,7 @@ def test_add_button_click_applies_staging_handler_remaining_results() -> None:
 def test_restore_document_click_clears_property_diff_after_handler_call() -> None:
     """Presenter clears property pane after single-file restore flow."""
     _, property_view, _, presenter = _make_presenter()
-    presenter._ui_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     presenter._current_history_selection = HistorySelection(item_kind="STAGING", commit_hash=None)
     presenter._restore_handler = MagicMock()
     presenter._restore_handler.restore_document.return_value = False
@@ -249,14 +249,14 @@ def test_restore_all_documents_delegates_current_selection_to_history_context_re
 def test_restore_all_from_history_clears_property_diff_after_handler_call() -> None:
     """Context restore-all clears property pane after delegated restore flow."""
     _, property_view, _, presenter = _make_presenter()
-    presenter._ui_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     presenter._restore_handler = MagicMock()
     presenter._restore_handler.restore_all.return_value = False
     selection = HistorySelection(item_kind="COMMIT", commit_hash="abc123")
 
     presenter.restore_all_from_history(selection)
 
-    presenter._restore_handler.restore_all.assert_called_once_with(presenter._ui_state.git_repository, selection)
+    presenter._restore_handler.restore_all.assert_called_once_with(presenter._application_state.git_repository, selection)
     assert any(call["method"] == "clear_property_diff" for call in property_view.get_calls())
 
 
@@ -265,7 +265,7 @@ def test_visual_diff_click_delegates_to_visual_diff_handler() -> None:
     _, _, _, presenter = _make_presenter()
     repo = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
-    presenter._ui_state.git_repository = repo
+    presenter._application_state.git_repository = repo
     presenter._current_history_selection = selection
     presenter._visual_diff_handler = MagicMock()
 

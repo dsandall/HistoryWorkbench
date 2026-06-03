@@ -129,6 +129,8 @@ if Gui is not None:
             from ..entrypoints.commands import register_commands
             from ..infrastructure.freecad.logger import FreeCADLogger
             from ..infrastructure.freecad.ports import get_freecad_runtime_context
+            from ..ui.registry import ui_registry
+            from ..ui.state import ApplicationState
             from ..ui.views.settings_preferences_page import DiffSettingsPreferencesPage
 
             # Create runtime context
@@ -142,6 +144,10 @@ if Gui is not None:
 
             # Make container globally available
             set_container(container)
+
+            # Create and register application state (survives panel open/close)
+            application_state = ApplicationState(git_repository=None)
+            ui_registry.register_application_state(application_state)
 
             # Re-register commands now that container exists
             register_commands()
@@ -199,7 +205,8 @@ if Gui is not None:
                     return
 
                 # Compose UI and register presenters globally
-                view = compose_and_register_ui(_container)
+                # Application state is pre-created during container init; passed in here
+                view = compose_and_register_ui(_container, ui_registry.application_state)
 
                 # Add as MDI subwindow
                 self._subwindow = mdi_area.addSubWindow(view)
@@ -223,6 +230,10 @@ if Gui is not None:
             """Called when the diff panel subwindow is closed."""
             Log.info("Diff panel closed.")
             self._subwindow = None  # Reset reference so new one will be created on next activation
+
+            # Clear panel-scoped presenters; application state survives for command access
+            from ..ui.registry import ui_registry
+            ui_registry.clear_presenters()
 
         def _focus_diff_panel_deferred(self) -> None:
             """Queue focus on diff subwindow after FreeCAD activation events settle."""

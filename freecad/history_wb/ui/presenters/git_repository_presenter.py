@@ -14,14 +14,24 @@ from freecad.history_wb.application.actions.find_active_git_repository import (
 )
 from freecad.history_wb.application.actions.get_commits import GetCommitsAction
 from freecad.history_wb.application.actions.get_git_identity import GetGitIdentityAction
+from freecad.history_wb.application.actions.get_git_repository_init_candidates import (
+    GetGitRepositoryInitCandidatesAction,
+)
+from freecad.history_wb.application.actions.get_gitignore_content import GetGitIgnoreContentAction
 from freecad.history_wb.application.actions.get_staged_file_paths import GetStagedFilePathsAction
+from freecad.history_wb.application.actions.initialize_git_repository import InitializeGitRepositoryAction
 from freecad.history_wb.application.actions.save_git_identity import SaveGitIdentityAction
+from freecad.history_wb.application.actions.update_gitignore import UpdateGitIgnoreAction
 from freecad.history_wb.domain.git.models import GitRepository
-from freecad.history_wb.ui.state import UIState
+from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.diff_panel.dialog_view import DialogView
-from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
 from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
 from freecad.history_wb.utils import Log, translate
+
+from .git_repository.author_configuration_handler import AuthorConfigurationHandler
+from .git_repository.commit_iteration_handler import CommitIterationHandler
+from .git_repository.gitignore_handler import GitIgnoreHandler
+from .git_repository.initialize_repository_handler import InitializeRepositoryHandler
 
 
 class GitRepositoryPresenter:
@@ -30,14 +40,13 @@ class GitRepositoryPresenter:
     This presenter is responsible for:
     1. Detecting the active git repository when the workbench is activated
     2. Updating the UI state with the detected repository
-    3. Displaying the repository information in the view
+   3. Displaying the repository information in the view
     4. Loading and displaying commits for the repository
 
     Attributes:
         _view: The DiffPanelView instance for displaying repository info.
         _find_git_repo_action: The action for finding the active git repository.
-        _get_commits_action: The action for getting git commits.
-        _ui_state: The UI state holder for storing repository.
+        _application_state: The application-scoped state holder for storing repository.
     """
 
     def __init__(
@@ -51,7 +60,11 @@ class GitRepositoryPresenter:
         get_git_identity_action: GetGitIdentityAction,
         save_git_identity_action: SaveGitIdentityAction,
         can_write_global_git_identity_action: CanWriteGlobalGitIdentityAction,
-        ui_state: UIState,
+        get_git_repository_init_candidates_action: GetGitRepositoryInitCandidatesAction,
+        initialize_git_repository_action: InitializeGitRepositoryAction,
+        get_gitignore_content_action: GetGitIgnoreContentAction,
+        update_gitignore_action: UpdateGitIgnoreAction,
+        application_state: ApplicationState,
         clear_doc_diffs: Callable[[], None],
     ) -> None:
         """Initialize the presenter with required dependencies.
@@ -61,7 +74,7 @@ class GitRepositoryPresenter:
             dialog_view: Dialog and message view implementation.
             find_git_repo_action: The action for finding the active git repository.
             get_commits_action: The action for getting git commits.
-            ui_state: The UI state holder for storing repository.
+            application_state: Application-scoped state holder for storing repository.
         """
         self._history_view = history_view
         self._dialog_view = dialog_view
@@ -72,8 +85,45 @@ class GitRepositoryPresenter:
         self._get_git_identity_action = get_git_identity_action
         self._save_git_identity_action = save_git_identity_action
         self._can_write_global_git_identity_action = can_write_global_git_identity_action
-        self._ui_state = ui_state
+        self._get_git_repository_init_candidates_action = get_git_repository_init_candidates_action
+        self._initialize_git_repository_action = initialize_git_repository_action
+        self._get_gitignore_content_action = get_gitignore_content_action
+        self._update_gitignore_action = update_gitignore_action
+        self._application_state = application_state
+        self._init_repo_handler = InitializeRepositoryHandler(
+            get_candidates_action=self._get_git_repository_init_candidates_action,
+            initialize_action=self._initialize_git_repository_action,
+            show_init_dialog=dialog_view.show_init_repository_dialog,
+            show_info_message=dialog_view.show_info_message,
+            show_error_message=dialog_view.show_error_message,
+            application_state=application_state,
+        )
+        self._gitignore_handler = GitIgnoreHandler(
+            get_content_action=self._get_gitignore_content_action,
+            update_action=self._update_gitignore_action,
+            show_editor_dialog=dialog_view.show_gitignore_editor_dialog,
+            show_info_message=dialog_view.show_info_message,
+            show_error_message=dialog_view.show_error_message,
+        )
         self._clear_doc_diffs = clear_doc_diffs
+        self._author_handler = AuthorConfigurationHandler(
+            get_git_identity_action=self._get_git_identity_action,
+            save_git_identity_action=self._save_git_identity_action,
+            can_write_global_git_identity_action=self._can_write_global_git_identity_action,
+            show_configure_author_dialog=dialog_view.show_configure_author_dialog,
+            show_warning_message=dialog_view.show_warning_message,
+            show_error_message=dialog_view.show_error_message,
+        )
+        self._commit_handler = CommitIterationHandler(
+            get_staged_file_paths_action=self._get_staged_file_paths_action,
+            commit_staging_action=self._commit_staging_action,
+            get_git_identity_action=self._get_git_identity_action,
+            author_configuration_handler=self._author_handler,
+            show_save_iteration_dialog=dialog_view.show_save_iteration_dialog,
+            show_warning_message=dialog_view.show_warning_message,
+            show_info_message=dialog_view.show_info_message,
+            show_error_message=dialog_view.show_error_message,
+        )
         self._page_size = 20
         self._loaded_commit_count = 0
         self._has_more_commits = False
@@ -101,7 +151,7 @@ class GitRepositoryPresenter:
 
     def save_iteration(self) -> None:
         """Execute save-iteration flow from toolbar or panel button."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
 
         if repo is None:
             self._dialog_view.show_warning_message(
@@ -110,43 +160,14 @@ class GitRepositoryPresenter:
             )
             return
 
-        staged_result = self._get_staged_file_paths_action.execute(repo)
-        if not staged_result.is_success or not staged_result.data:
-            self._dialog_view.show_info_message(
-                translate("History", "No Reviewed Files"),
-                translate("History", "There are no reviewed files to save."),
-            )
-            return
-
-        if self._identity_missing_after_configuration(repo):
-            return
-
-        commit_message = self._dialog_view.show_save_iteration_dialog()
-        if commit_message is None:
-            return
-
-        trimmed_message = commit_message.strip()
-        if not trimmed_message:
-            self._dialog_view.show_warning_message(
-                translate("History", "Empty Notes"),
-                translate("History", "Iteration notes cannot be empty"),
-            )
-            return
-
-        result = self._commit_staging_action.execute(repo, trimmed_message)
-        if result.is_success:
+        success = self._commit_handler.execute(repo)
+        if success:
             Log.info("Commit successful")
             self.refresh_repository_and_commits()
-            return
-
-        self._dialog_view.show_error_message(
-            translate("History", "Save Iteration Failed"),
-            result.message or translate("History", "Git commit failed"),
-        )
 
     def configure_author(self) -> None:
         """Open author configuration flow from toolbar command."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             self._dialog_view.show_warning_message(
                 translate("History", "No Project"),
@@ -154,85 +175,25 @@ class GitRepositoryPresenter:
             )
             return
 
-        self._configure_repository_identity(repo)
+        self._author_handler.execute(repo)
 
-    def _identity_missing_after_configuration(
-        self,
-        repo: GitRepository,
-    ) -> bool:
-        """Return whether git identity is still missing after configuration attempt."""
-        identity_result = self._get_git_identity_action.execute(repo)
-        if identity_result.data is not None:
-            return False
+    def initialize_repository(self) -> None:
+        """Execute repository initialization flow from toolbar command."""
+        initialized = self._init_repo_handler.execute()
+        if initialized:
+            self.refresh_repository_and_commits()
 
-        return not self._configure_repository_identity(repo)
-
-    def _configure_repository_identity(self, repo: GitRepository) -> bool:
-        """Show git config dialog and save identity for repository."""
-        from freecad.history_wb.domain.git.models import GitIdentity
-
-        retry_message: str | None = None
-        initial_values = self._configured_identity_dialog_values(repo)
-        global_config_writable = self._can_write_global_identity()
-        while True:
-            dialog_result = self._dialog_view.show_configure_author_dialog(
-                message=retry_message,
-                initial_values=initial_values,
-                global_config_writable=global_config_writable,
+    def update_gitignore(self) -> None:
+        """Execute gitignore editor flow from toolbar command."""
+        repo = self._application_state.git_repository
+        if repo is None:
+            self._dialog_view.show_warning_message(
+                translate("History", "No Project"),
+                translate("History", "No project detected. Open a FreeCAD document in a project first."),
             )
-            if dialog_result is None:
-                return False
+            return
 
-            if not dialog_result.author_name or not dialog_result.author_email:
-                self._dialog_view.show_warning_message(
-                    translate("History", "Save Iteration Failed"),
-                    translate("History", "Name and email are required to save iteration"),
-                )
-                return False
-
-            save_result = self._save_git_identity_action.execute(
-                repo,
-                GitIdentity(name=dialog_result.author_name, email=dialog_result.author_email),
-                dialog_result.should_save_globally,
-            )
-            if save_result.is_success:
-                return True
-
-            if not dialog_result.should_save_globally:
-                self._dialog_view.show_error_message(
-                    translate("History", "Save Iteration Failed"),
-                    translate("History", "Git identity could not be saved"),
-                )
-                return False
-
-            retry_message = translate(
-                "History",
-                "Could not save git identity for all projects. "
-                "Uncheck the global option to save it only for this project.",
-            )
-            initial_values = dialog_result
-
-    def _can_write_global_identity(self) -> bool:
-        """Return whether global git identity config can be written."""
-        result = self._can_write_global_git_identity_action.execute()
-        if not result.is_success:
-            return False
-        return bool(result.data)
-
-    def _configured_identity_dialog_values(
-        self,
-        repo: GitRepository,
-    ) -> GitConfigDialogResult | None:
-        """Return existing git identity as dialog defaults when configured."""
-        identity_result = self._get_git_identity_action.execute(repo)
-        identity = identity_result.data
-        if identity is None:
-            return None
-        return GitConfigDialogResult(
-            author_name=identity.name,
-            author_email=identity.email,
-            should_save_globally=False,
-        )
+        self._gitignore_handler.execute(repo)
 
     def _detect_git_repository(self) -> None:
         """Detect git repository and update UI and application state.
@@ -244,7 +205,7 @@ class GitRepositoryPresenter:
 
         if result.is_success:
             repo = result.data
-            self._ui_state.git_repository = repo
+            self._application_state.git_repository = repo
             self._history_view.show_repository(repo)
             self._reset_commit_pagination(repo)
 
@@ -252,7 +213,7 @@ class GitRepositoryPresenter:
             if repo is not None:
                 self._load_initial_commits(repo)
         else:
-            self._ui_state.git_repository = None
+            self._application_state.git_repository = None
             self._reset_commit_pagination(None)
             self._history_view.show_repository(None)
             self._history_view.show_commits([], show_special_items=False)
@@ -295,7 +256,7 @@ class GitRepositoryPresenter:
         if now - self._last_scroll_load_ts < self._scroll_load_interval_seconds:
             return
 
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             return
         if self._active_repo_path != repo.absolute_path:

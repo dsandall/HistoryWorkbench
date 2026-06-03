@@ -25,7 +25,7 @@ from ...application.actions.stage_documents import StageDocumentsAction
 from ...application.actions.unstage_documents import UnstageDocumentsAction
 from ...domain.settings import SettingsRepository
 from ...utils import Log
-from ..state import UIState
+from ..state import ApplicationState
 from ..views.diff_panel.dialog_view import DialogView
 from ..views.document_diff.panel import DocumentDiffTreeWidget
 from ..views.history.models import HistorySelection
@@ -59,7 +59,7 @@ class DiffPresenter:
         document_view: DocumentDiffTreeWidget,
         property_view: PropertyDiffTreeWidget,
         dialog_view: DialogView,
-        ui_state: UIState,
+        application_state: ApplicationState,
         get_eligible_docs_action: GetOpenEligibleDocumentsAction,
         create_document_diffs_action: CreateDocumentDiffsAction,
         stage_documents_action: StageDocumentsAction,
@@ -77,7 +77,7 @@ class DiffPresenter:
             document_view: Document-diff view collaborator
             property_view: Property-diff view collaborator
             dialog_view: Modal dialog and message collaborator
-            ui_state: UI state holder containing git repository info
+            application_state: Application-scoped state holder containing git repository info
             get_eligible_docs_action: Action to get eligible open documents
             create_document_diffs_action: Action to orchestrate document diffs by mode
             stage_documents_action: Action to stage documents to git
@@ -88,7 +88,7 @@ class DiffPresenter:
         self._document_view = document_view
         self._property_view = property_view
         self._dialog_view = dialog_view
-        self._ui_state = ui_state
+        self._application_state = application_state
         self._open_document = open_document_action
         self._settings_repo = settings_repo
         self._default_precision = DEFAULT_FLOAT_PRECISION
@@ -118,7 +118,7 @@ class DiffPresenter:
 
     def open_document_for_comparison(self, git_path: str) -> None:
         """Open missing working-tree document in FreeCAD, then recompute Current Files diff."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
@@ -186,7 +186,7 @@ class DiffPresenter:
         2. Include every dirty FCStd path from git, including deleted files
         3. Display status-only rows when no snapshot diff can be computed
         """
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             self.clear_doc_diff()
@@ -215,7 +215,7 @@ class DiffPresenter:
         self._document_view.set_stage_all_button_visible(False)
         self._document_view.set_remove_all_button_visible(False)
 
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             self.clear_doc_diff()
@@ -244,7 +244,7 @@ class DiffPresenter:
             self.clear_doc_diff()
             return
 
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             self.clear_doc_diff()
@@ -265,7 +265,7 @@ class DiffPresenter:
         For deleted documents, stages the deletion with no snapshots.
         For other documents, stages the new snapshot from the diff result.
         """
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
@@ -278,7 +278,7 @@ class DiffPresenter:
         Collects snapshots for non-deleted stage-able documents and deleted paths
         for stage-able deleted documents, then stages everything in one call.
         """
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
@@ -287,7 +287,7 @@ class DiffPresenter:
 
     def remove_document_from_reviewed(self, git_path: str) -> None:
         """Unstage one reviewed document unit (FCStd + snapshot yaml)."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
@@ -296,7 +296,7 @@ class DiffPresenter:
 
     def remove_all_from_reviewed(self) -> None:
         """Unstage all reviewed staged paths from index."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return
@@ -308,7 +308,7 @@ class DiffPresenter:
     def restore_document(self, git_path: str) -> None:
         """Restore one document for current staging/commit source."""
         current = self._current_history_selection
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if current is None or repo is None:
             return
         if current.item_kind not in ("STAGING", "COMMIT"):
@@ -331,7 +331,7 @@ class DiffPresenter:
 
     def restore_all_from_history(self, selection: HistorySelection) -> None:
         """Restore from history context selection without changing selected row."""
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             return
         if selection.item_kind not in ("STAGING", "COMMIT"):
@@ -391,7 +391,7 @@ class DiffPresenter:
         if current_selection is None:
             return
 
-        repo = self._ui_state.git_repository
+        repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
             return

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ....domain.git.models import GitRepositoryInitCandidate
 from ....qt import QtWidgets
 from ....utils import translate
 from ..widgets.buttons import make_dialog_button_box
@@ -235,3 +236,112 @@ def show_restore_scope_dialog(parent: QtWidgets.QWidget) -> str | None:
         return None
 
     return "listed_fcstd" if listed.isChecked() else "all_fcstd"
+
+
+def show_init_repository_dialog(
+    parent: QtWidgets.QWidget,
+    candidates: list[GitRepositoryInitCandidate],
+) -> str | None:
+    """Show repository initialization dialog and return selected directory."""
+    dialog = QtWidgets.QDialog(parent)
+    dialog.setWindowTitle(translate("History", "Initialize Project"))
+    dialog.setSizeGripEnabled(True)
+    layout = QtWidgets.QVBoxLayout(dialog)
+    layout.addWidget(
+        QtWidgets.QLabel(
+            translate(
+                "History",
+                "Choose a directory to initialize based on currently open documents. "
+                "The selected directory will be the root of your project:",
+            )
+        )
+    )
+
+    button_group = QtWidgets.QButtonGroup(dialog)
+    first_available_button: QtWidgets.QRadioButton | None = None
+
+    for index, candidate in enumerate(candidates):
+        row_layout = QtWidgets.QHBoxLayout()
+        radio = QtWidgets.QRadioButton(candidate.path, dialog)
+        radio.setEnabled(candidate.is_available)
+        button_group.addButton(radio, index)
+        row_layout.addWidget(radio)
+        if candidate.is_available and first_available_button is None:
+            first_available_button = radio
+
+        if not candidate.is_available:
+            reason_label = QtWidgets.QLabel(
+                translate("History", "Already inside project"),
+                dialog,
+            )
+            reason_label.setEnabled(False)
+            row_layout.addWidget(reason_label)
+
+        row_layout.addStretch()
+        layout.addLayout(row_layout)
+
+    if first_available_button is not None:
+        first_available_button.setChecked(True)
+    else:
+        no_available_text = translate("History", "All listed directories are already inside projects.")
+        layout.addWidget(QtWidgets.QLabel(no_available_text))
+
+    button_layout = QtWidgets.QHBoxLayout()
+    initialize_button = QtWidgets.QPushButton(translate("History", "Initialize"))
+    initialize_button.setEnabled(first_available_button is not None)
+    cancel_button = QtWidgets.QPushButton(translate("History", "Cancel"))
+    initialize_button.clicked.connect(dialog.accept)
+    cancel_button.clicked.connect(dialog.reject)
+
+    button_layout.addStretch()
+    button_layout.addWidget(initialize_button)
+    button_layout.addWidget(cancel_button)
+    layout.addLayout(button_layout)
+
+    dialog.setMinimumWidth(680)
+    dialog.adjustSize()
+    target_height = min(360, dialog.sizeHint().height() + 8)
+    dialog.resize(dialog.width(), target_height)
+
+    if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+        return None
+
+    selected_id = button_group.checkedId()
+    if selected_id < 0:
+        return None
+    return candidates[selected_id].path
+
+
+def show_gitignore_editor_dialog(parent: QtWidgets.QWidget, content: str) -> str | None:
+    """Show gitignore editor dialog. Returns edited content on accept, None on cancel."""
+    dialog = QtWidgets.QDialog(parent)
+    dialog.setWindowTitle(translate("History", "Edit Ignored Files"))
+    dialog.setMinimumWidth(680)
+    dialog.setMinimumHeight(460)
+
+    layout = QtWidgets.QVBoxLayout(dialog)
+    help_template = translate(
+        "History",
+        'Update the ignored files list. Lines starting with a "#" are considered comments. '
+        'Click <a href="%1">here</a> to learn about the full syntax.',
+    )
+    help_label = QtWidgets.QLabel(help_template.replace("%1", "https://www.w3schools.com/git/git_ignore.asp"))
+    help_label.setOpenExternalLinks(True)
+    layout.addWidget(help_label)
+
+    text_edit = QtWidgets.QPlainTextEdit(dialog)
+    text_edit.setPlainText(content)
+    layout.addWidget(text_edit)
+
+    button_box = make_dialog_button_box(
+        accept_text=translate("History", "Save"),
+        reject_text=translate("History", "Cancel"),
+    )
+    button_box.accepted.connect(dialog.accept)
+    button_box.rejected.connect(dialog.reject)
+    layout.addWidget(button_box)
+
+    if dialog.exec() != QtWidgets.QDialog.DialogCode.Accepted:
+        return None
+
+    return text_edit.toPlainText()
