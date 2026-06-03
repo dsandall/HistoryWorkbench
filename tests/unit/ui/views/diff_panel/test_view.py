@@ -23,12 +23,14 @@ def test_history_click_updates_document_row_buttons_on_first_click() -> None:
     assert document_tree is not None
 
     history_panel.show_commits([])
-    history_panel.history_selection_requested.connect(lambda _selection: panel.show_doc_diffs([_sample_diff_tree()]))
+    history_panel.history_selection_requested.connect(
+        lambda _selection: document_tree.show_doc_diffs([_sample_diff_tree()])
+    )
 
-    history_panel.history_list.itemClicked.emit(history_panel.history_list.item(1))
+    history_panel._history_list.itemClicked.emit(history_panel._history_list.item(1))
     assert _document_row_button_texts(document_tree) == ["Restore", "Remove"]
 
-    history_panel.history_list.itemClicked.emit(history_panel.history_list.item(0))
+    history_panel._history_list.itemClicked.emit(history_panel._history_list.item(0))
     assert _document_row_button_texts(document_tree) == ["+ Reviewed"]
 
 

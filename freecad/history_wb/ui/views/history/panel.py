@@ -33,15 +33,6 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         self._setup_ui()
         self._connect_internal_signals()
 
-    @property
-    def history_list(self) -> QtWidgets.QListWidget:
-        """Expose list widget for facade compatibility and tests."""
-        return self._history_list
-
-    def get_current_history_selection(self) -> HistorySelection | None:
-        """Return currently selected history entry."""
-        return self._current_selection
-
     def show_snapshots(self, snapshots: list[SnapshotSummary]) -> None:
         """Display list of available snapshots."""
         self._history_list.clear()

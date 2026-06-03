@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitRepositoryPresenter.
 # These tests verify that the presenter correctly orchestrates git repository
-# detection, commit loading, and delegates command flows to WorkbenchCommandPresenter.
+# detection and commit loading.
 """Unit tests for GitRepositoryPresenter."""
 
 from datetime import datetime
@@ -261,20 +261,6 @@ class TestSaveIterationFlow:
         refresh.assert_not_called()
 
 
-class TestConfigureAuthorFlow:
-    """Tests for configure-author delegation in GitRepositoryPresenter."""
-
-    def test_configure_author_delegates_to_command_presenter(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_command_presenter: MagicMock,
-    ) -> None:
-        """Presenter delegates configure-author to command presenter."""
-        presenter.configure_author()
-
-        mock_command_presenter.configure_author.assert_called_once()
-
-
 class TestInitializeRepositoryFlow:
     """Tests for initialize-repository delegation in GitRepositoryPresenter."""
 
@@ -324,13 +310,13 @@ class TestUpdateGitignoreFlow:
 class TestCommitLoading:
     """Tests for GitRepositoryPresenter commit loading functionality."""
 
-    def test_load_commits_calls_show_commits_on_success(
+    def test_load_initial_commits_calls_show_commits_on_success(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
         mock_get_commits_action: MagicMock,
     ) -> None:
-        """_load_commits() calls show_commits with commits on success."""
+        """_load_initial_commits() calls show_commits with commits on success."""
         commits = [
             GitCommit(
                 id="a1b2c3d4e5f67890",
@@ -346,18 +332,18 @@ class TestCommitLoading:
 
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
 
-        presenter._load_commits(repo)
+        presenter._load_initial_commits(repo)
 
         mock_get_commits_action.execute.assert_called_once_with(repo)
         mock_view.show_commits.assert_called_once_with(commits)
 
-    def test_load_commits_shows_empty_list_on_failure(
+    def test_load_initial_commits_shows_empty_list_on_failure(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
         mock_get_commits_action: MagicMock,
     ) -> None:
-        """_load_commits() shows empty list when action fails."""
+        """_load_initial_commits() shows empty list when action fails."""
         mock_result = MagicMock()
         mock_result.is_success = False
         mock_result.message = "Git error"
@@ -365,7 +351,7 @@ class TestCommitLoading:
 
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
 
-        presenter._load_commits(repo)
+        presenter._load_initial_commits(repo)
 
         mock_view.show_commits.assert_called_once_with([])
 

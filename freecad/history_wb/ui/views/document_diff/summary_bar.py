@@ -23,26 +23,6 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
         self._remove_reviewed_tooltip = remove_reviewed_tooltip
         self._setup_ui()
 
-    @property
-    def summary_label(self) -> QtWidgets.QLabel:
-        """Expose count label for facade compatibility and focused tests."""
-        return self._changed_label
-
-    @property
-    def stage_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Mark All Reviewed button for facade compatibility and focused tests."""
-        return self._stage_all_button
-
-    @property
-    def remove_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Remove All button for facade compatibility and focused tests."""
-        return self._remove_all_button
-
-    @property
-    def restore_all_button(self) -> QtWidgets.QToolButton:
-        """Expose Restore All button for facade compatibility and focused tests."""
-        return self._restore_all_button
-
     def _setup_ui(self) -> None:
         layout = QtWidgets.QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)

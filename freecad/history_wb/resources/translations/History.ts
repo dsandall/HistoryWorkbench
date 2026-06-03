@@ -76,7 +76,7 @@ Saved history will not be affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="169"/>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="67"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="47"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -148,7 +148,7 @@ Saved history will not be affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="25"/>
-        <location filename="../../ui/views/history/repository_header.py" line="108"/>
+        <location filename="../../ui/views/history/repository_header.py" line="93"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -303,19 +303,19 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="57"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="37"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="68"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="48"/>
         <source>Choose which files to restore from the selected iteration.
 Current files on disk can be overwritten or removed.
 Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="83"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="63"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -327,18 +327,18 @@ They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="91"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="86"/>
         <source>Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="96"/>
-        <location filename="../../ui/views/document_diff/tree.py" line="97"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="91"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="92"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="53"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="48"/>
         <location filename="../../ui/views/document_diff/tree_items.py" line="24"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
@@ -362,7 +362,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="98"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="78"/>
         <source>No changes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -377,42 +377,42 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="101"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="81"/>
         <source>Modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="102"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
         <source>Deleted:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="103"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="83"/>
         <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="100"/>
+        <location filename="../../ui/views/history/panel.py" line="91"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/repository_header.py" line="98"/>
+        <location filename="../../ui/views/history/repository_header.py" line="83"/>
         <source>Refresh Project and Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="147"/>
+        <location filename="../../ui/views/history/panel.py" line="138"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="153"/>
+        <location filename="../../ui/views/history/panel.py" line="144"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="71"/>
+        <location filename="../../ui/views/history/panel.py" line="62"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -442,12 +442,12 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/repository_header.py" line="78"/>
+        <location filename="../../ui/views/history/repository_header.py" line="63"/>
         <source>No project detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/repository_header.py" line="85"/>
+        <location filename="../../ui/views/history/repository_header.py" line="70"/>
         <source>Project: %1</source>
         <translation type="unfinished"></translation>
     </message>

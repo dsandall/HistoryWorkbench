@@ -15,7 +15,7 @@ def test_refresh_button_emits_signal() -> None:
     received = []
     header.refresh_requested.connect(lambda: received.append("refresh"))
 
-    header.refresh_button.click()
+    header._refresh_button.click()
 
     assert received == ["refresh"]
 
@@ -26,7 +26,7 @@ def test_save_iteration_button_emits_signal() -> None:
     received = []
     header.save_iteration_requested.connect(lambda: received.append("save"))
 
-    header.save_iteration_button.click()
+    header._save_iteration_button.click()
 
     assert received == ["save"]
 
@@ -41,10 +41,10 @@ def test_header_buttons_keep_expected_order_and_icon_only_policy() -> None:
         if child_widget is not None:
             button_positions.append(child_widget)
 
-    assert button_positions[-2] is header.save_iteration_button
-    assert button_positions[-1] is header.refresh_button
-    assert header.save_iteration_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
-    assert header.refresh_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
+    assert button_positions[-2] is header._save_iteration_button
+    assert button_positions[-1] is header._refresh_button
+    assert header._save_iteration_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
+    assert header._refresh_button.toolButtonStyle() == QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly
 
 
 def test_show_repository_none_shows_empty_state() -> None:
@@ -53,10 +53,10 @@ def test_show_repository_none_shows_empty_state() -> None:
 
     header.show_repository(None)
 
-    assert "no project detected" in header.repository_label.text().lower()
-    assert header.repository_label.toolTip() == ""
-    assert "italic" in header.repository_label.styleSheet()
-    assert "gray" in header.repository_label.styleSheet()
+    assert "no project detected" in header._repository_label.text().lower()
+    assert header._repository_label.toolTip() == ""
+    assert "italic" in header._repository_label.styleSheet()
+    assert "gray" in header._repository_label.styleSheet()
 
 
 def test_show_repository_valid_repo_updates_text_tooltip_and_link_style() -> None:
@@ -66,10 +66,10 @@ def test_show_repository_valid_repo_updates_text_tooltip_and_link_style() -> Non
 
     header.show_repository(repo)
 
-    assert header.repository_label.text() == "Project: test_project"
-    assert header.repository_label.toolTip() == "/home/user/test_project"
-    assert "bold" in header.repository_label.styleSheet()
-    assert "underline" in header.repository_label.styleSheet()
+    assert header._repository_label.text() == "Project: test_project"
+    assert header._repository_label.toolTip() == "/home/user/test_project"
+    assert "bold" in header._repository_label.styleSheet()
+    assert "underline" in header._repository_label.styleSheet()
 
 
 def test_open_repository_directory_opens_path_when_present() -> None:

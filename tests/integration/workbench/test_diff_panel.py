@@ -22,9 +22,11 @@ class TestHistoryPanelView:
         assert panel is not None
 
         # Public protocol methods must be callable
-        assert callable(panel.show_doc_diffs)
-        assert callable(panel.show_summary)
+        assert callable(panel.document_diff_panel.show_doc_diffs)
+        assert callable(panel.document_diff_panel.show_summary)
 
         # Methods execute without errors
-        panel.show_doc_diffs([DiffTreePresentation(nodes=[], git_path="parts/A.FCStd", indicators=[])])
-        panel.show_summary(0, 0, 0)
+        panel.document_diff_panel.show_doc_diffs(
+            [DiffTreePresentation(nodes=[], git_path="parts/A.FCStd", indicators=[])]
+        )
+        panel.document_diff_panel.show_summary(0, 0, 0)

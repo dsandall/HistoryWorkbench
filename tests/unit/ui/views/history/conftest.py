@@ -35,7 +35,7 @@ def history_panel_widget() -> HistoryPanelWidget:
 @pytest.fixture
 def history_list_widget(history_panel_widget: HistoryPanelWidget):
     """Expose HistoryList child through panel fixture."""
-    return history_panel_widget.history_list
+    return history_panel_widget._history_list
 
 
 def make_commit(

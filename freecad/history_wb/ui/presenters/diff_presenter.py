@@ -166,17 +166,13 @@ class DiffPresenter:
         elif selection.item_kind == "COMMIT":
             self._on_commit_selected(selection.commit_hash)
 
-    def clear_property_diff(self) -> None:
-        """Clear property diff panel content."""
-        self._property_view.clear_property_diff()
-
     def clear_doc_diff(self) -> None:
         """Clear document diff data and document/property diff panels."""
         self._result_store.clear()
         self._document_view.clear_doc_diffs()
 
         # Property panel belongs to selected document tree node and must clear with the tree.
-        self.clear_property_diff()
+        self._property_view.clear_property_diff()
 
     def _on_working_tree_selected(self) -> None:
         """Handle Working Tree item selection.
@@ -314,7 +310,7 @@ class DiffPresenter:
         if current.item_kind not in ("STAGING", "COMMIT"):
             return
         restore_success = self._restore_handler.restore_document(repo, current, git_path)
-        self.clear_property_diff()
+        self._property_view.clear_property_diff()
         if (
             restore_success
             and self._current_history_selection is not None
@@ -338,7 +334,7 @@ class DiffPresenter:
             return
 
         restore_success = self._restore_handler.restore_all(repo, selection)
-        self.clear_property_diff()
+        self._property_view.clear_property_diff()
         if (
             restore_success
             and self._current_history_selection is not None
@@ -359,7 +355,7 @@ class DiffPresenter:
             self.clear_doc_diff()
             return
 
-        self.clear_property_diff()
+        self._property_view.clear_property_diff()
 
         is_working_tree = (
             self._current_history_selection is not None and self._current_history_selection.item_kind == "WORKING_TREE"
@@ -410,14 +406,14 @@ class DiffPresenter:
         """
         # Guard: No diff results stored
         if not self._result_store.has_diff_results():
-            self.clear_property_diff()
+            self._property_view.clear_property_diff()
             return
 
         # Stale tree selections can arrive after refresh; clear instead of raising.
         diff_result = self._result_store.get_diff_result(git_path)
         if diff_result is None:
             Log.debug(f"[PRESENTER] No DiffResult found for git_path: {git_path}")
-            self.clear_property_diff()
+            self._property_view.clear_property_diff()
             return
 
         # Find NodeDiff by path within this document's hierarchy
@@ -426,7 +422,7 @@ class DiffPresenter:
         # If not found, clear properties
         if node_diff is None:
             Log.debug(f"[PRESENTER] NodeDiff not found for path: {node_path} in document {git_path}")
-            self.clear_property_diff()
+            self._property_view.clear_property_diff()
             return
 
         # Transform property diffs to presentations
@@ -440,7 +436,7 @@ class DiffPresenter:
             self.clear_doc_diff()
 
         if state.clear_property_diff:
-            self.clear_property_diff()
+            self._property_view.clear_property_diff()
 
         # Cached working-tree remainder can be re-presented without reloading actions.
         if state.remaining_document_results is not None:

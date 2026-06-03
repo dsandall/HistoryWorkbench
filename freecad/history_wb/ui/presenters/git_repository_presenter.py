@@ -97,10 +97,6 @@ class GitRepositoryPresenter:
             Log.info("Commit successful")
             self.refresh_repository_and_commits()
 
-    def configure_author(self) -> None:
-        """Open author configuration flow from toolbar command."""
-        self._command_presenter.configure_author()
-
     def initialize_repository(self) -> None:
         """Execute repository initialization flow from toolbar command."""
         initialized = self._command_presenter.initialize_repository()
@@ -161,10 +157,6 @@ class GitRepositoryPresenter:
             # Show empty list on failure
             self._history_view.show_commits([])
             Log.warning(f"Failed to load commits: {result.message}")
-
-    def _load_commits(self, repo: GitRepository) -> None:
-        """Backward-compatible wrapper for tests and callers."""
-        self._load_initial_commits(repo)
 
     def load_more_commits(self) -> None:
         """Load next commit page when history scroll reaches bottom area."""

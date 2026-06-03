@@ -50,21 +50,6 @@ class RepositoryHeader(QtWidgets.QWidget):
         self._current_repository_path: str | None = None
         self._setup_ui()
 
-    @property
-    def refresh_button(self) -> QtWidgets.QToolButton:
-        """Expose refresh button for facade compatibility and tests."""
-        return self._refresh_button
-
-    @property
-    def save_iteration_button(self) -> QtWidgets.QToolButton:
-        """Expose save-iteration button for facade compatibility and tests."""
-        return self._save_iteration_button
-
-    @property
-    def repository_label(self) -> QtWidgets.QLabel:
-        """Expose repository label for facade compatibility and tests."""
-        return self._repository_label
-
     def open_repository_directory(self) -> None:
         """Open current repository directory when one is displayed."""
         self._repository_label.open_repository_directory()

@@ -28,11 +28,6 @@ class DocumentDiffTree(QtWidgets.QWidget):
         super().__init__(parent)
         self._setup_ui()
 
-    @property
-    def tree_widget(self) -> QtWidgets.QTreeWidget:
-        """Expose underlying tree widget for facade integration and tests."""
-        return self._tree_widget
-
     def clear(self) -> None:
         """Clear all rendered document and node items."""
         self._tree_widget.clear()

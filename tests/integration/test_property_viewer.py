@@ -269,10 +269,10 @@ class TestPropertyViewerIntegration:
                 )
 
             # Call show_property_diff - should not raise
-            panel.show_property_diff(properties)
+            panel.property_diff_panel.show_property_diff(properties)
 
             # Verify tree has items
-            root_count = panel._property_diff_tree.topLevelItemCount()
+            root_count = panel.property_diff_panel.topLevelItemCount()
             assert root_count > 0, "Properties tree should have items"
 
             # Verify groups are present (should be at least 1)
