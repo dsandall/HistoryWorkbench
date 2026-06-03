@@ -22,7 +22,7 @@ class HistoryPanelView(QtWidgets.QWidget):
 
     """
 
-    history_selection_changed = QtCore.Signal(object)
+    history_selection_changed = QtCore.Signal(object)  # HistorySelection | None
 
     def __init__(
         self,

@@ -11,7 +11,7 @@ from ..widgets.styles import TREE_ITEM_HEIGHT, TREE_ITEM_ICON_SIZE
 class DocumentStatusIndicatorsWidget(QtWidgets.QWidget):
     """Render document status indicators and emit open-document actions."""
 
-    open_document_requested = QtCore.Signal(str)
+    open_document_requested = QtCore.Signal(str)  # git_path
 
     def __init__(
         self,

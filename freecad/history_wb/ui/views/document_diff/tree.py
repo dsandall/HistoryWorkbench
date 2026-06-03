@@ -21,8 +21,8 @@ __all__ = ["DocumentDiffTree"]
 class DocumentDiffTree(QtWidgets.QWidget):
     """Render document diff trees and emit node-level user actions."""
 
-    node_selected = QtCore.Signal(str, str)
-    visual_diff_requested = QtCore.Signal(str, str)
+    node_selected = QtCore.Signal(str, str)  # git_path, node_path
+    visual_diff_requested = QtCore.Signal(str, str)  # git_path, node_path
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)

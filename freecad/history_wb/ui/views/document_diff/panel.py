@@ -17,15 +17,15 @@ __all__ = ["DocumentDiffTreeWidget"]
 class DocumentDiffTreeWidget(QtWidgets.QWidget):
     """Middle-column widget that renders document/node diffs and staging actions."""
 
-    add_requested = QtCore.Signal(str)
+    add_requested = QtCore.Signal(str)  # git_path
     stage_all_requested = QtCore.Signal()
     remove_all_requested = QtCore.Signal()
-    restore_requested = QtCore.Signal(str)
+    restore_requested = QtCore.Signal(str)  # git_path
     restore_all_requested = QtCore.Signal()
-    remove_from_reviewed_requested = QtCore.Signal(str)
-    node_selection_requested = QtCore.Signal(str, str)
-    visual_diff_requested = QtCore.Signal(str, str)
-    open_document_for_comparison_requested = QtCore.Signal(str)
+    remove_from_reviewed_requested = QtCore.Signal(str)  # git_path
+    node_selection_requested = QtCore.Signal(str, str)  # git_path, node_path
+    visual_diff_requested = QtCore.Signal(str, str)  # git_path, node_path
+    open_document_for_comparison_requested = QtCore.Signal(str)  # git_path
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)

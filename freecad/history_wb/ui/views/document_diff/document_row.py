@@ -27,10 +27,10 @@ REMOVE_REVIEWED_TOOLTIP = translate(
 class DocumentDiffRowWidget(QtWidgets.QWidget):
     """Render one document row and emit per-document action requests."""
 
-    stage_requested = QtCore.Signal(str)
-    remove_from_reviewed_requested = QtCore.Signal(str)
-    restore_requested = QtCore.Signal(str)
-    open_document_requested = QtCore.Signal(str)
+    stage_requested = QtCore.Signal(str)  # git_path
+    remove_from_reviewed_requested = QtCore.Signal(str)  # git_path
+    restore_requested = QtCore.Signal(str)  # git_path
+    open_document_requested = QtCore.Signal(str)  # git_path
 
     def __init__(
         self,

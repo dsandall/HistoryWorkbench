@@ -9,16 +9,16 @@ class HistoryList(QtWidgets.QListWidget):
     """Own history-list interactions and row-local behavior."""
 
     # Emitted only for direct user clicks on selectable history rows.
-    user_selection_requested = QtCore.Signal(object)
+    user_selection_requested = QtCore.Signal(HistorySelection)
 
     # Emitted for every effective selection-state change, including
     # user clicks, restored selections, and cleared invalid selections.
-    effective_selection_changed = QtCore.Signal(object)
+    effective_selection_changed = QtCore.Signal(object)  # HistorySelection | None
 
     near_bottom_requested = QtCore.Signal()
     remove_all_from_reviewed_requested = QtCore.Signal()
     mark_all_reviewed_from_in_progress_requested = QtCore.Signal()
-    restore_all_from_history_context_requested = QtCore.Signal(object)
+    restore_all_from_history_context_requested = QtCore.Signal(HistorySelection)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)

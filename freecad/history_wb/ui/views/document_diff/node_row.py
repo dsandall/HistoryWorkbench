@@ -21,7 +21,7 @@ __all__ = ["NodeDiffRowWidget"]
 class NodeDiffRowWidget(QtWidgets.QWidget):
     """Render one tree-node row with visual-diff action."""
 
-    visual_diff_requested = QtCore.Signal(str, str)
+    visual_diff_requested = QtCore.Signal(str, str)  # git_path, node_path
 
     def __init__(
         self,

@@ -20,12 +20,12 @@ class HistoryPanelWidget(QtWidgets.QWidget):
 
     refresh_requested = QtCore.Signal()
     save_iteration_requested = QtCore.Signal()
-    history_selection_requested = QtCore.Signal(object)
-    history_selection_changed = QtCore.Signal(object)
+    history_selection_requested = QtCore.Signal(HistorySelection)
+    history_selection_changed = QtCore.Signal(object)  # HistorySelection | None
     history_scroll_bottom_requested = QtCore.Signal()
     remove_all_from_reviewed_requested = QtCore.Signal()
     mark_all_reviewed_from_in_progress_requested = QtCore.Signal()
-    restore_all_from_history_context_requested = QtCore.Signal(object)
+    restore_all_from_history_context_requested = QtCore.Signal(HistorySelection)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
         super().__init__(parent)
