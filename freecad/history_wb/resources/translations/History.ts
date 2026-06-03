@@ -298,7 +298,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="147"/>
+        <location filename="../../ui/views/history/history_list.py" line="150"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -327,34 +327,34 @@ They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="86"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="88"/>
         <source>Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="91"/>
-        <location filename="../../ui/views/document_diff/tree.py" line="92"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="93"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="94"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/tree.py" line="48"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="50"/>
         <location filename="../../ui/views/document_diff/tree_items.py" line="24"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/document_row.py" line="101"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="105"/>
         <source>+ Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/document_row.py" line="111"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="115"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/document_row.py" line="120"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="124"/>
         <source>Restore the selected file.
 This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.
 THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.
@@ -367,12 +367,12 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/status_indicators.py" line="51"/>
+        <location filename="../../ui/views/document_diff/status_indicators.py" line="52"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/node_row.py" line="57"/>
+        <location filename="../../ui/views/document_diff/node_row.py" line="58"/>
         <source>Open 3D comparison</source>
         <translation type="unfinished"></translation>
     </message>
@@ -392,7 +392,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="91"/>
+        <location filename="../../ui/views/history/panel.py" line="94"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
@@ -402,37 +402,37 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="138"/>
+        <location filename="../../ui/views/history/panel.py" line="141"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="144"/>
+        <location filename="../../ui/views/history/panel.py" line="147"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/panel.py" line="62"/>
+        <location filename="../../ui/views/history/panel.py" line="65"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="139"/>
+        <location filename="../../ui/views/history/history_list.py" line="142"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="154"/>
+        <location filename="../../ui/views/history/history_list.py" line="157"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="155"/>
+        <location filename="../../ui/views/history/history_list.py" line="158"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="169"/>
+        <location filename="../../ui/views/history/history_list.py" line="172"/>
         <source>Restore all files from iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -542,7 +542,7 @@ Saved history will not be affected.</source>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="141"/>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="153"/>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="219"/>
-        <location filename="../../ui/views/document_diff/document_row.py" line="128"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="132"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>

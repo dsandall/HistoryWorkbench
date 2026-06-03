@@ -12,16 +12,6 @@ from freecad.history_wb.ui.views.document_diff.panel import DocumentDiffTreeWidg
 from freecad.history_wb.ui.views.document_diff.tree import DocumentDiffTree
 
 
-@pytest.fixture(scope="session", autouse=True)
-def application() -> QtWidgets.QApplication:
-    """Provide one QApplication instance for document diff widget tests."""
-    app = QtWidgets.QApplication.instance()
-    if app is None:
-        app = QtWidgets.QApplication([])
-    assert isinstance(app, QtWidgets.QApplication)
-    return app
-
-
 @pytest.fixture
 def panel() -> DocumentDiffTreeWidget:
     """Create a fresh document diff panel widget per test."""

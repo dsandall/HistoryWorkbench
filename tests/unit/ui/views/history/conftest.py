@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import cast
 
 import pytest
 
@@ -12,23 +11,9 @@ from freecad.history_wb.qt import QtWidgets
 from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
 
 
-@pytest.fixture(autouse=True)
-def qt_application() -> QtWidgets.QApplication:
-    """Ensure QApplication exists for all history view tests."""
-    app = QtWidgets.QApplication.instance()
-    if app is None:
-        app = QtWidgets.QApplication([])
-
-    return cast(QtWidgets.QApplication, app)
-
-
 @pytest.fixture
 def history_panel_widget() -> HistoryPanelWidget:
     """Create HistoryPanelWidget with QApplication available."""
-    app = QtWidgets.QApplication.instance()
-    if app is None:
-        app = QtWidgets.QApplication([])
-
     return HistoryPanelWidget()
 
 
