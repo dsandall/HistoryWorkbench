@@ -8,24 +8,24 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from freecad.history_wb.application.actions.create_document_diffs import CreateDocumentDiffsAction
-from freecad.history_wb.application.actions.get_committed_file_paths import GetCommittedFilePathsAction
-from freecad.history_wb.application.actions.get_open_eligible_documents import GetOpenEligibleDocumentsAction
-from freecad.history_wb.application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from freecad.history_wb.application.actions.open_document import OpenDocumentAction
-from freecad.history_wb.application.actions.open_visual_diff import OpenVisualDiffAction
-from freecad.history_wb.application.actions.restore_documents import RestoreDocumentsAction
+from freecad.history_wb.application.actions.diffs.create_document_diffs import CreateDocumentDiffsAction
+from freecad.history_wb.application.actions.diffs.open_visual_diff import OpenVisualDiffAction
+from freecad.history_wb.application.actions.documents.get_open_eligible_documents import GetOpenEligibleDocumentsAction
+from freecad.history_wb.application.actions.documents.open_document import OpenDocumentAction
+from freecad.history_wb.application.actions.git_history.get_committed_file_paths import GetCommittedFilePathsAction
+from freecad.history_wb.application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from freecad.history_wb.application.actions.git_workflow.restore_documents import RestoreDocumentsAction
+from freecad.history_wb.application.actions.git_workflow.stage_documents import StageDocumentsAction
+from freecad.history_wb.application.actions.git_workflow.unstage_documents import UnstageDocumentsAction
 from freecad.history_wb.application.actions.result_models import DiffIssues, DocumentDiffResult, Result
-from freecad.history_wb.application.actions.stage_documents import StageDocumentsAction
-from freecad.history_wb.application.actions.unstage_documents import UnstageDocumentsAction
 from freecad.history_wb.domain.diff.models import DiffResult, DiffState
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.domain.snapshots.models import Snapshot
 from freecad.history_wb.ui.presenters.diff_presenter import DiffPresenter
-from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, PropertyPresentation
-from freecad.history_wb.ui.views.document_diff.summary_state import SummaryButtonState, SummaryCounts
 from freecad.history_wb.ui.presenters.document_diff.staging_handler import StagingDisplayState
+from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, PropertyPresentation
 from freecad.history_wb.ui.state import ApplicationState
+from freecad.history_wb.ui.views.document_diff.summary_state import SummaryButtonState, SummaryCounts
 from freecad.history_wb.ui.views.history.models import HistorySelection
 from tests.fakes.fake_views import FakeDialogView, FakeDocumentDiffView, FakePropertyDiffView
 

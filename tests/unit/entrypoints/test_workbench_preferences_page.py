@@ -52,7 +52,7 @@ def test_workbench_initializes_and_registers_preference_page_once(monkeypatch) -
         update_gitignore_action=Mock(),
     )
     monkeypatch.setattr(
-        "freecad.history_wb.application.di.container.create_application_container",
+        "freecad.history_wb.application.container.create_application_container",
         lambda _ctx: fake_container,
     )
     monkeypatch.setattr("freecad.history_wb._container.set_container", lambda _container: None)
@@ -103,7 +103,7 @@ def test_preference_registration_is_idempotent_across_module_reload(monkeypatch)
             update_gitignore_action=Mock(),
         )
         monkeypatch.setattr(
-            "freecad.history_wb.application.di.container.create_application_container",
+            "freecad.history_wb.application.container.create_application_container",
             lambda _ctx: fake_container,
         )
         monkeypatch.setattr("freecad.history_wb._container.set_container", lambda _container: None)

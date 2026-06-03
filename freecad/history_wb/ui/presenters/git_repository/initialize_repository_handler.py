@@ -3,10 +3,10 @@
 
 from collections.abc import Callable
 
-from ....application.actions.get_git_repository_init_candidates import (
+from ....application.actions.git_repo.get_git_repository_init_candidates import (
     GetGitRepositoryInitCandidatesAction,
 )
-from ....application.actions.initialize_git_repository import InitializeGitRepositoryAction
+from ....application.actions.git_repo.initialize_git_repository import InitializeGitRepositoryAction
 from ....utils import Log, translate
 from ...state import ApplicationState
 

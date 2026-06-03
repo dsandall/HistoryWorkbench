@@ -1,7 +1,7 @@
 # File responsibility: Build and execute visual diff requests for history selections.
 """Build and execute visual diff requests for history selections."""
 
-from ....application.actions.open_visual_diff import (
+from ....application.actions.diffs.open_visual_diff import (
     OpenVisualDiffAction,
     OpenVisualDiffRequest,
     VisualDiffRequestType,

@@ -3,8 +3,8 @@
 
 from collections.abc import Callable
 
-from ....application.actions.get_gitignore_content import GetGitIgnoreContentAction
-from ....application.actions.update_gitignore import UpdateGitIgnoreAction
+from ....application.actions.git_config.get_gitignore_content import GetGitIgnoreContentAction
+from ....application.actions.git_config.update_gitignore import UpdateGitIgnoreAction
 from ....domain.git.models import GitRepository
 from ....utils import translate
 

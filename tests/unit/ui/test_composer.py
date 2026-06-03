@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from freecad.history_wb.application.di.container import ApplicationContainer
+from freecad.history_wb.application.container import ApplicationContainer
 from freecad.history_wb.ui.composer import compose_and_register_panel, compose_and_register_workbench_commands
 from freecad.history_wb.ui.registry import ui_registry
 from freecad.history_wb.ui.state import ApplicationState

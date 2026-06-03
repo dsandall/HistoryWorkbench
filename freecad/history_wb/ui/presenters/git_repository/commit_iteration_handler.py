@@ -9,9 +9,9 @@ validate UI-level flow, call actions.
 
 from collections.abc import Callable
 
-from ....application.actions.commit_staging import CommitStagingAction
-from ....application.actions.get_git_identity import GetGitIdentityAction
-from ....application.actions.get_staged_file_paths import GetStagedFilePathsAction
+from ....application.actions.git_config.get_git_identity import GetGitIdentityAction
+from ....application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from ....application.actions.git_workflow.commit_staging import CommitStagingAction
 from ....domain.git.models import GitRepository
 from ....utils import translate
 from .author_configuration_handler import AuthorConfigurationHandler

@@ -7,13 +7,13 @@
 from .fake_freecad_port import FakeFreeCadPort, MockDocument
 from .fake_git_port import FakeGitPort
 from .fake_logger import FakeLogger
-from .fake_views import FakeDialogView, FakeDocumentDiffView, FakeHistoryView, FakePropertyDiffView
 from .fake_repositories import (
     FakeDiffEngine,
     FakeSettingsRepository,
     FakeSnapshotRepository,
     InMemorySnapshotRepository,
 )
+from .fake_views import FakeDialogView, FakeDocumentDiffView, FakeHistoryView, FakePropertyDiffView
 
 
 __all__ = [

@@ -4,9 +4,9 @@
 from dataclasses import dataclass
 from typing import Literal
 
+from ....application.actions.git_workflow.stage_documents import StageDocumentsAction
+from ....application.actions.git_workflow.unstage_documents import UnstageDocumentsAction
 from ....application.actions.result_models import DocumentDiffResult
-from ....application.actions.stage_documents import StageDocumentsAction
-from ....application.actions.unstage_documents import UnstageDocumentsAction
 from ....domain.diff.models import DiffState
 from ....domain.git.models import GitRepository
 from ....domain.snapshots.models import Snapshot

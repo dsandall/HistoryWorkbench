@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtWidgets
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, NodePresentation

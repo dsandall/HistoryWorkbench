@@ -6,7 +6,7 @@
 # own state lifecycle.
 """UI Composer - Composes and registers UI components."""
 
-from ..application.di.container import ApplicationContainer
+from ..application.container import ApplicationContainer
 from ..ui.registry import ui_registry
 from ..ui.state import ApplicationState
 from ..ui.views.diff_panel import DialogView, HistoryPanelView

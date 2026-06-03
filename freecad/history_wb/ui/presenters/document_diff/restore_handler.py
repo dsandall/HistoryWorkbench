@@ -3,9 +3,9 @@
 
 from collections.abc import Callable
 
-from ....application.actions.get_committed_file_paths import GetCommittedFilePathsAction
-from ....application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from ....application.actions.restore_documents import (
+from ....application.actions.git_history.get_committed_file_paths import GetCommittedFilePathsAction
+from ....application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from ....application.actions.git_workflow.restore_documents import (
     RestoreDocumentsAction,
     RestoreDocumentsRequest,
     RestoreScope,

@@ -1,0 +1,1 @@
+"""Git history query actions."""

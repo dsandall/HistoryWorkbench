@@ -8,9 +8,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from freecad.history_wb.application.actions.git_workflow.stage_documents import StageDocumentsAction
+from freecad.history_wb.application.actions.git_workflow.unstage_documents import UnstageDocumentsAction
 from freecad.history_wb.application.actions.result_models import DiffIssues, DocumentDiffResult, Result
-from freecad.history_wb.application.actions.stage_documents import StageDocumentsAction
-from freecad.history_wb.application.actions.unstage_documents import UnstageDocumentsAction
 from freecad.history_wb.domain.diff.models import DiffResult, DiffState
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.domain.snapshots.models import Snapshot

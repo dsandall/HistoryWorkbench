@@ -5,10 +5,10 @@
 from collections.abc import Callable
 from time import monotonic
 
-from freecad.history_wb.application.actions.find_active_git_repository import (
+from freecad.history_wb.application.actions.git_history.get_commits import GetCommitsAction
+from freecad.history_wb.application.actions.git_repo.find_active_git_repository import (
     FindActiveGitRepositoryAction,
 )
-from freecad.history_wb.application.actions.get_commits import GetCommitsAction
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.diff_panel.dialog_view import DialogView

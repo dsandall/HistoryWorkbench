@@ -11,18 +11,18 @@ diff results into UI-friendly presentation models.
 from collections.abc import Callable
 from pathlib import Path
 
-from ...application.actions.create_document_diffs import CreateDocumentDiffsAction
-from ...application.actions.get_committed_file_paths import GetCommittedFilePathsAction
-from ...application.actions.get_open_eligible_documents import GetOpenEligibleDocumentsAction
-from ...application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from ...application.actions.open_document import OpenDocumentAction
-from ...application.actions.open_visual_diff import OpenVisualDiffAction
-from ...application.actions.restore_documents import RestoreDocumentsAction
+from ...application.actions.diffs.create_document_diffs import CreateDocumentDiffsAction
+from ...application.actions.diffs.open_visual_diff import OpenVisualDiffAction
+from ...application.actions.documents.get_open_eligible_documents import GetOpenEligibleDocumentsAction
+from ...application.actions.documents.open_document import OpenDocumentAction
+from ...application.actions.git_history.get_committed_file_paths import GetCommittedFilePathsAction
+from ...application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from ...application.actions.git_workflow.restore_documents import RestoreDocumentsAction
+from ...application.actions.git_workflow.stage_documents import StageDocumentsAction
+from ...application.actions.git_workflow.unstage_documents import UnstageDocumentsAction
 from ...application.actions.result_models import (
     DocumentDiffResult,
 )
-from ...application.actions.stage_documents import StageDocumentsAction
-from ...application.actions.unstage_documents import UnstageDocumentsAction
 from ...domain.settings import SettingsRepository
 from ...utils import Log
 from ..state import ApplicationState

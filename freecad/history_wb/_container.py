@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 
 if TYPE_CHECKING:
-    from .application.di.container import ApplicationContainer
+    from .application.container import ApplicationContainer
 else:
     # At runtime, avoid circular imports - use Any placeholder
     ApplicationContainer = Any  # type: ignore[var-annotated]

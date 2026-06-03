@@ -110,9 +110,9 @@ Location: `freecad/history_wb/application/`
 
 The application layer exposes workbench use cases as small action classes. Actions coordinate desktop side effects through ports without owning Qt presentation behavior.
 
-- `actions/` contains use cases such as creating snapshots, creating document diffs, staging documents, committing staged files, opening visual comparisons, reading settings, and finding repositories.
+- `actions/` contains use cases organized by domain: `git_repo/` (repository lifecycle), `git_history/` (read history), `git_workflow/` (staging, commit, restore), `git_config/` (identity and gitignore), `documents/` (FreeCAD document ops), `snapshots/` (snapshot creation), `diffs/` (diff computation and visual comparison), and `settings/` (preferences).
 - `actions/result_models.py` contains reusable result types.
-- `di/container.py` wires application actions, domain services, and infrastructure adapters.
+- `container.py` wires application actions, domain services, and infrastructure adapters.
 
 Actions should be stateless after construction. They receive dependencies through constructors, execute one operation, and return a result. They may save FreeCAD documents, open comparison documents, write snapshot files, or stage git paths when those effects are part of the use case and are performed through ports or domain services.
 
@@ -159,8 +159,16 @@ freecad/history_wb/
 ├── utils.py
 ├── version.py
 ├── application/
+│   ├── container.py
 │   ├── actions/
-│   └── di/
+│   │   ├── diffs/
+│   │   ├── documents/
+│   │   ├── git_config/
+│   │   ├── git_history/
+│   │   ├── git_repo/
+│   │   ├── git_workflow/
+│   │   ├── settings/
+│   │   └── snapshots/
 ├── domain/
 │   ├── config.py
 │   ├── freecad_ports.py

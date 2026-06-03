@@ -267,11 +267,11 @@ task test
 
 ### Add An Application Action
 
-1. Add a focused action class under `freecad/history_wb/application/actions/`.
+1. Add a focused action class under the appropriate subdirectory in `freecad/history_wb/application/actions/` (e.g. `git_repo/`, `diffs/`, `documents/`).
 2. Return an existing result model or add a small result model when needed.
 3. Inject domain services or ports through the constructor.
-4. Wire the action in `application/di/container.py`.
-5. Add unit tests under `tests/unit/application/actions/`.
+4. Wire the action in `application/container.py`.
+5. Add unit tests under the matching subdirectory in `tests/unit/application/actions/`.
 
 ### Add UI Text
 

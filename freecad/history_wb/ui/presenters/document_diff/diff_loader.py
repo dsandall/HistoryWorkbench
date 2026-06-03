@@ -1,8 +1,8 @@
 # File responsibility: Load document diff results for working-tree, staging, and commit selections.
 """Load document diff results for presenter selection flows."""
 
-from ....application.actions.create_document_diffs import CreateDocumentDiffsAction
-from ....application.actions.get_open_eligible_documents import GetOpenEligibleDocumentsAction
+from ....application.actions.diffs.create_document_diffs import CreateDocumentDiffsAction
+from ....application.actions.documents.get_open_eligible_documents import GetOpenEligibleDocumentsAction
 from ....application.actions.result_models import (
     CreateDocumentDiffsRequest,
     DocumentDiffMode,

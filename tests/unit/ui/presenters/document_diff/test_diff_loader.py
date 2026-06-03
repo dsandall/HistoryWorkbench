@@ -5,12 +5,12 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from freecad.history_wb.application.actions.create_document_diffs import CreateDocumentDiffsAction
-from freecad.history_wb.application.actions.get_open_eligible_documents import GetOpenEligibleDocumentsAction
+from freecad.history_wb.application.actions.diffs.create_document_diffs import CreateDocumentDiffsAction
+from freecad.history_wb.application.actions.documents.get_open_eligible_documents import GetOpenEligibleDocumentsAction
 from freecad.history_wb.application.actions.result_models import (
     CreateDocumentDiffsRequest,
-    DocumentDiffMode,
     DiffIssues,
+    DocumentDiffMode,
     DocumentDiffResult,
     Result,
 )

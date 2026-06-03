@@ -6,8 +6,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ...application.actions.get_diff_settings import GetDiffSettingsAction
-from ...application.actions.save_diff_settings import SaveDiffSettingsAction
+from ...application.actions.settings.get_diff_settings import GetDiffSettingsAction
+from ...application.actions.settings.save_diff_settings import SaveDiffSettingsAction
 from ...domain.config import EXCLUDED_PROPERTIES, EXCLUDED_PROPERTIES_BY_TYPE, EXCLUDED_TYPES, FLOAT_PRECISION
 from ...domain.settings.persistence_state import (
     ByTypeSettingState,

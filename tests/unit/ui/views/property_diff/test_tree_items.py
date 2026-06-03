@@ -7,7 +7,10 @@ import pytest
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtCore
 from freecad.history_wb.ui.presenters.presentation_models import PropertyPresentation
-from freecad.history_wb.ui.views.property_diff.tree_items import apply_stored_expansion_state, build_grouped_property_items
+from freecad.history_wb.ui.views.property_diff.tree_items import (
+    apply_stored_expansion_state,
+    build_grouped_property_items,
+)
 from freecad.history_wb.ui.views.theme.diff import DIFF_STATE_ROLE
 
 

@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.entrypoints.commands import (
-    _ConfigureAuthorCommand,
     _CommitCommand,
+    _ConfigureAuthorCommand,
     _InitializeGitRepositoryCommand,
     _OpenAllDocumentsInRepositoryCommand,
     _RecomputeAllOpenDocumentsCommand,

@@ -5,7 +5,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from freecad.history_wb.qt import QtCore, QtGui, QtWidgets
-from freecad.history_wb.ui.views.history.history_list import HistoryList
 from freecad.history_wb.ui.views.history.history_row import create_commit_history_item, create_special_history_item
 from freecad.history_wb.ui.views.history.models import HistorySelection
 

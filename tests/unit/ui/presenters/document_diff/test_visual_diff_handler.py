@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from freecad.history_wb.application.actions.open_visual_diff import (
+from freecad.history_wb.application.actions.diffs.open_visual_diff import (
     OpenVisualDiffAction,
     OpenVisualDiffRequest,
     VisualDiffRequestType,

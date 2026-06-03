@@ -121,7 +121,7 @@ if Gui is not None:
         def _initialize_container(self) -> None:
             """Create application container and set up global state."""
             from .._container import set_container
-            from ..application.di.container import create_application_container
+            from ..application.container import create_application_container
             from ..entrypoints.commands import register_commands
             from ..infrastructure.freecad.logger import FreeCADLogger
             from ..infrastructure.freecad.ports import get_freecad_runtime_context

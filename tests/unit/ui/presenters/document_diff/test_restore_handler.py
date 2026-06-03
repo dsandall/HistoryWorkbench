@@ -5,9 +5,9 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from freecad.history_wb.application.actions.get_committed_file_paths import GetCommittedFilePathsAction
-from freecad.history_wb.application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from freecad.history_wb.application.actions.restore_documents import (
+from freecad.history_wb.application.actions.git_history.get_committed_file_paths import GetCommittedFilePathsAction
+from freecad.history_wb.application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from freecad.history_wb.application.actions.git_workflow.restore_documents import (
     RestoreDocumentsAction,
     RestoreDocumentsRequest,
     RestoreScope,

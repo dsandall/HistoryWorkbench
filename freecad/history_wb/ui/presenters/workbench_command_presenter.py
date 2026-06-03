@@ -11,19 +11,19 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ...qt import QtWidgets
 
-from ...application.actions.can_write_global_git_identity import (
+from ...application.actions.git_config.can_write_global_git_identity import (
     CanWriteGlobalGitIdentityAction,
 )
-from ...application.actions.commit_staging import CommitStagingAction
-from ...application.actions.get_git_identity import GetGitIdentityAction
-from ...application.actions.get_git_repository_init_candidates import (
+from ...application.actions.git_config.get_git_identity import GetGitIdentityAction
+from ...application.actions.git_config.get_gitignore_content import GetGitIgnoreContentAction
+from ...application.actions.git_config.save_git_identity import SaveGitIdentityAction
+from ...application.actions.git_config.update_gitignore import UpdateGitIgnoreAction
+from ...application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from ...application.actions.git_repo.get_git_repository_init_candidates import (
     GetGitRepositoryInitCandidatesAction,
 )
-from ...application.actions.get_gitignore_content import GetGitIgnoreContentAction
-from ...application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from ...application.actions.initialize_git_repository import InitializeGitRepositoryAction
-from ...application.actions.save_git_identity import SaveGitIdentityAction
-from ...application.actions.update_gitignore import UpdateGitIgnoreAction
+from ...application.actions.git_repo.initialize_git_repository import InitializeGitRepositoryAction
+from ...application.actions.git_workflow.commit_staging import CommitStagingAction
 from ...utils import Log, translate
 from ..state import ApplicationState
 from ..views.diff_panel.dialog_view import DialogView

@@ -2,7 +2,7 @@
 # File responsibility: Unit tests for workbench lifecycle, state registration, and presenter cleanup.
 """Unit tests for HistoryWorkbench."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 

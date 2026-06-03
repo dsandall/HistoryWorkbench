@@ -5,7 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from freecad.history_wb.domain.git.models import GitRepository
-from freecad.history_wb.qt import QtCore, QtGui, QtWidgets
+from freecad.history_wb.qt import QtCore, QtGui
 from freecad.history_wb.ui.views.history.repository_header import RepositoryHeader
 
 

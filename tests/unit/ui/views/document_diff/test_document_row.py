@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from freecad.history_wb.domain.diff.models import DiffState
 from freecad.history_wb.qt import QtWidgets
-from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, WorkingTreeDocumentClosedIndicator
+from freecad.history_wb.ui.presenters.presentation_models import (
+    DiffTreePresentation,
+    WorkingTreeDocumentClosedIndicator,
+)
 from freecad.history_wb.ui.views.document_diff.document_row import DocumentDiffRowWidget
 from freecad.history_wb.ui.views.history.models import HistorySelection
 

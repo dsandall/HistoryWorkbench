@@ -8,11 +8,11 @@ code, not a new application use case.
 
 from collections.abc import Callable
 
-from ....application.actions.can_write_global_git_identity import (
+from ....application.actions.git_config.can_write_global_git_identity import (
     CanWriteGlobalGitIdentityAction,
 )
-from ....application.actions.get_git_identity import GetGitIdentityAction
-from ....application.actions.save_git_identity import SaveGitIdentityAction
+from ....application.actions.git_config.get_git_identity import GetGitIdentityAction
+from ....application.actions.git_config.save_git_identity import SaveGitIdentityAction
 from ....domain.git.models import GitIdentity, GitRepository
 from ....utils import translate
 from ...views.diff_panel.dialogs import GitConfigDialogResult
