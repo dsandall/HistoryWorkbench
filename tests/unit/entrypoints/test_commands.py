@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-"""File responsibility: Tests for FreeCAD command entry points.
-
-These tests verify that commands correctly instantiate handlers directly
-from the container and DialogView, without requiring the diff panel to be open.
-"""
+# File responsibility: Tests for FreeCAD command entry points.
+# These tests verify that commands delegate to ui_registry.workbench_command_presenter
+# for shared command flows, keeping them usable after the diff panel is closed.
+"""Tests for FreeCAD command entry points."""
 
 from unittest.mock import MagicMock, Mock, patch
 
@@ -105,110 +104,60 @@ class TestRecomputeAllOpenDocumentsCommand:
 class TestUpdateGitIgnoreCommand:
     """Tests for _UpdateGitIgnoreCommand."""
 
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_builds_handler_directly(
+    @patch("freecad.history_wb.ui.registry.ui_registry")
+    def test_activated_delegates_to_command_presenter(
         self,
-        mock_get_container: Mock,
+        mock_ui_registry: Mock,
     ) -> None:
-        """Activated builds GitIgnoreHandler directly from container + DialogView."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
-
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        with (
-            patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn", return_value=repo),
-            patch(
-                "freecad.history_wb.ui.presenters.git_repository.gitignore_handler.GitIgnoreHandler"
-            ) as MockHandler,
-        ):
-            mock_handler = MagicMock()
-            MockHandler.return_value = mock_handler
-
-            command = _UpdateGitIgnoreCommand()
-            command.Activated()
-
-            MockHandler.assert_called_once()
-            mock_handler.execute.assert_called_once_with(repo)
-
-    @patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn")
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_returns_early_when_no_repo(
-        self,
-        mock_get_container: Mock,
-        mock_get_repo: Mock,
-    ) -> None:
-        """Activated returns early when no repository is detected."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
-        mock_get_repo.return_value = None
+        """Activated delegates to workbench_command_presenter.update_gitignore()."""
+        mock_command_presenter = MagicMock()
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
         command = _UpdateGitIgnoreCommand()
         command.Activated()
 
-        # Should not raise; handler not called
-        mock_get_repo.assert_called_once()
+        mock_command_presenter.update_gitignore.assert_called_once()
 
 
 class TestInitializeGitRepositoryCommand:
     """Tests for _InitializeGitRepositoryCommand."""
 
-    @patch("freecad.history_wb._container.get_container")
     @patch("freecad.history_wb.ui.registry.ui_registry")
-    def test_activated_builds_handler_directly(
+    def test_activated_delegates_to_command_presenter(
         self,
         mock_ui_registry: Mock,
-        mock_get_container: Mock,
     ) -> None:
-        """Activated builds InitializeRepositoryHandler directly from container + DialogView."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
+        """Activated delegates to workbench_command_presenter.initialize_repository()."""
+        mock_command_presenter = MagicMock()
+        mock_command_presenter.initialize_repository.return_value = True
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
-        with (
-            patch(
-                "freecad.history_wb.ui.presenters.git_repository.initialize_repository_handler.InitializeRepositoryHandler"
-            ) as MockHandler,
-            patch("freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open") as mock_refresh,
-        ):
-            mock_handler = MagicMock()
-            mock_handler.execute.return_value = True
-            MockHandler.return_value = mock_handler
-
+        with patch(
+            "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
+        ) as mock_refresh:
             command = _InitializeGitRepositoryCommand()
             command.Activated()
 
-            MockHandler.assert_called_once()
-            mock_handler.execute.assert_called_once()
+            mock_command_presenter.initialize_repository.assert_called_once()
             mock_refresh.assert_called_once()
 
-    @patch("freecad.history_wb._container.get_container")
     @patch("freecad.history_wb.ui.registry.ui_registry")
-    def test_activated_skips_refresh_on_handler_failure(
+    def test_activated_skips_refresh_on_failure(
         self,
         mock_ui_registry: Mock,
-        mock_get_container: Mock,
     ) -> None:
-        """Activated does not refresh presenter when handler returns False."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
+        """Activated does not refresh presenter when command presenter returns False."""
+        mock_command_presenter = MagicMock()
+        mock_command_presenter.initialize_repository.return_value = False
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
-        with (
-            patch(
-                "freecad.history_wb.ui.presenters.git_repository.initialize_repository_handler.InitializeRepositoryHandler"
-            ) as MockHandler,
-            patch("freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open") as mock_refresh,
-        ):
-            mock_handler = MagicMock()
-            mock_handler.execute.return_value = False
-            MockHandler.return_value = mock_handler
-
+        with patch(
+            "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
+        ) as mock_refresh:
             command = _InitializeGitRepositoryCommand()
             command.Activated()
 
-            mock_handler.execute.assert_called_once()
+            mock_command_presenter.initialize_repository.assert_called_once()
             mock_refresh.assert_not_called()
 
 
@@ -226,162 +175,100 @@ class TestOpenAllDocumentsInRepositoryCommand:
         mock_get_container.return_value = mock_container
 
         repo = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
-        with patch(
-            "freecad.history_wb.entrypoints.commands._get_application_repo_or_warn", return_value=repo
+        with (
+            patch("freecad.history_wb.ui.registry.ui_registry") as mock_ui_registry,
+            patch("freecad.history_wb.entrypoints.commands._create_dialog_view") as mock_create_dialog,
         ):
+            mock_ui_registry.application_state.git_repository = repo
+            mock_create_dialog.return_value = MagicMock()
+
             command = _OpenAllDocumentsInRepositoryCommand()
             command.Activated()
 
         mock_container.open_all_documents_in_repository_action.execute.assert_called_once_with(repo)
 
-    @patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn")
+    @patch("freecad.history_wb.ui.registry.ui_registry")
     @patch("freecad.history_wb._container.get_container")
     def test_activated_returns_early_when_no_repo(
         self,
         mock_get_container: Mock,
-        mock_get_repo: Mock,
+        mock_ui_registry: Mock,
     ) -> None:
         """Activated returns early and does not execute action when no repo."""
         mock_container = MagicMock()
         mock_container._freecad_port.get_main_window.return_value = MagicMock()
         mock_get_container.return_value = mock_container
-        mock_get_repo.return_value = None
+        mock_ui_registry.application_state.git_repository = None
 
-        command = _OpenAllDocumentsInRepositoryCommand()
-        command.Activated()
+        with patch("freecad.history_wb.entrypoints.commands._create_dialog_view") as mock_create_dialog:
+            mock_dialog = MagicMock()
+            mock_create_dialog.return_value = mock_dialog
+
+            command = _OpenAllDocumentsInRepositoryCommand()
+            command.Activated()
 
         mock_container.open_all_documents_in_repository_action.execute.assert_not_called()
+        mock_dialog.show_warning_message.assert_called_once()
 
 
 class TestConfigureAuthorCommand:
     """Tests for _ConfigureAuthorCommand."""
 
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_builds_handler_directly(
+    @patch("freecad.history_wb.ui.registry.ui_registry")
+    def test_activated_delegates_to_command_presenter(
         self,
-        mock_get_container: Mock,
+        mock_ui_registry: Mock,
     ) -> None:
-        """Activated builds AuthorConfigurationHandler directly from container + DialogView."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
-
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        with (
-            patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn", return_value=repo),
-            patch(
-                "freecad.history_wb.entrypoints.commands._build_author_configuration_handler"
-            ) as MockBuilder,
-        ):
-            mock_handler = MagicMock()
-            MockBuilder.return_value = mock_handler
-
-            command = _ConfigureAuthorCommand()
-            command.Activated()
-
-            MockBuilder.assert_called_once()
-            mock_handler.execute.assert_called_once_with(repo)
-
-    @patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn")
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_returns_early_when_no_repo(
-        self,
-        mock_get_container: Mock,
-        mock_get_repo: Mock,
-    ) -> None:
-        """Activated returns early when no repository is detected."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
-        mock_get_repo.return_value = None
+        """Activated delegates to workbench_command_presenter.configure_author()."""
+        mock_command_presenter = MagicMock()
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
         command = _ConfigureAuthorCommand()
         command.Activated()
 
-        mock_get_repo.assert_called_once()
+        mock_command_presenter.configure_author.assert_called_once()
 
 
 class TestCommitCommand:
     """Tests for _CommitCommand."""
 
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_builds_handler_and_refreshes_on_success(
+    @patch("freecad.history_wb.ui.registry.ui_registry")
+    def test_activated_delegates_to_command_presenter_and_refreshes_on_success(
         self,
-        mock_get_container: Mock,
+        mock_ui_registry: Mock,
     ) -> None:
-        """Activated builds CommitIterationHandler, executes, and refreshes presenter on success."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
+        """Activated delegates to command presenter, refreshes presenter on success."""
+        mock_command_presenter = MagicMock()
+        mock_command_presenter.save_iteration.return_value = True
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        with (
-            patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn", return_value=repo),
-            patch(
-                "freecad.history_wb.entrypoints.commands._build_commit_iteration_handler"
-            ) as MockBuilder,
-            patch(
-                "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
-            ) as mock_refresh,
-        ):
-            mock_handler = MagicMock()
-            mock_handler.execute.return_value = True
-            MockBuilder.return_value = mock_handler
-
+        with patch(
+            "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
+        ) as mock_refresh:
             command = _CommitCommand()
             command.Activated()
 
-            MockBuilder.assert_called_once()
-            mock_handler.execute.assert_called_once_with(repo)
+            mock_command_presenter.save_iteration.assert_called_once()
             mock_refresh.assert_called_once()
 
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_skips_refresh_on_handler_failure(
+    @patch("freecad.history_wb.ui.registry.ui_registry")
+    def test_activated_skips_refresh_on_failure(
         self,
-        mock_get_container: Mock,
+        mock_ui_registry: Mock,
     ) -> None:
-        """Activated does not refresh presenter when commit handler returns False."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
+        """Activated does not refresh presenter when command presenter returns False."""
+        mock_command_presenter = MagicMock()
+        mock_command_presenter.save_iteration.return_value = False
+        mock_ui_registry.workbench_command_presenter = mock_command_presenter
 
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        with (
-            patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn", return_value=repo),
-            patch(
-                "freecad.history_wb.entrypoints.commands._build_commit_iteration_handler"
-            ) as MockBuilder,
-            patch(
-                "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
-            ) as mock_refresh,
-        ):
-            mock_handler = MagicMock()
-            mock_handler.execute.return_value = False
-            MockBuilder.return_value = mock_handler
-
+        with patch(
+            "freecad.history_wb.entrypoints.commands._refresh_git_repository_presenter_if_open"
+        ) as mock_refresh:
             command = _CommitCommand()
             command.Activated()
 
-            mock_handler.execute.assert_called_once_with(repo)
+            mock_command_presenter.save_iteration.assert_called_once()
             mock_refresh.assert_not_called()
-
-    @patch("freecad.history_wb.entrypoints.commands._get_application_repo_or_warn")
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_returns_early_when_no_repo(
-        self,
-        mock_get_container: Mock,
-        mock_get_repo: Mock,
-    ) -> None:
-        """Activated returns early when no repository is detected."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = MagicMock()
-        mock_get_container.return_value = mock_container
-        mock_get_repo.return_value = None
-
-        command = _CommitCommand()
-        command.Activated()
-
-        mock_get_repo.assert_called_once()
 
     def test_command_resources_correct(self) -> None:
         """Menu text, tooltips, icons are correct."""
@@ -399,14 +286,3 @@ class TestCommitCommand:
         """Command is always active."""
         command = _CommitCommand()
         assert command.IsActive() is True
-
-    def test_activated_returns_early_when_no_main_window(self) -> None:
-        """Activated returns early when FreeCAD main window is not available."""
-        mock_container = MagicMock()
-        mock_container._freecad_port.get_main_window.return_value = None
-
-        with patch("freecad.history_wb._container.get_container", return_value=mock_container):
-            command = _CommitCommand()
-            command.Activated()
-
-        # Should not raise; no action executed

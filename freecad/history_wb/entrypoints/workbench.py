@@ -11,15 +11,11 @@ deferred to Activated() for faster FreeCAD startup.
 
 import os
 import traceback
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from ..qt import QtCore, QtGui, QtWidgets
 from ..resources import ICONPATH
 from ..utils import Log, set_logger, translate
-
-
-if TYPE_CHECKING:
-    pass
 
 
 _PREFERENCES_REGISTRY_ATTR = "_history_wb_preference_pages"
@@ -129,6 +125,7 @@ if Gui is not None:
             from ..entrypoints.commands import register_commands
             from ..infrastructure.freecad.logger import FreeCADLogger
             from ..infrastructure.freecad.ports import get_freecad_runtime_context
+            from ..ui.composer import compose_and_register_workbench_commands
             from ..ui.registry import ui_registry
             from ..ui.state import ApplicationState
             from ..ui.views.settings_preferences_page import DiffSettingsPreferencesPage
@@ -148,6 +145,9 @@ if Gui is not None:
             # Create and register application state (survives panel open/close)
             application_state = ApplicationState(git_repository=None)
             ui_registry.register_application_state(application_state)
+
+            # Create and register workbench command presenter (app-scoped, survives panel close)
+            compose_and_register_workbench_commands(container, application_state)
 
             # Re-register commands now that container exists
             register_commands()
@@ -193,7 +193,7 @@ if Gui is not None:
 
             try:
                 from .._container import _container
-                from ..ui.composer import compose_and_register_ui
+                from ..ui.composer import compose_and_register_panel
                 from ..ui.registry import ui_registry
 
                 # Get MDI area
@@ -206,7 +206,7 @@ if Gui is not None:
 
                 # Compose UI and register presenters globally
                 # Application state is pre-created during container init; passed in here
-                view = compose_and_register_ui(_container, ui_registry.application_state)
+                view = compose_and_register_panel(_container, ui_registry.application_state)
 
                 # Add as MDI subwindow
                 self._subwindow = mdi_area.addSubWindow(view)

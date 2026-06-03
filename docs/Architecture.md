@@ -16,7 +16,7 @@ History Workbench uses a layered architecture with domain-driven and ports-and-a
 History Workbench is a desktop FreeCAD workbench hosted inside another application. Use the project layer names when deciding where code belongs.
 
 ```text
-FreeCAD command/workbench callback -> entry point -> handler or application action
+FreeCAD command/workbench callback -> entry point -> WorkbenchCommandPresenter or application action
 Qt widget event                    -> presenter   -> application action
 Handler                            -> application action
 Application action                 -> domain service/model -> infrastructure adapter
@@ -40,6 +40,7 @@ Workbench.Initialize()
         |-- create FreeCAD runtime context
         |-- create ApplicationContainer
         |-- create and register ApplicationState
+        |-- create and register WorkbenchCommandPresenter
         |-- configure Log with FreeCADLogger
         |-- register FreeCAD commands
         |-- register preferences page
@@ -47,7 +48,7 @@ Workbench.Initialize()
 Workbench.Activated() or Open Diff Window command
         |
         v
-compose_and_register_ui(container, application_state)
+compose_and_register_panel(container, application_state)
         |
         |-- create DiffPanelView
         |-- create presenters (consume application_state)
@@ -69,7 +70,7 @@ Location: `freecad/history_wb/entrypoints/`
 Entry points integrate with FreeCAD's workbench and command APIs. They are driving adapters from the host desktop application into History Workbench.
 
 - `workbench.py` defines `HistoryWorkbench`, registers toolbars/menus, creates the application container, registers preferences, and opens the diff panel.
-- `commands.py` defines FreeCAD command classes and delegates work to handlers, presenters, or application actions.
+- `commands.py` defines FreeCAD command classes and delegates work to `WorkbenchCommandPresenter` or application actions.
 - Entry points may access the global container through `freecad/history_wb/_container.py`.
 - Entry points should stay thin. They translate FreeCAD callbacks into application or UI calls.
 - Command classes should stay thin. They translate FreeCAD callbacks into handler or application calls, instantiating handlers with container actions and dialog callbacks.
@@ -83,7 +84,7 @@ The UI layer owns presenter state, Qt views, dialog flow, display feedback, sign
 - `composer.py` is UI composition root. Creates views and presenters, consuming a pre-created `ApplicationState`.
 - `wiring.py` binds public widget/component signals to presenter listener methods.
 - `state.py` stores application-scoped `ApplicationState` such as detected `GitRepository`. Survives panel close and is accessible to commands even when the panel is closed.
-- `registry.py` stores globally reachable `ApplicationState` and nullable panel-scoped presenters.
+- `registry.py` stores globally reachable `ApplicationState`, app-scoped `WorkbenchCommandPresenter`, and nullable panel-scoped presenters.
 - `presenters/` coordinates application actions, owns UI session flow, and maps domain/application results into presentation models.
 - `views/` contains Qt widgets, child view components, dialog helpers, theme helpers, and preferences UI.
 - User-facing UI text is translated at display sites with literal `translate("History", "...")` calls, or defined with `QT_TRANSLATE_NOOP` when deferred.
@@ -91,14 +92,15 @@ The UI layer owns presenter state, Qt views, dialog flow, display feedback, sign
 Presenter responsibilities are split by kind:
 
 - `DiffPresenter` is top-level diff coordinator. Owns current history selection, triggers load/stage/restore/open flows, and updates document/property views.
-- `GitRepositoryPresenter` owns repository detection, commit loading, save-iteration flow, and git-identity dialog flow.
+- `GitRepositoryPresenter` owns repository detection, commit loading, and panel-specific rendering. Delegates shared command flows to `WorkbenchCommandPresenter`.
+- `WorkbenchCommandPresenter` is app-scoped. Owns single instances of `AuthorConfigurationHandler`, `CommitIterationHandler`, `InitializeRepositoryHandler`, and `GitIgnoreHandler`. Creates temporary `DialogView` instances parented to the FreeCAD main window at call time, avoiding stale Qt references from panel widgets.
 - `presenters/document_diff/` contains focused helpers for diff loading, staging, restore, visual diff, cached results, document/node mapping, status indicators, and summary-button state.
 - `presenters/git_repository/` contains focused handlers for repository initialization, gitignore editing, author configuration, and commit iteration.
 - `presenters/property_diff/` contains property presentation mapping and nested property-path tree helpers.
 
 Presenters receive only the specific view objects and action objects they need from the UI composer, not sibling child widgets or Qt gesture details. Views render Qt widgets and perform translation. Presenters pass raw data and intent, not translated UI strings. Dialogs and message boxes stay in view layer even when launched from FreeCAD command entry points.
 
-Handlers are focused, stateless workflow classes inside presenter subdirectories. They own multi-step dialog flows and action orchestration for a single use case. Presenters compose handlers and delegate to them. Commands can also instantiate handlers directly using the container and a `DialogView` with the main window as parent, without requiring the diff panel to be open.
+Handlers are focused, stateless workflow classes inside presenter subdirectories. They own multi-step dialog flows and action orchestration for a single use case. They are owned by `WorkbenchCommandPresenter` for command-accessible flows. Panel presenters delegate shared command flows to `WorkbenchCommandPresenter` instead of constructing handlers directly.
 
 ### Application Layer
 
@@ -184,7 +186,9 @@ freecad/history_wb/
     ├── presenters/
     │   ├── document_diff/
     │   ├── git_repository/
-    │   └── property_diff/
+    │   ├── property_diff/
+    │   ├── git_repository_presenter.py
+    │   └── workbench_command_presenter.py
     └── views/
 ```
 
@@ -207,7 +211,6 @@ Infrastructure Layer
 ```
 
 - Entry points may call UI registries, presenters, commands, and application container accessors.
-- Entry points may instantiate handlers directly using container actions and `DialogView` with the main window as parent.
 - UI may call application actions and use domain models for display state.
 - Handlers depend on application actions and `ApplicationState`, not on presenters or concrete widgets.
 - Application may use domain services, domain models, and domain ports.
@@ -251,13 +254,13 @@ The container is stored through `set_container()` so FreeCAD command instances c
 
 ### UI Composition
 
-`compose_and_register_ui(container, application_state)` creates:
+`compose_and_register_panel(container, application_state)` creates:
 
 - `DiffPanelView`
 - `DiffPresenter`
 - `GitRepositoryPresenter`
 
-`ApplicationState` is created externally during workbench/container initialization and passed in. This keeps state alive across panel open/close cycles.
+`ApplicationState` and `WorkbenchCommandPresenter` are created externally during workbench/container initialization. The command presenter is registered in the UI registry before composition, and the composer fetches it to pass into `GitRepositoryPresenter`. This keeps both state and command flows alive across panel open/close cycles.
 
 It then registers UI objects in `ui_registry` for command access. UI composition happens when the diff panel is created, not during initial FreeCAD module import.
 
@@ -355,6 +358,6 @@ Direct file imports are acceptable when a symbol is not part of a package API or
 | Port | Protocol that describes an external dependency. |
 | Presenter | UI coordinator that turns application results into view updates. |
 | Snapshot | Text-friendly representation of a FreeCAD document's model state. |
-| UIState | UI-session state owned by the UI layer, such as detected repository. |
+| ApplicationState | Session state owned by the UI layer, such as detected repository. |
 | ApplicationState | Application-scoped state shared across entry points and UI. Survives panel close. |
 | Handler | Focused workflow class inside presenter subdirectories. Owns multi-step dialog flows and action orchestration for a single use case. |

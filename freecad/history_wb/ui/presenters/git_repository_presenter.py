@@ -5,33 +5,17 @@
 from collections.abc import Callable
 from time import monotonic
 
-from freecad.history_wb.application.actions.can_write_global_git_identity import (
-    CanWriteGlobalGitIdentityAction,
-)
-from freecad.history_wb.application.actions.commit_staging import CommitStagingAction
 from freecad.history_wb.application.actions.find_active_git_repository import (
     FindActiveGitRepositoryAction,
 )
 from freecad.history_wb.application.actions.get_commits import GetCommitsAction
-from freecad.history_wb.application.actions.get_git_identity import GetGitIdentityAction
-from freecad.history_wb.application.actions.get_git_repository_init_candidates import (
-    GetGitRepositoryInitCandidatesAction,
-)
-from freecad.history_wb.application.actions.get_gitignore_content import GetGitIgnoreContentAction
-from freecad.history_wb.application.actions.get_staged_file_paths import GetStagedFilePathsAction
-from freecad.history_wb.application.actions.initialize_git_repository import InitializeGitRepositoryAction
-from freecad.history_wb.application.actions.save_git_identity import SaveGitIdentityAction
-from freecad.history_wb.application.actions.update_gitignore import UpdateGitIgnoreAction
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.diff_panel.dialog_view import DialogView
 from freecad.history_wb.ui.views.history.panel import HistoryPanelWidget
-from freecad.history_wb.utils import Log, translate
+from freecad.history_wb.utils import Log
 
-from .git_repository.author_configuration_handler import AuthorConfigurationHandler
-from .git_repository.commit_iteration_handler import CommitIterationHandler
-from .git_repository.gitignore_handler import GitIgnoreHandler
-from .git_repository.initialize_repository_handler import InitializeRepositoryHandler
+from .workbench_command_presenter import WorkbenchCommandPresenter
 
 
 class GitRepositoryPresenter:
@@ -40,8 +24,12 @@ class GitRepositoryPresenter:
     This presenter is responsible for:
     1. Detecting the active git repository when the workbench is activated
     2. Updating the UI state with the detected repository
-   3. Displaying the repository information in the view
+    3. Displaying the repository information in the view
     4. Loading and displaying commits for the repository
+
+    Shared command flows (save iteration, configure author, initialize repo,
+    update gitignore) are delegated to WorkbenchCommandPresenter to avoid
+    duplicating handler construction and dialog lifecycle management.
 
     Attributes:
         _view: The DiffPanelView instance for displaying repository info.
@@ -55,17 +43,9 @@ class GitRepositoryPresenter:
         dialog_view: DialogView,
         find_git_repo_action: FindActiveGitRepositoryAction,
         get_commits_action: GetCommitsAction,
-        get_staged_file_paths_action: GetStagedFilePathsAction,
-        commit_staging_action: CommitStagingAction,
-        get_git_identity_action: GetGitIdentityAction,
-        save_git_identity_action: SaveGitIdentityAction,
-        can_write_global_git_identity_action: CanWriteGlobalGitIdentityAction,
-        get_git_repository_init_candidates_action: GetGitRepositoryInitCandidatesAction,
-        initialize_git_repository_action: InitializeGitRepositoryAction,
-        get_gitignore_content_action: GetGitIgnoreContentAction,
-        update_gitignore_action: UpdateGitIgnoreAction,
         application_state: ApplicationState,
         clear_doc_diffs: Callable[[], None],
+        workbench_command_presenter: WorkbenchCommandPresenter,
     ) -> None:
         """Initialize the presenter with required dependencies.
 
@@ -75,55 +55,16 @@ class GitRepositoryPresenter:
             find_git_repo_action: The action for finding the active git repository.
             get_commits_action: The action for getting git commits.
             application_state: Application-scoped state holder for storing repository.
+            clear_doc_diffs: Callback to clear document diffs.
+            workbench_command_presenter: App-scoped presenter for shared command flows.
         """
         self._history_view = history_view
         self._dialog_view = dialog_view
         self._find_git_repo_action = find_git_repo_action
         self._get_commits_action = get_commits_action
-        self._get_staged_file_paths_action = get_staged_file_paths_action
-        self._commit_staging_action = commit_staging_action
-        self._get_git_identity_action = get_git_identity_action
-        self._save_git_identity_action = save_git_identity_action
-        self._can_write_global_git_identity_action = can_write_global_git_identity_action
-        self._get_git_repository_init_candidates_action = get_git_repository_init_candidates_action
-        self._initialize_git_repository_action = initialize_git_repository_action
-        self._get_gitignore_content_action = get_gitignore_content_action
-        self._update_gitignore_action = update_gitignore_action
         self._application_state = application_state
-        self._init_repo_handler = InitializeRepositoryHandler(
-            get_candidates_action=self._get_git_repository_init_candidates_action,
-            initialize_action=self._initialize_git_repository_action,
-            show_init_dialog=dialog_view.show_init_repository_dialog,
-            show_info_message=dialog_view.show_info_message,
-            show_error_message=dialog_view.show_error_message,
-            application_state=application_state,
-        )
-        self._gitignore_handler = GitIgnoreHandler(
-            get_content_action=self._get_gitignore_content_action,
-            update_action=self._update_gitignore_action,
-            show_editor_dialog=dialog_view.show_gitignore_editor_dialog,
-            show_info_message=dialog_view.show_info_message,
-            show_error_message=dialog_view.show_error_message,
-        )
         self._clear_doc_diffs = clear_doc_diffs
-        self._author_handler = AuthorConfigurationHandler(
-            get_git_identity_action=self._get_git_identity_action,
-            save_git_identity_action=self._save_git_identity_action,
-            can_write_global_git_identity_action=self._can_write_global_git_identity_action,
-            show_configure_author_dialog=dialog_view.show_configure_author_dialog,
-            show_warning_message=dialog_view.show_warning_message,
-            show_error_message=dialog_view.show_error_message,
-        )
-        self._commit_handler = CommitIterationHandler(
-            get_staged_file_paths_action=self._get_staged_file_paths_action,
-            commit_staging_action=self._commit_staging_action,
-            get_git_identity_action=self._get_git_identity_action,
-            author_configuration_handler=self._author_handler,
-            show_save_iteration_dialog=dialog_view.show_save_iteration_dialog,
-            show_warning_message=dialog_view.show_warning_message,
-            show_info_message=dialog_view.show_info_message,
-            show_error_message=dialog_view.show_error_message,
-        )
+        self._command_presenter = workbench_command_presenter
         self._page_size = 20
         self._loaded_commit_count = 0
         self._has_more_commits = False
@@ -151,49 +92,24 @@ class GitRepositoryPresenter:
 
     def save_iteration(self) -> None:
         """Execute save-iteration flow from toolbar or panel button."""
-        repo = self._application_state.git_repository
-
-        if repo is None:
-            self._dialog_view.show_warning_message(
-                translate("History", "No Project"),
-                translate("History", "No project detected. Please open a document from a project."),
-            )
-            return
-
-        success = self._commit_handler.execute(repo)
+        success = self._command_presenter.save_iteration()
         if success:
             Log.info("Commit successful")
             self.refresh_repository_and_commits()
 
     def configure_author(self) -> None:
         """Open author configuration flow from toolbar command."""
-        repo = self._application_state.git_repository
-        if repo is None:
-            self._dialog_view.show_warning_message(
-                translate("History", "No Project"),
-                translate("History", "No project detected. Please open a document from a project."),
-            )
-            return
-
-        self._author_handler.execute(repo)
+        self._command_presenter.configure_author()
 
     def initialize_repository(self) -> None:
         """Execute repository initialization flow from toolbar command."""
-        initialized = self._init_repo_handler.execute()
+        initialized = self._command_presenter.initialize_repository()
         if initialized:
             self.refresh_repository_and_commits()
 
     def update_gitignore(self) -> None:
         """Execute gitignore editor flow from toolbar command."""
-        repo = self._application_state.git_repository
-        if repo is None:
-            self._dialog_view.show_warning_message(
-                translate("History", "No Project"),
-                translate("History", "No project detected. Open a FreeCAD document in a project first."),
-            )
-            return
-
-        self._gitignore_handler.execute(repo)
+        self._command_presenter.update_gitignore()
 
     def _detect_git_repository(self) -> None:
         """Detect git repository and update UI and application state.

@@ -41,6 +41,15 @@ def test_workbench_initializes_and_registers_preference_page_once(monkeypatch) -
         _freecad_port=SimpleNamespace(message=lambda _msg: None),
         get_diff_settings_action=Mock(),
         save_diff_settings_action=Mock(),
+        get_staged_file_paths_action=Mock(),
+        commit_staging_action=Mock(),
+        get_git_identity_action=Mock(),
+        save_git_identity_action=Mock(),
+        can_write_global_git_identity_action=Mock(),
+        get_git_repository_init_candidates_action=Mock(),
+        initialize_git_repository_action=Mock(),
+        get_gitignore_content_action=Mock(),
+        update_gitignore_action=Mock(),
     )
     monkeypatch.setattr(
         "freecad.history_wb.application.di.container.create_application_container",
@@ -83,6 +92,15 @@ def test_preference_registration_is_idempotent_across_module_reload(monkeypatch)
             _freecad_port=SimpleNamespace(message=lambda _msg: None),
             get_diff_settings_action=Mock(),
             save_diff_settings_action=Mock(),
+            get_staged_file_paths_action=Mock(),
+            commit_staging_action=Mock(),
+            get_git_identity_action=Mock(),
+            save_git_identity_action=Mock(),
+            can_write_global_git_identity_action=Mock(),
+            get_git_repository_init_candidates_action=Mock(),
+            initialize_git_repository_action=Mock(),
+            get_gitignore_content_action=Mock(),
+            update_gitignore_action=Mock(),
         )
         monkeypatch.setattr(
             "freecad.history_wb.application.di.container.create_application_container",

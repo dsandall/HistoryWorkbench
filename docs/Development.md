@@ -116,7 +116,7 @@ Guidelines:
 - UI presenters receive the specific view objects, action objects, and UI state they need.
 - Infrastructure adapters wrap external APIs.
 - `ApplicationContainer` wires application actions and domain services.
-- `compose_and_register_ui()` wires views, presenters, `DialogView`, and `UIState`.
+- `compose_and_register_panel()` wires views, presenters, `DialogView`, and `UIState`.
 - `ui/wiring.py` binds public component signals to presenter listener methods.
 
 ## Classes And Functions

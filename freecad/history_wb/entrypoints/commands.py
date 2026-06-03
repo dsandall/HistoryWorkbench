@@ -1,34 +1,24 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-"""File responsibility: FreeCAD command entry points for the Diff Workbench.
-
-This module defines the FreeCAD commands that bridge user interactions
-(toolbar/menu clicks) with handlers, presenters, and application actions.
-Commands instantiate handlers directly from the container and DialogView,
-without requiring the diff panel to be open.
-"""
+# File responsibility: FreeCAD command entry points for the Diff Workbench.
+# Commands delegate to the app-scoped WorkbenchCommandPresenter for shared
+# command flows, keeping them usable after the diff panel is closed.
+"""FreeCAD command entry points for the Diff Workbench."""
 
 from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING, TypedDict
 
-from ..qt import QtCore, QtWidgets
+from ..qt import QtCore
 from ..resources import ICONPATH
 from ..utils import Log, translate
 
 
 if TYPE_CHECKING:
-    QWidget = QtWidgets.QWidget
-
-    from ..application.di.container import ApplicationContainer
-    from ..domain.git.models import GitRepository
-    from ..ui.presenters.git_repository.author_configuration_handler import (
-        AuthorConfigurationHandler,
-    )
-    from ..ui.presenters.git_repository.commit_iteration_handler import (
-        CommitIterationHandler,
-    )
+    from ..qt import QtWidgets
     from ..ui.views.diff_panel import DialogView
+
+    QWidget = QtWidgets.QWidget
 
 
 def _main_window_parent(container) -> QWidget | None:
@@ -44,34 +34,18 @@ def _main_window_parent(container) -> QWidget | None:
     return main_window  # type: ignore[return-value]
 
 
-def _create_dialog_view(container: ApplicationContainer) -> DialogView:
-    """Create a DialogView anchored to the FreeCAD main window."""
+def _create_dialog_view(container) -> DialogView:
+    """Create a DialogView anchored to the FreeCAD main window.
+
+    Used by the command that needs to show a warning when no repo exists
+    but are not covered by the command presenter flows.
+    """
     from ..ui.views.diff_panel import DialogView
 
     parent = _main_window_parent(container)
     if parent is None:
         raise RuntimeError("FreeCAD main window not available")
     return DialogView(parent)
-
-
-def _get_application_repo_or_warn(
-    container: ApplicationContainer,
-    dialog_view: DialogView,
-) -> GitRepository | None:
-    """Return the current git repository from application state, or show a warning.
-
-    Returns:
-        GitRepository if set, None otherwise (warning already shown).
-    """
-    from ..ui.registry import ui_registry
-
-    repo = ui_registry.application_state.git_repository
-    if repo is None:
-        dialog_view.show_warning_message(
-            translate("History", "No Project"),
-            translate("History", "No project detected. Open a FreeCAD document in a project first."),
-        )
-    return repo
 
 
 def _refresh_git_repository_presenter_if_open() -> None:
@@ -81,43 +55,6 @@ def _refresh_git_repository_presenter_if_open() -> None:
     presenter = ui_registry.git_repository_presenter
     if presenter is not None:
         presenter.refresh_repository_and_commits()
-
-
-def _build_author_configuration_handler(
-    container: ApplicationContainer,
-    dialog_view: DialogView,
-) -> AuthorConfigurationHandler:
-    """Build an AuthorConfigurationHandler from container actions and dialog callbacks."""
-    from ..ui.presenters.git_repository.author_configuration_handler import AuthorConfigurationHandler
-
-    return AuthorConfigurationHandler(
-        get_git_identity_action=container.get_git_identity_action,
-        save_git_identity_action=container.save_git_identity_action,
-        can_write_global_git_identity_action=container.can_write_global_git_identity_action,
-        show_configure_author_dialog=dialog_view.show_configure_author_dialog,
-        show_warning_message=dialog_view.show_warning_message,
-        show_error_message=dialog_view.show_error_message,
-    )
-
-
-def _build_commit_iteration_handler(
-    container: ApplicationContainer,
-    dialog_view: DialogView,
-) -> CommitIterationHandler:
-    """Build a CommitIterationHandler from container actions, dialog callbacks, and an author handler."""
-    from ..ui.presenters.git_repository.commit_iteration_handler import CommitIterationHandler
-
-    author_handler = _build_author_configuration_handler(container, dialog_view)
-    return CommitIterationHandler(
-        get_staged_file_paths_action=container.get_staged_file_paths_action,
-        commit_staging_action=container.commit_staging_action,
-        get_git_identity_action=container.get_git_identity_action,
-        author_configuration_handler=author_handler,
-        show_save_iteration_dialog=dialog_view.show_save_iteration_dialog,
-        show_warning_message=dialog_view.show_warning_message,
-        show_info_message=dialog_view.show_info_message,
-        show_error_message=dialog_view.show_error_message,
-    )
 
 
 class CommandResources(TypedDict):
@@ -145,20 +82,9 @@ class _ConfigureAuthorCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
+        from ..ui.registry import ui_registry
 
-        container = get_container()
-        try:
-            dialog_view = _create_dialog_view(container)
-        except RuntimeError:
-            return
-
-        repo = _get_application_repo_or_warn(container, dialog_view)
-        if repo is None:
-            return
-
-        handler = _build_author_configuration_handler(container, dialog_view)
-        handler.execute(repo)
+        ui_registry.workbench_command_presenter.configure_author()
 
 
 class _CommitCommand:
@@ -178,20 +104,9 @@ class _CommitCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
+        from ..ui.registry import ui_registry
 
-        container = get_container()
-        try:
-            dialog_view = _create_dialog_view(container)
-        except RuntimeError:
-            return
-
-        repo = _get_application_repo_or_warn(container, dialog_view)
-        if repo is None:
-            return
-
-        handler = _build_commit_iteration_handler(container, dialog_view)
-        success = handler.execute(repo)
+        success = ui_registry.workbench_command_presenter.save_iteration()
         if success:
             Log.info("Commit successful")
             _refresh_git_repository_presenter_if_open()
@@ -260,25 +175,9 @@ class _InitializeGitRepositoryCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
-        from ..ui.presenters.git_repository.initialize_repository_handler import InitializeRepositoryHandler
         from ..ui.registry import ui_registry
 
-        container = get_container()
-        try:
-            dialog_view = _create_dialog_view(container)
-        except RuntimeError:
-            return
-
-        handler = InitializeRepositoryHandler(
-            get_candidates_action=container.get_git_repository_init_candidates_action,
-            initialize_action=container.initialize_git_repository_action,
-            show_init_dialog=dialog_view.show_init_repository_dialog,
-            show_info_message=dialog_view.show_info_message,
-            show_error_message=dialog_view.show_error_message,
-            application_state=ui_registry.application_state,
-        )
-        initialized = handler.execute()
+        initialized = ui_registry.workbench_command_presenter.initialize_repository()
         if initialized:
             _refresh_git_repository_presenter_if_open()
 
@@ -307,6 +206,7 @@ class _OpenAllDocumentsInRepositoryCommand:
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
         from .._container import get_container
+        from ..ui.registry import ui_registry
 
         container = get_container()
         try:
@@ -314,8 +214,12 @@ class _OpenAllDocumentsInRepositoryCommand:
         except RuntimeError:
             return
 
-        repo = _get_application_repo_or_warn(container, dialog_view)
+        repo = ui_registry.application_state.git_repository
         if repo is None:
+            dialog_view.show_warning_message(
+                translate("History", "No Project"),
+                translate("History", "No project detected. Open a FreeCAD document in a project first."),
+            )
             return
 
         container.open_all_documents_in_repository_action.execute(repo)
@@ -341,27 +245,9 @@ class _UpdateGitIgnoreCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
-        from ..ui.presenters.git_repository.gitignore_handler import GitIgnoreHandler
+        from ..ui.registry import ui_registry
 
-        container = get_container()
-        try:
-            dialog_view = _create_dialog_view(container)
-        except RuntimeError:
-            return
-
-        repo = _get_application_repo_or_warn(container, dialog_view)
-        if repo is None:
-            return
-
-        handler = GitIgnoreHandler(
-            get_content_action=container.get_gitignore_content_action,
-            update_action=container.update_gitignore_action,
-            show_editor_dialog=dialog_view.show_gitignore_editor_dialog,
-            show_info_message=dialog_view.show_info_message,
-            show_error_message=dialog_view.show_error_message,
-        )
-        handler.execute(repo)
+        ui_registry.workbench_command_presenter.update_gitignore()
 
 
 class _RecomputeAllOpenDocumentsCommand:

@@ -4,17 +4,11 @@
 <context>
     <name>History</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="71"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="158"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="173"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="191"/>
+        <location filename="../../entrypoints/commands.py" line="220"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="123"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="139"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="159"/>
         <source>No Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="159"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="174"/>
-        <source>No project detected. Please open a document from a project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -226,8 +220,10 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="72"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="192"/>
+        <location filename="../../entrypoints/commands.py" line="221"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="124"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="140"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="160"/>
         <source>No project detected. Open a FreeCAD document in a project first.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -559,12 +555,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryCloseDiffWindows</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="446"/>
+        <location filename="../../entrypoints/commands.py" line="332"/>
         <source>Close Comparison Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="447"/>
+        <location filename="../../entrypoints/commands.py" line="333"/>
         <source>Close every document starting with &apos;Diff_&apos; without saving</source>
         <translation type="unfinished"></translation>
     </message>
@@ -572,12 +568,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryCommit</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="170"/>
+        <location filename="../../entrypoints/commands.py" line="96"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="171"/>
+        <location filename="../../entrypoints/commands.py" line="97"/>
         <source>Save reviewed changes as an iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -585,12 +581,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryConfigureAuthorCommand</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="137"/>
+        <location filename="../../entrypoints/commands.py" line="74"/>
         <source>Configure Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="138"/>
+        <location filename="../../entrypoints/commands.py" line="75"/>
         <source>Configure author name and email</source>
         <translation type="unfinished"></translation>
     </message>
@@ -598,12 +594,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryInitializeGitRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="249"/>
+        <location filename="../../entrypoints/commands.py" line="164"/>
         <source>Initialize Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="250"/>
+        <location filename="../../entrypoints/commands.py" line="165"/>
         <source>Initialize a new project in the selected directory</source>
         <translation type="unfinished"></translation>
     </message>
@@ -611,12 +607,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryOpenAllDocumentsInRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="292"/>
+        <location filename="../../entrypoints/commands.py" line="191"/>
         <source>Open All Documents in Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="296"/>
+        <location filename="../../entrypoints/commands.py" line="195"/>
         <source>Open every .FCStd file found in the project. Useful for generating en masse.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -624,12 +620,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryOpenDiffWindow</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="421"/>
+        <location filename="../../entrypoints/commands.py" line="307"/>
         <source>Open History Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="422"/>
+        <location filename="../../entrypoints/commands.py" line="308"/>
         <source>Open history panel view</source>
         <translation type="unfinished"></translation>
     </message>
@@ -637,12 +633,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryRecomputeActiveDocument</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="396"/>
+        <location filename="../../entrypoints/commands.py" line="282"/>
         <source>Recompute Active Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="397"/>
+        <location filename="../../entrypoints/commands.py" line="283"/>
         <source>Recompute the active document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -650,12 +646,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryRecomputeAllOpenDocuments</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="373"/>
+        <location filename="../../entrypoints/commands.py" line="259"/>
         <source>Recompute All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="374"/>
+        <location filename="../../entrypoints/commands.py" line="260"/>
         <source>Recompute every open document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -663,12 +659,12 @@ Saved history will not be affected.</source>
 <context>
     <name>HistoryRefreshRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="206"/>
+        <location filename="../../entrypoints/commands.py" line="121"/>
         <source>Refresh Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="207"/>
+        <location filename="../../entrypoints/commands.py" line="122"/>
         <source>Refresh the detected project and reload iterations.
 Open at least one FreeCAD document located within a project before running this command.
 How it works: open FreeCAD documents are checked one by one until one is found to be located within a project.</source>
@@ -678,12 +674,12 @@ How it works: open FreeCAD documents are checked one by one until one is found t
 <context>
     <name>HistoryUpdateGitIgnore</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="330"/>
+        <location filename="../../entrypoints/commands.py" line="234"/>
         <source>Edit Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="331"/>
+        <location filename="../../entrypoints/commands.py" line="235"/>
         <source>Edit project ignored files list (.gitignore)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -691,15 +687,15 @@ How it works: open FreeCAD documents are checked one by one until one is found t
 <context>
     <name>Workbench</name>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="64"/>
+        <location filename="../../entrypoints/workbench.py" line="60"/>
+        <location filename="../../entrypoints/workbench.py" line="78"/>
         <location filename="../../entrypoints/workbench.py" line="82"/>
-        <location filename="../../entrypoints/workbench.py" line="86"/>
-        <location filename="../../entrypoints/workbench.py" line="107"/>
+        <location filename="../../entrypoints/workbench.py" line="103"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="65"/>
+        <location filename="../../entrypoints/workbench.py" line="61"/>
         <source>Track project iterations and history</source>
         <translation type="unfinished"></translation>
     </message>

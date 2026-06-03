@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from freecad.history_wb.application.di.container import ApplicationContainer
-from freecad.history_wb.ui.composer import compose_and_register_ui
+from freecad.history_wb.ui.composer import compose_and_register_panel, compose_and_register_workbench_commands
 from freecad.history_wb.ui.registry import ui_registry
 from freecad.history_wb.ui.state import ApplicationState
 
@@ -89,18 +89,15 @@ def _mock_container() -> MagicMock:
     mock.initialize_git_repository_action = MagicMock()
     mock.get_gitignore_content_action = MagicMock()
     mock.update_gitignore_action = MagicMock()
-    mock.commit_staging_action = MagicMock()
-    mock.get_git_identity_action = MagicMock()
-    mock.save_git_identity_action = MagicMock()
-    mock.can_write_global_git_identity_action = MagicMock()
     mock.settings_repo = MagicMock()
     return mock
 
 
 def test_compose_creates_and_registers_ui_components() -> None:
-    """compose_and_register_ui returns view, uses externally provided ApplicationState, registers both presenters, calls on_workbench_activated."""  # noqa: E501
+    """compose_and_register_panel returns view, uses externally provided ApplicationState, registers both presenters, calls on_workbench_activated."""  # noqa: E501
     mock_container = _mock_container()
     mock_application_state = ApplicationState(git_repository=None)
+    mock_command_presenter = MagicMock()
 
     with (
         patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
@@ -119,7 +116,10 @@ def test_compose_creates_and_registers_ui_components() -> None:
         mock_git_presenter = MagicMock()
         MockGitPresenter.return_value = mock_git_presenter
 
-        result = compose_and_register_ui(mock_container, mock_application_state)
+        # Register command presenter before compose
+        ui_registry.register_workbench_command_presenter(mock_command_presenter)
+
+        result = compose_and_register_panel(mock_container, mock_application_state)
 
         # Returns the view
         assert result is mock_view
@@ -136,6 +136,7 @@ def test_compose_uses_externally_provided_application_state() -> None:
     """Composer passes the externally provided ApplicationState into both presenters."""
     mock_container = _mock_container()
     mock_application_state = ApplicationState(git_repository=None)
+    mock_command_presenter = MagicMock()
 
     with (
         patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
@@ -154,7 +155,10 @@ def test_compose_uses_externally_provided_application_state() -> None:
         mock_git_presenter = MagicMock()
         MockGitPresenter.return_value = mock_git_presenter
 
-        compose_and_register_ui(mock_container, mock_application_state)
+        # Register command presenter before compose
+        ui_registry.register_workbench_command_presenter(mock_command_presenter)
+
+        compose_and_register_panel(mock_container, mock_application_state)
 
         # Both presenters receive the same ApplicationState instance
         diff_kwargs = MockDiffPresenter.call_args.kwargs
@@ -168,6 +172,7 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
     """Action dependencies and event wiring are delegated correctly."""
     mock_container = _mock_container()
     mock_application_state = ApplicationState(git_repository=None)
+    mock_command_presenter = MagicMock()
 
     with (
         patch("freecad.history_wb.ui.composer.DiffPanelView") as MockView,
@@ -186,7 +191,10 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         mock_git_presenter = MagicMock()
         MockGitPresenter.return_value = mock_git_presenter
 
-        compose_and_register_ui(mock_container, mock_application_state)
+        # Register command presenter before compose
+        ui_registry.register_workbench_command_presenter(mock_command_presenter)
+
+        compose_and_register_panel(mock_container, mock_application_state)
 
         # DiffPresenter receives correct concrete collaborators and actions from container
         diff_kwargs = MockDiffPresenter.call_args.kwargs
@@ -203,17 +211,14 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         assert diff_kwargs["open_document_action"] is mock_container.open_document_action
         assert diff_kwargs["restore_documents_action"] is mock_container.restore_documents_action
 
-        # GitRepositoryPresenter receives correct concrete collaborators and actions from container
+        # GitRepositoryPresenter receives correct collaborators and command presenter
         git_kwargs = MockGitPresenter.call_args.kwargs
         assert git_kwargs["history_view"] is mock_view.history_panel
         assert git_kwargs["dialog_view"] is mock_dialog_view
         assert git_kwargs["find_git_repo_action"] is mock_container.find_active_git_repository_action
         assert git_kwargs["get_commits_action"] is mock_container.get_commits_action
-        assert git_kwargs["get_staged_file_paths_action"] is mock_container.get_staged_file_paths_action
-        assert git_kwargs["commit_staging_action"] is mock_container.commit_staging_action
-        assert git_kwargs["get_git_identity_action"] is mock_container.get_git_identity_action
-        assert git_kwargs["save_git_identity_action"] is mock_container.save_git_identity_action
-        assert git_kwargs["can_write_global_git_identity_action"] is mock_container.can_write_global_git_identity_action
+        assert git_kwargs["application_state"] is mock_application_state
+        assert git_kwargs["workbench_command_presenter"] is mock_command_presenter
 
         # Composer delegates public signal binding to ui.wiring.
         mock_view.history_panel.refresh_requested.connect.assert_called_once_with(
@@ -247,3 +252,35 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         mock_view.document_diff_panel.open_document_for_comparison_requested.connect.assert_called_once_with(
             mock_diff_presenter.open_document_for_comparison
         )
+
+
+def test_compose_and_register_workbench_commands() -> None:
+    """compose_and_register_workbench_commands creates and registers WorkbenchCommandPresenter."""
+    mock_container = _mock_container()
+    mock_application_state = ApplicationState(git_repository=None)
+
+    with (
+        patch("freecad.history_wb.ui.presenters.workbench_command_presenter.WorkbenchCommandPresenter") as MockWCP,
+        patch("freecad.history_wb.entrypoints.workbench.getMainWindow", return_value=MagicMock()),
+    ):
+        mock_wcp_instance = MagicMock()
+        MockWCP.return_value = mock_wcp_instance
+
+        compose_and_register_workbench_commands(mock_container, mock_application_state)
+
+        # WorkbenchCommandPresenter created with correct arguments
+        assert MockWCP.call_count == 1
+        wcp_kwargs = MockWCP.call_args.kwargs
+        assert wcp_kwargs["application_state"] is mock_application_state
+        assert wcp_kwargs["get_staged_file_paths_action"] is mock_container.get_staged_file_paths_action
+        assert wcp_kwargs["commit_staging_action"] is mock_container.commit_staging_action
+        assert wcp_kwargs["get_git_identity_action"] is mock_container.get_git_identity_action
+        assert wcp_kwargs["save_git_identity_action"] is mock_container.save_git_identity_action
+        assert wcp_kwargs["can_write_global_git_identity_action"] is mock_container.can_write_global_git_identity_action
+        assert wcp_kwargs["get_git_repository_init_candidates_action"] is mock_container.get_git_repository_init_candidates_action
+        assert wcp_kwargs["initialize_git_repository_action"] is mock_container.initialize_git_repository_action
+        assert wcp_kwargs["get_gitignore_content_action"] is mock_container.get_gitignore_content_action
+        assert wcp_kwargs["update_gitignore_action"] is mock_container.update_gitignore_action
+
+        # Registered in ui_registry
+        assert ui_registry.workbench_command_presenter is mock_wcp_instance

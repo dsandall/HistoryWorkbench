@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitRepositoryPresenter.
 # These tests verify that the presenter correctly orchestrates git repository
-# detection, commit loading, and delegates to handlers for identity and commit flows.
+# detection, commit loading, and delegates command flows to WorkbenchCommandPresenter.
 """Unit tests for GitRepositoryPresenter."""
 
 from datetime import datetime
@@ -38,62 +38,14 @@ def mock_get_commits_action() -> MagicMock:
 
 
 @pytest.fixture
-def mock_get_staged_file_paths_action() -> MagicMock:
-    """Create a mock GetStagedFilePathsAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_commit_staging_action() -> MagicMock:
-    """Create a mock CommitStagingAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_get_git_identity_action() -> MagicMock:
-    """Create a mock GetGitIdentityAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_save_git_identity_action() -> MagicMock:
-    """Create a mock SaveGitIdentityAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_can_write_global_git_identity_action() -> MagicMock:
-    """Create a mock CanWriteGlobalGitIdentityAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_get_git_repository_init_candidates_action() -> MagicMock:
-    """Create a mock GetGitRepositoryInitCandidatesAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_initialize_git_repository_action() -> MagicMock:
-    """Create a mock InitializeGitRepositoryAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_get_gitignore_content_action() -> MagicMock:
-    """Create a mock GetGitIgnoreContentAction."""
-    return MagicMock()
-
-
-@pytest.fixture
-def mock_update_gitignore_action() -> MagicMock:
-    """Create a mock UpdateGitIgnoreAction."""
-    return MagicMock()
-
-
-@pytest.fixture
 def mock_application_state() -> MagicMock:
     """Create a mock ApplicationState."""
+    return MagicMock()
+
+
+@pytest.fixture
+def mock_command_presenter() -> MagicMock:
+    """Create a mock WorkbenchCommandPresenter."""
     return MagicMock()
 
 
@@ -103,16 +55,8 @@ def presenter(
     mock_dialog_view: MagicMock,
     mock_find_action: MagicMock,
     mock_get_commits_action: MagicMock,
-    mock_get_staged_file_paths_action: MagicMock,
-    mock_commit_staging_action: MagicMock,
-    mock_get_git_identity_action: MagicMock,
-    mock_save_git_identity_action: MagicMock,
-    mock_can_write_global_git_identity_action: MagicMock,
-    mock_get_git_repository_init_candidates_action: MagicMock,
-    mock_initialize_git_repository_action: MagicMock,
-    mock_get_gitignore_content_action: MagicMock,
-    mock_update_gitignore_action: MagicMock,
     mock_application_state: MagicMock,
+    mock_command_presenter: MagicMock,
 ) -> GitRepositoryPresenter:
     """Create a GitRepositoryPresenter instance with mocked dependencies."""
     return GitRepositoryPresenter(
@@ -120,17 +64,9 @@ def presenter(
         dialog_view=mock_dialog_view,
         find_git_repo_action=mock_find_action,
         get_commits_action=mock_get_commits_action,
-        get_staged_file_paths_action=mock_get_staged_file_paths_action,
-        commit_staging_action=mock_commit_staging_action,
-        get_git_identity_action=mock_get_git_identity_action,
-        save_git_identity_action=mock_save_git_identity_action,
-        can_write_global_git_identity_action=mock_can_write_global_git_identity_action,
-        get_git_repository_init_candidates_action=mock_get_git_repository_init_candidates_action,
-        initialize_git_repository_action=mock_initialize_git_repository_action,
-        get_gitignore_content_action=mock_get_gitignore_content_action,
-        update_gitignore_action=mock_update_gitignore_action,
         application_state=mock_application_state,
         clear_doc_diffs=MagicMock(),
+        workbench_command_presenter=mock_command_presenter,
     )
 
 
@@ -202,16 +138,8 @@ class TestGitRepositoryPresenter:
         mock_dialog_view: MagicMock,
         mock_find_action: MagicMock,
         mock_get_commits_action: MagicMock,
-        mock_get_staged_file_paths_action: MagicMock,
-        mock_commit_staging_action: MagicMock,
-        mock_get_git_identity_action: MagicMock,
-        mock_save_git_identity_action: MagicMock,
-        mock_can_write_global_git_identity_action: MagicMock,
-        mock_get_git_repository_init_candidates_action: MagicMock,
-        mock_initialize_git_repository_action: MagicMock,
-        mock_get_gitignore_content_action: MagicMock,
-        mock_update_gitignore_action: MagicMock,
         mock_application_state: MagicMock,
+        mock_command_presenter: MagicMock,
     ) -> None:
         """Presenter stores all dependencies correctly on initialization."""
         presenter = GitRepositoryPresenter(
@@ -219,17 +147,9 @@ class TestGitRepositoryPresenter:
             dialog_view=mock_dialog_view,
             find_git_repo_action=mock_find_action,
             get_commits_action=mock_get_commits_action,
-            get_staged_file_paths_action=mock_get_staged_file_paths_action,
-            commit_staging_action=mock_commit_staging_action,
-            get_git_identity_action=mock_get_git_identity_action,
-            save_git_identity_action=mock_save_git_identity_action,
-            can_write_global_git_identity_action=mock_can_write_global_git_identity_action,
-            get_git_repository_init_candidates_action=mock_get_git_repository_init_candidates_action,
-            initialize_git_repository_action=mock_initialize_git_repository_action,
-            get_gitignore_content_action=mock_get_gitignore_content_action,
-            update_gitignore_action=mock_update_gitignore_action,
             application_state=mock_application_state,
             clear_doc_diffs=MagicMock(),
+            workbench_command_presenter=mock_command_presenter,
         )
 
         assert presenter._history_view is mock_view
@@ -237,6 +157,7 @@ class TestGitRepositoryPresenter:
         assert presenter._find_git_repo_action is mock_find_action
         assert presenter._get_commits_action is mock_get_commits_action
         assert presenter._application_state is mock_application_state
+        assert presenter._command_presenter is mock_command_presenter
 
     def test_refresh_repository_and_commits_with_successful_detection(
         self,
@@ -309,89 +230,95 @@ class TestGitRepositoryPresenter:
 
 
 class TestSaveIterationFlow:
-    """Tests for save-iteration orchestration in GitRepositoryPresenter."""
+    """Tests for save-iteration delegation in GitRepositoryPresenter."""
 
-    def test_save_iteration_warns_when_no_repository(
+    def test_save_iteration_delegates_to_command_presenter(
         self,
         presenter: GitRepositoryPresenter,
-        mock_application_state: MagicMock,
+        mock_command_presenter: MagicMock,
     ) -> None:
-        """No repository shows warning and exits early."""
-        mock_application_state.git_repository = None
-        mock_handler = MagicMock()
-        presenter._commit_handler = mock_handler
-
-        presenter.save_iteration()
-
-        presenter._dialog_view.show_warning_message.assert_called_once()
-        mock_handler.execute.assert_not_called()
-
-    def test_save_iteration_delegates_to_commit_handler(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """Presenter delegates save-iteration to CommitIterationHandler."""
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        mock_application_state.git_repository = repo
-        mock_handler = MagicMock()
-        mock_handler.execute.return_value = True
-        presenter._commit_handler = mock_handler
+        """Presenter delegates save-iteration to command presenter."""
+        mock_command_presenter.save_iteration.return_value = True
 
         with patch.object(presenter, "refresh_repository_and_commits") as refresh:
             presenter.save_iteration()
 
-        mock_handler.execute.assert_called_once_with(repo)
+        mock_command_presenter.save_iteration.assert_called_once()
         refresh.assert_called_once_with()
 
-    def test_save_iteration_skips_refresh_on_handler_failure(
+    def test_save_iteration_skips_refresh_on_command_presenter_failure(
         self,
         presenter: GitRepositoryPresenter,
-        mock_application_state: MagicMock,
+        mock_command_presenter: MagicMock,
     ) -> None:
-        """Presenter does not refresh when commit handler returns False."""
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        mock_application_state.git_repository = repo
-        mock_handler = MagicMock()
-        mock_handler.execute.return_value = False
-        presenter._commit_handler = mock_handler
+        """Presenter does not refresh when command presenter returns False."""
+        mock_command_presenter.save_iteration.return_value = False
 
         with patch.object(presenter, "refresh_repository_and_commits") as refresh:
             presenter.save_iteration()
 
-        mock_handler.execute.assert_called_once_with(repo)
+        mock_command_presenter.save_iteration.assert_called_once()
         refresh.assert_not_called()
 
 
 class TestConfigureAuthorFlow:
-    """Tests for configure-author orchestration in GitRepositoryPresenter."""
+    """Tests for configure-author delegation in GitRepositoryPresenter."""
 
-    def test_configure_author_warns_when_no_repository(
+    def test_configure_author_delegates_to_command_presenter(
         self,
         presenter: GitRepositoryPresenter,
-        mock_application_state: MagicMock,
+        mock_command_presenter: MagicMock,
     ) -> None:
-        """No repository shows warning and exits early."""
-        mock_application_state.git_repository = None
-
+        """Presenter delegates configure-author to command presenter."""
         presenter.configure_author()
 
-        presenter._dialog_view.show_warning_message.assert_called_once()
+        mock_command_presenter.configure_author.assert_called_once()
 
-    def test_configure_author_delegates_to_author_handler(
+
+class TestInitializeRepositoryFlow:
+    """Tests for initialize-repository delegation in GitRepositoryPresenter."""
+
+    def test_initialize_repository_delegates_and_refreshes_on_success(
         self,
         presenter: GitRepositoryPresenter,
-        mock_application_state: MagicMock,
+        mock_command_presenter: MagicMock,
     ) -> None:
-        """Presenter delegates configure-author to AuthorConfigurationHandler."""
-        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
-        mock_application_state.git_repository = repo
-        mock_handler = MagicMock()
-        presenter._author_handler = mock_handler
+        """Presenter delegates to command presenter and refreshes on success."""
+        mock_command_presenter.initialize_repository.return_value = True
 
-        presenter.configure_author()
+        with patch.object(presenter, "refresh_repository_and_commits") as refresh:
+            presenter.initialize_repository()
 
-        mock_handler.execute.assert_called_once_with(repo)
+        mock_command_presenter.initialize_repository.assert_called_once()
+        refresh.assert_called_once_with()
+
+    def test_initialize_repository_skips_refresh_on_failure(
+        self,
+        presenter: GitRepositoryPresenter,
+        mock_command_presenter: MagicMock,
+    ) -> None:
+        """Presenter does not refresh when command presenter returns False."""
+        mock_command_presenter.initialize_repository.return_value = False
+
+        with patch.object(presenter, "refresh_repository_and_commits") as refresh:
+            presenter.initialize_repository()
+
+        mock_command_presenter.initialize_repository.assert_called_once()
+        refresh.assert_not_called()
+
+
+class TestUpdateGitignoreFlow:
+    """Tests for gitignore delegation in GitRepositoryPresenter."""
+
+    def test_update_gitignore_delegates_to_command_presenter(
+        self,
+        presenter: GitRepositoryPresenter,
+        mock_command_presenter: MagicMock,
+    ) -> None:
+        """Presenter delegates update_gitignore to command presenter."""
+        presenter.update_gitignore()
+
+        mock_command_presenter.update_gitignore.assert_called_once()
 
 
 class TestCommitLoading:
