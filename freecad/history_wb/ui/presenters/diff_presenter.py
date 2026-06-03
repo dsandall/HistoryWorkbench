@@ -28,6 +28,9 @@ from ...utils import Log
 from ..state import ApplicationState
 from ..views.diff_panel.dialog_view import DialogView
 from ..views.document_diff.panel import DocumentDiffTreeWidget
+from ..views.document_diff.summary_state import (
+    SummaryButtonState,
+)
 from ..views.history.models import HistorySelection
 from ..views.property_diff.tree import PropertyDiffTreeWidget
 from .document_diff.diff_loader import DocumentDiffLoader
@@ -36,7 +39,6 @@ from .document_diff.restore_handler import DocumentDiffRestoreHandler
 from .document_diff.result_store import DocumentDiffResultStore
 from .document_diff.staging_handler import DocumentDiffStagingHandler, StagingDisplayState
 from .document_diff.summary_state import (
-    SummaryButtonState,
     build_summary_button_state,
     count_summary_counts,
 )
@@ -208,9 +210,6 @@ class DiffPresenter:
         Displays resulting diffs. For paths where index snapshot is missing,
         creates flat warning items (no tree below).
         """
-        self._document_view.set_stage_all_button_visible(False)
-        self._document_view.set_remove_all_button_visible(False)
-
         repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")
@@ -232,9 +231,6 @@ class DiffPresenter:
         Requests document-level commit diffs via CreateDocumentDiffsAction,
         then stores results and presents them to the view.
         """
-        self._document_view.set_stage_all_button_visible(False)
-        self._document_view.set_remove_all_button_visible(False)
-
         if commit_hash is None:
             Log.warning("Commit selection received without commit hash")
             self.clear_doc_diff()
@@ -367,19 +363,10 @@ class DiffPresenter:
 
         self._document_view.show_doc_diffs(presentations)
         state: SummaryButtonState = build_summary_button_state(self._current_history_selection, presentations)
-        self._document_view.set_stage_all_button_visible(state.stage_all_visible)
-        self._document_view.set_stage_all_button_enabled(state.stage_all_enabled)
-        self._document_view.set_remove_all_button_visible(state.remove_all_visible)
-        self._document_view.set_remove_all_button_enabled(state.remove_all_enabled)
-        self._document_view.set_restore_all_button_visible(state.restore_all_visible)
-        self._document_view.set_restore_all_button_enabled(state.restore_all_enabled)
+        self._document_view.set_button_states(state)
 
         counts = count_summary_counts(document_results)
-        self._document_view.show_summary(
-            modified_docs=counts.modified_docs,
-            deleted_docs=counts.deleted_docs,
-            added_docs=counts.added_docs,
-        )
+        self._document_view.set_summary_counts(counts)
 
     def open_visual_diff(self, git_path: str, node_path: str) -> None:
         """Open visual diff for one node in current history mode."""

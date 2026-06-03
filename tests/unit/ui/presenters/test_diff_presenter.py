@@ -23,7 +23,7 @@ from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.domain.snapshots.models import Snapshot
 from freecad.history_wb.ui.presenters.diff_presenter import DiffPresenter
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, PropertyPresentation
-from freecad.history_wb.ui.presenters.document_diff.summary_state import SummaryButtonState, SummaryCounts
+from freecad.history_wb.ui.views.document_diff.summary_state import SummaryButtonState, SummaryCounts
 from freecad.history_wb.ui.presenters.document_diff.staging_handler import StagingDisplayState
 from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.history.models import HistorySelection
@@ -224,14 +224,10 @@ def test_present_diffs_sorts_presentations_and_updates_summary_controls() -> Non
     show_doc_diffs_call = next(call for call in document_view.get_calls() if call["method"] == "show_doc_diffs")
     assert [tree.git_path for tree in show_doc_diffs_call["diff_trees"]] == ["a.FCStd", "z.FCStd"]
     assert any(call["method"] == "clear_property_diff" for call in property_view.get_calls())
-    assert {call["method"]: call for call in document_view.get_calls()}["set_stage_all_button_visible"]["visible"] is True
-    assert {call["method"]: call for call in document_view.get_calls()}["set_stage_all_button_enabled"]["enabled"] is True
-    assert {call["method"]: call for call in document_view.get_calls()}["show_summary"] == {
-        "method": "show_summary",
-        "modified_docs": 2,
-        "deleted_docs": 1,
-        "added_docs": 3,
-    }
+    button_states_call = next(call for call in document_view.get_calls() if call["method"] == "set_button_states")
+    assert button_states_call["state"] == button_state
+    summary_counts_call = next(call for call in document_view.get_calls() if call["method"] == "set_summary_counts")
+    assert summary_counts_call["counts"] == counts
 
 
 def test_restore_all_documents_delegates_current_selection_to_history_context_restore() -> None:

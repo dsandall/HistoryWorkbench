@@ -76,7 +76,7 @@ Saved history will not be affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="169"/>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="47"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="48"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -303,19 +303,19 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="37"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="38"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="48"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="49"/>
         <source>Choose which files to restore from the selected iteration.
 Current files on disk can be overwritten or removed.
 Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="63"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="64"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -362,7 +362,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="78"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="77"/>
         <source>No changes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -377,17 +377,17 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="81"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="80"/>
         <source>Modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="81"/>
         <source>Deleted:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="83"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
         <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>

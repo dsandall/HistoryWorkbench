@@ -7,6 +7,7 @@ from typing import Any
 from freecad.history_wb.domain.git.models import GitCommit, GitRepository
 from freecad.history_wb.ui.presenters.presentation_models import DiffTreePresentation, PropertyPresentation
 from freecad.history_wb.ui.views.diff_panel.dialogs import GitConfigDialogResult
+from freecad.history_wb.ui.views.document_diff.summary_state import SummaryButtonState, SummaryCounts
 
 
 class _CallRecorder:
@@ -50,14 +51,16 @@ class FakeDocumentDiffView(_CallRecorder):
         """Capture document-diff clear call."""
         self._record_call("clear_doc_diffs")
 
-    def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
-        """Capture summary display call."""
+    def set_summary_counts(self, counts: SummaryCounts) -> None:
+        """Capture summary counts display call."""
         self._record_call(
-            "show_summary",
-            modified_docs=modified_docs,
-            deleted_docs=deleted_docs,
-            added_docs=added_docs,
+            "set_summary_counts",
+            counts=counts,
         )
+
+    def set_button_states(self, state: SummaryButtonState) -> None:
+        """Capture button states update."""
+        self._record_call("set_button_states", state=state)
 
     def collapse_tree_item(self, git_path: str) -> None:
         """Capture tree collapse request."""
@@ -66,30 +69,6 @@ class FakeDocumentDiffView(_CallRecorder):
     def set_stage_button_enabled(self, git_path: str, enabled: bool) -> None:
         """Capture per-document stage-button state update."""
         self._record_call("set_stage_button_enabled", git_path=git_path, enabled=enabled)
-
-    def set_stage_all_button_visible(self, visible: bool) -> None:
-        """Capture stage-all visibility update."""
-        self._record_call("set_stage_all_button_visible", visible=visible)
-
-    def set_stage_all_button_enabled(self, enabled: bool) -> None:
-        """Capture stage-all enabled update."""
-        self._record_call("set_stage_all_button_enabled", enabled=enabled)
-
-    def set_remove_all_button_visible(self, visible: bool) -> None:
-        """Capture remove-all visibility update."""
-        self._record_call("set_remove_all_button_visible", visible=visible)
-
-    def set_remove_all_button_enabled(self, enabled: bool) -> None:
-        """Capture remove-all enabled update."""
-        self._record_call("set_remove_all_button_enabled", enabled=enabled)
-
-    def set_restore_all_button_visible(self, visible: bool) -> None:
-        """Capture restore-all visibility update."""
-        self._record_call("set_restore_all_button_visible", visible=visible)
-
-    def set_restore_all_button_enabled(self, enabled: bool) -> None:
-        """Capture restore-all enabled update."""
-        self._record_call("set_restore_all_button_enabled", enabled=enabled)
 
 
 class FakePropertyDiffView(_CallRecorder):

@@ -7,6 +7,7 @@ from ...presenters.presentation_models import DiffTreePresentation
 from ..history.models import HistorySelection
 from .document_row import REMOVE_REVIEWED_TOOLTIP, DocumentDiffRowWidget
 from .summary_bar import DocumentDiffSummaryBar
+from .summary_state import SummaryButtonState, SummaryCounts
 from .tree import DocumentDiffTree
 
 
@@ -55,29 +56,13 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         """Collapse every document and node row in the tree."""
         self._tree.collapse_all_tree_items()
 
-    def set_stage_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Mark All Reviewed button."""
-        self._summary_bar.set_stage_all_button_visible(visible)
+    def set_button_states(self, state: SummaryButtonState) -> None:
+        """Apply visibility and enabled state for all bulk action buttons."""
+        self._summary_bar.set_button_states(state)
 
-    def set_stage_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Mark All Reviewed button."""
-        self._summary_bar.set_stage_all_button_enabled(enabled)
-
-    def set_remove_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Remove All button for Reviewed selection."""
-        self._summary_bar.set_remove_all_button_visible(visible)
-
-    def set_remove_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Remove All button for Reviewed selection."""
-        self._summary_bar.set_remove_all_button_enabled(enabled)
-
-    def set_restore_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Restore All button."""
-        self._summary_bar.set_restore_all_button_visible(visible)
-
-    def set_restore_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Restore All button."""
-        self._summary_bar.set_restore_all_button_enabled(enabled)
+    def set_summary_counts(self, counts: SummaryCounts) -> None:
+        """Display per-status document counts."""
+        self._summary_bar.set_summary_counts(counts)
 
     def show_doc_diffs(self, diffs: list[DiffTreePresentation]) -> None:
         """Display multiple diff trees in the tree widget."""
@@ -110,19 +95,10 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
     def clear_doc_diffs(self) -> None:
         """Clear document diff tree and related controls."""
         self._tree.clear()
-        self._summary_bar.show_summary(0, 0, 0)
-        self.set_stage_all_button_visible(False)
-        self.set_stage_all_button_enabled(False)
-        self.set_remove_all_button_visible(False)
-        self.set_remove_all_button_enabled(False)
-        self.set_restore_all_button_visible(False)
-        self.set_restore_all_button_enabled(False)
+        self.set_summary_counts(SummaryCounts())
+        self.set_button_states(SummaryButtonState.hidden())
         self._stage_buttons.clear()
         self._remove_from_reviewed_buttons.clear()
-
-    def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
-        """Display per-status document counts."""
-        self._summary_bar.show_summary(modified_docs, deleted_docs, added_docs)
 
     def _on_stage_all_clicked(self) -> None:
         """Forward Stage All button click through facade signal."""

@@ -6,6 +6,7 @@ from ....qt import QtCore, QtWidgets
 from ....utils import translate
 from ..widgets.buttons import make_tool_button
 from ..widgets.styles import TREE_ITEM_HEIGHT
+from .summary_state import SummaryButtonState, SummaryCounts
 
 
 STAGE_ALL_BUTTON_WIDTH = 140
@@ -70,11 +71,9 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
         self._remove_all_button.clicked.connect(self.remove_all_requested.emit)
         layout.addWidget(self._remove_all_button)
 
-    def show_summary(self, modified_docs: int, deleted_docs: int, added_docs: int) -> None:
+    def set_summary_counts(self, counts: SummaryCounts) -> None:
         """Display per-status document counts."""
-
-        # Zero counts mean presenter wants explicit empty-state text.
-        if (modified_docs + deleted_docs + added_docs) == 0:
+        if (counts.modified_docs + counts.deleted_docs + counts.added_docs) == 0:
             self._changed_label.setText(translate("History", "No changes"))
             return
 
@@ -82,29 +81,16 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
         deleted_text = translate("History", "Deleted:")
         added_text = translate("History", "Added:")
         self._changed_label.setText(
-            f"{modified_text} {modified_docs}  {deleted_text} {deleted_docs}  {added_text} {added_docs}"
+            f"{modified_text} {counts.modified_docs}  "
+            f"{deleted_text} {counts.deleted_docs}  "
+            f"{added_text} {counts.added_docs}"
         )
 
-    def set_stage_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Mark All Reviewed button."""
-        self._stage_all_button.setVisible(visible)
-
-    def set_stage_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Mark All Reviewed button."""
-        self._stage_all_button.setEnabled(enabled)
-
-    def set_remove_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Remove All button."""
-        self._remove_all_button.setVisible(visible)
-
-    def set_remove_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Remove All button."""
-        self._remove_all_button.setEnabled(enabled)
-
-    def set_restore_all_button_visible(self, visible: bool) -> None:
-        """Show or hide Restore All button."""
-        self._restore_all_button.setVisible(visible)
-
-    def set_restore_all_button_enabled(self, enabled: bool) -> None:
-        """Enable or disable Restore All button."""
-        self._restore_all_button.setEnabled(enabled)
+    def set_button_states(self, state: SummaryButtonState) -> None:
+        """Apply visibility and enabled state for all bulk action buttons."""
+        self._stage_all_button.setVisible(state.stage_all_visible)
+        self._stage_all_button.setEnabled(state.stage_all_enabled)
+        self._remove_all_button.setVisible(state.remove_all_visible)
+        self._remove_all_button.setEnabled(state.remove_all_enabled)
+        self._restore_all_button.setVisible(state.restore_all_visible)
+        self._restore_all_button.setEnabled(state.restore_all_enabled)

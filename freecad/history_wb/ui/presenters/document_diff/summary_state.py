@@ -1,42 +1,23 @@
-# File responsibility: Pure summary counts and summary-button state helpers.
-"""Pure summary counts and summary-button state helpers."""
+# File responsibility: Pure summary counts and summary-button state computation.
+"""Pure summary counts and summary-button state computation.
 
-from dataclasses import dataclass
+Imports dataclasses from the view layer and provides computation functions
+that operate on presenter-level types (HistorySelection, DiffTreePresentation).
+"""
 
 from ....application.actions.result_models import DocumentDiffResult
 from ....domain.diff.models import DiffState
-from ...views.history.models import HistorySelection
+from ...views.document_diff.summary_state import SummaryButtonState, SummaryCounts
 from ..presentation_models import DiffTreePresentation
 
 
-@dataclass(frozen=True)
-class SummaryButtonState:
-    """Visibility and enabled state for summary-bar bulk actions."""
-
-    stage_all_visible: bool
-    stage_all_enabled: bool
-    remove_all_visible: bool
-    remove_all_enabled: bool
-    restore_all_visible: bool
-    restore_all_enabled: bool
-
-
-@dataclass(frozen=True)
-class SummaryCounts:
-    """Per-document-state counts shown in summary bar."""
-
-    modified_docs: int = 0
-    deleted_docs: int = 0
-    added_docs: int = 0
-
-
 def build_summary_button_state(
-    current_selection: HistorySelection | None,
+    current_selection,
     presentations: list[DiffTreePresentation],
 ) -> SummaryButtonState:
     """Return summary-bar button state for current history selection."""
     if current_selection is None:
-        return SummaryButtonState(False, False, False, False, False, False)
+        return SummaryButtonState.hidden()
 
     if current_selection.item_kind == "WORKING_TREE":
         any_stagable = any(p.stage_button_enabled for p in presentations)
