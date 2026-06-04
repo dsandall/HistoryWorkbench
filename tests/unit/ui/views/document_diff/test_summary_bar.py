@@ -8,21 +8,25 @@ from freecad.history_wb.ui.views.document_diff.summary_state import SummaryButto
 
 
 def test_set_summary_counts_with_zero_changes(application) -> None:  # type: ignore[no-untyped-def]
-    """set_summary_counts with zero values displays No changes."""
+    """set_summary_counts with zero values displays 0 for all counts."""
     widget = DocumentDiffSummaryBar(REMOVE_REVIEWED_TOOLTIP)
 
     widget.set_summary_counts(SummaryCounts())
 
-    assert widget._changed_label.text() == "No changes"
+    assert widget._modified_count_label.text() == "0"
+    assert widget._deleted_count_label.text() == "0"
+    assert widget._added_count_label.text() == "0"
 
 
 def test_set_summary_counts_with_per_status_counts(application) -> None:  # type: ignore[no-untyped-def]
-    """set_summary_counts displays Modified/Deleted/Added counts."""
+    """set_summary_counts displays correct counts for each status."""
     widget = DocumentDiffSummaryBar(REMOVE_REVIEWED_TOOLTIP)
 
     widget.set_summary_counts(SummaryCounts(modified_docs=2, deleted_docs=1, added_docs=3))
 
-    assert widget._changed_label.text() == "Modified: 2  Deleted: 1  Added: 3"
+    assert widget._modified_count_label.text() == "2"
+    assert widget._deleted_count_label.text() == "1"
+    assert widget._added_count_label.text() == "3"
 
 
 def test_stage_all_button_visibility_and_enabled(application) -> None:  # type: ignore[no-untyped-def]

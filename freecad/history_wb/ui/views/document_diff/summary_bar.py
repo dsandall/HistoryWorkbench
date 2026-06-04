@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from ....qt import QtCore, QtWidgets
+from ....qt import QtCore, QtGui, QtWidgets
+from ....resources import get_icon_path
 from ....utils import translate
 from ..widgets.buttons import make_tool_button
 from ..widgets.styles import TREE_ITEM_HEIGHT
@@ -10,6 +11,7 @@ from .summary_state import SummaryButtonState, SummaryCounts
 
 
 STAGE_ALL_BUTTON_WIDTH = 140
+_ICON_SIZE = 16
 
 
 class DocumentDiffSummaryBar(QtWidgets.QWidget):
@@ -29,10 +31,26 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(16)
 
-        self._changed_label = QtWidgets.QLabel("")
-        self._changed_label.setObjectName("documentDiffSummaryLabel")
-        self._changed_label.setStyleSheet("font-weight: bold;")
-        layout.addWidget(self._changed_label)
+        self._summary_layout = QtWidgets.QHBoxLayout()
+        self._summary_layout.setContentsMargins(0, 0, 0, 0)
+        self._summary_layout.setSpacing(8)
+
+        modified_container, self._modified_count_label = self._create_summary_section(
+            "SummaryModified.svg", translate("History", "Modified file count")
+        )
+        added_container, self._added_count_label = self._create_summary_section(
+            "SummaryAdded.svg", translate("History", "Added file count")
+        )
+        deleted_container, self._deleted_count_label = self._create_summary_section(
+            "SummaryDeleted.svg", translate("History", "Deleted file count")
+        )
+
+        self._summary_layout.addWidget(modified_container)
+        self._summary_layout.addWidget(added_container)
+        self._summary_layout.addWidget(deleted_container)
+        self._summary_layout.addStretch()
+
+        layout.addLayout(self._summary_layout)
 
         self._stage_all_button = make_tool_button(
             text=translate("History", "+ Mark All Reviewed"),
@@ -71,20 +89,33 @@ class DocumentDiffSummaryBar(QtWidgets.QWidget):
         self._remove_all_button.clicked.connect(self.remove_all_requested.emit)
         layout.addWidget(self._remove_all_button)
 
+    def _create_summary_section(self, icon_name: str, tooltip: str) -> tuple[QtWidgets.QWidget, QtWidgets.QLabel]:
+        """Create an icon+count section with a shared tooltip.
+
+        Returns the container widget and the count label.
+        """
+        container = QtWidgets.QWidget()
+        container.setToolTip(tooltip)
+
+        section_layout = QtWidgets.QHBoxLayout(container)
+        section_layout.setContentsMargins(0, 0, 0, 0)
+        section_layout.setSpacing(4)
+
+        icon_label = QtWidgets.QLabel()
+        icon_label.setPixmap(QtGui.QIcon(str(get_icon_path(icon_name))).pixmap(_ICON_SIZE, _ICON_SIZE))
+        section_layout.addWidget(icon_label)
+
+        count_label = QtWidgets.QLabel("0")
+        count_label.setStyleSheet("font-weight: bold;")
+        section_layout.addWidget(count_label)
+
+        return container, count_label
+
     def set_summary_counts(self, counts: SummaryCounts) -> None:
         """Display per-status document counts."""
-        if (counts.modified_docs + counts.deleted_docs + counts.added_docs) == 0:
-            self._changed_label.setText(translate("History", "No changes"))
-            return
-
-        modified_text = translate("History", "Modified:")
-        deleted_text = translate("History", "Deleted:")
-        added_text = translate("History", "Added:")
-        self._changed_label.setText(
-            f"{modified_text} {counts.modified_docs}  "
-            f"{deleted_text} {counts.deleted_docs}  "
-            f"{added_text} {counts.added_docs}"
-        )
+        self._modified_count_label.setText(str(counts.modified_docs))
+        self._deleted_count_label.setText(str(counts.deleted_docs))
+        self._added_count_label.setText(str(counts.added_docs))
 
     def set_button_states(self, state: SummaryButtonState) -> None:
         """Apply visibility and enabled state for all bulk action buttons."""

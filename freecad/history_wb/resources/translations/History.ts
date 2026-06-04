@@ -76,7 +76,7 @@ Saved history will not be affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="169"/>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="48"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="66"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -303,19 +303,34 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="38"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="39"/>
+        <source>Modified file count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="42"/>
+        <source>Added file count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="45"/>
+        <source>Deleted file count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="56"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="49"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="67"/>
         <source>Choose which files to restore from the selected iteration.
 Current files on disk can be overwritten or removed.
 Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="64"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -362,11 +377,6 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="77"/>
-        <source>No changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../ui/views/document_diff/status_indicators.py" line="51"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
@@ -374,21 +384,6 @@ Saved history will not be affected.</source>
     <message>
         <location filename="../../ui/views/document_diff/node_row.py" line="57"/>
         <source>Open 3D comparison</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="80"/>
-        <source>Modified:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="81"/>
-        <source>Deleted:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
-        <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
