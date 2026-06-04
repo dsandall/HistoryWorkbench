@@ -24,7 +24,7 @@ It helps answer questions like:
 History Workbench uses Git internally for version control, but Git knowledge is not required for normal use. The workbench intentionally replaces Git terminology with CAD-focused terms, such as **Project**, **Iteration**, and **Review**, so the workflow matches how CAD users think about model history.
 
 > [!NOTE]
-> This workbench is relatively new. We try to avoid backwards-incompatible changes but they are still possible. Sharing feedback, opening issues, and submitting pull requests are encouraged!
+> This workbench is relatively new. Sharing feedback, opening issues, and submitting pull requests are encouraged!
 
 ## Features
 
