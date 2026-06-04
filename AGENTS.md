@@ -27,6 +27,7 @@
 - Add comments on if-statements and other code-path decisions, when semantics are not immediately clear
 - Separate code comments and previous code with an empty line, so that code comment has a line space before it
 - Keep cyclomatic complexity at B (5-10) or better in the src dir: `uv run radon cc --min C freecad/history_wb --no-assert -s`
+- New features that can be easily tested from the GUI should be added to @docs/manual-testing/smoke-testing.md
 
 Terse like caveman. Technical substance exact. Only fluff die.
 Drop: articles, filler (just/really/basically), pleasantries, hedging.
