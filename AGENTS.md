@@ -20,13 +20,14 @@
 - If code reaches an impossible state, raise `RuntimeError` (or more specific exception) immediately. Do not return `None`, default values, or silently continue.
 - Encode invariants in types and function signatures: if `None` is not valid, do not use optional return types. Validate preconditions at entry points, then keep inner helpers strict and non-optional.
 - All user-facing English words and phrases must use `translate("History", "...")` literals at display sites, or `QT_TRANSLATE_NOOP` with correct context when deferred (command `GetResources()` uses exact command context; workbench labels use `Workbench`; property descriptions use `App::Property`). Logs do not require translation.
-- When changing user-facing text, run `task translations:refresh` before the completion of your work.
+- When changing user-facing text, run `task translate` before the completion of your work.
 - Read the `docs/Architecture.md` guidelines when planning new features.
 - Do not remove useful line comments when refactoring
 - DO add comments for all public functions/methods, and private/internal methods when their name doesn't describe their logic well enough
 - Add comments on if-statements and other code-path decisions, when semantics are not immediately clear
 - Separate code comments and previous code with an empty line, so that code comment has a line space before it
 - Keep cyclomatic complexity at B (5-10) or better in the src dir: `uv run radon cc --min C freecad/history_wb --no-assert -s`
+- New features that can be easily tested from the GUI should be added to @docs/manual-testing/smoke-testing.md
 
 Terse like caveman. Technical substance exact. Only fluff die.
 Drop: articles, filler (just/really/basically), pleasantries, hedging.

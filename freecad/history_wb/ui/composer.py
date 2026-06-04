@@ -1,50 +1,82 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# File responsibility: Composes UI components and registers them in UIRegistry.
-# This module is responsible for creating UI views, UIState, wiring presenters
-# to views and state, registering presenters globally, and connecting callbacks.
+# File responsibility: Composes and registers UI components.
+# Provides two composition roots: one for the app-scoped workbench command
+# presenter, and one for the panel-scoped diff panel (views + presenters +
+# signal wiring). It consumes a pre-created ApplicationState and does not
+# own state lifecycle.
 """UI Composer - Composes and registers UI components."""
 
-from ..application.di.container import ApplicationContainer
+from ..application.container import ApplicationContainer
 from ..ui.registry import ui_registry
-from ..ui.state import UIState
-from ..ui.views.diff_panel_view import DiffPanelView
+from ..ui.state import ApplicationState
+from ..ui.views.diff_panel import DialogView, HistoryPanelView
+from ..ui.wiring import bind_ui_events
 from .presenters.diff_presenter import DiffPresenter
 from .presenters.git_repository_presenter import GitRepositoryPresenter
 
 
-__all__ = ["compose_and_register_ui"]
+__all__ = ["compose_and_register_workbench_commands", "compose_and_register_panel"]
 
 
-def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
-    """Create UI components and register them globally.
+def compose_and_register_workbench_commands(
+    container: ApplicationContainer,
+    application_state: ApplicationState,
+) -> None:
+    """Create and register the app-scoped workbench command presenter."""
+    from ..entrypoints.workbench import getMainWindow
+    from .presenters.workbench_command_presenter import WorkbenchCommandPresenter
 
-    This function is the composition root for the UI layer. It creates all
-    UI components (views, presenters, state) and wires them together,
+    command_presenter = WorkbenchCommandPresenter(
+        application_state=application_state,
+        get_main_window=lambda: getMainWindow(),  # noqa: B026
+        get_staged_file_paths_action=container.get_staged_file_paths_action,
+        commit_staging_action=container.commit_staging_action,
+        get_git_identity_action=container.get_git_identity_action,
+        save_git_identity_action=container.save_git_identity_action,
+        can_write_global_git_identity_action=container.can_write_global_git_identity_action,
+        get_git_repository_init_candidates_action=container.get_git_repository_init_candidates_action,
+        initialize_git_repository_action=container.initialize_git_repository_action,
+        get_gitignore_content_action=container.get_gitignore_content_action,
+        update_gitignore_action=container.update_gitignore_action,
+    )
+    ui_registry.register_workbench_command_presenter(command_presenter)
+
+
+def compose_and_register_panel(
+    container: ApplicationContainer,
+    application_state: ApplicationState,
+) -> HistoryPanelView:
+    """Create and register the diff panel UI components.
+
+    This function is the composition root for the panel-scoped UI layer.
+    It creates all UI components (views, presenters) and wires them together,
     then registers the presenters in the global UI registry for access
     by entry points (commands).
 
+    ApplicationState is created externally (workbench lifecycle) and passed
+    in. This keeps state alive across panel open/close cycles.
+
     Args:
         container: Application container with actions wired (backend only)
+        application_state: Pre-created application state (survives panel close)
     Returns:
-        The configured DiffPanelView
+        The configured HistoryPanelView
 
     Side Effects:
-        - Creates UIState (frontend state)
         - Registers presenters in UIRegistry
         - Connects all callbacks
         - Initializes git repository detection
     """
-    # Create UI state (frontend state, like Pinia/Redux)
-    ui_state = UIState(git_repository=None)
-    ui_registry.register_ui_state(ui_state)
-
     # Create view with settings repo for runtime precision
-    view = DiffPanelView(settings_repo=container.settings_repo)
+    view = HistoryPanelView(settings_repo=container.settings_repo)
+    dialog_view = DialogView(view)
 
-    # Create and register diff_presenter (needs ui_state for git_repository)
+    # Create and register diff_presenter (needs application_state for git_repository)
     diff_presenter = DiffPresenter(
-        view=view,
-        ui_state=ui_state,
+        document_view=view.document_diff_panel,
+        property_view=view.property_diff_panel,
+        dialog_view=dialog_view,
+        application_state=application_state,
         get_eligible_docs_action=container.get_open_eligible_docs_action,
         create_document_diffs_action=container.create_document_diffs_action,
         stage_documents_action=container.stage_documents_action,
@@ -58,30 +90,23 @@ def compose_and_register_ui(container: ApplicationContainer) -> DiffPanelView:
     )
     ui_registry.register_diff_presenter(diff_presenter)
 
-    # Connect tree widget callback using the new callback method
-    view.set_node_selection_callback(diff_presenter.on_node_selected)
-    view.set_visual_diff_callback(diff_presenter.on_visual_diff_clicked)
-
-    # Connect add button callback
-    view.set_add_button_callback(diff_presenter.on_add_button_clicked)
-    view.set_remove_from_reviewed_button_callback(diff_presenter.on_remove_from_reviewed_button_clicked)
-    view.set_remove_all_from_reviewed_callback(diff_presenter.on_remove_all_from_reviewed_clicked)
-    view.set_mark_all_reviewed_from_in_progress_callback(diff_presenter.on_stage_all_clicked)
+    # Get app-scoped command presenter (created during workbench init)
+    command_presenter = ui_registry.workbench_command_presenter
 
     # Lifecycle presenter - creates git detection + refresh behavior
     git_repo_presenter = GitRepositoryPresenter(
-        view=view,
+        history_view=view.history_panel,
+        dialog_view=dialog_view,
         find_git_repo_action=container.find_active_git_repository_action,
         get_commits_action=container.get_commits_action,
-        get_staged_file_paths_action=container.get_staged_file_paths_action,
-        commit_staging_action=container.commit_staging_action,
-        get_git_identity_action=container.get_git_identity_action,
-        save_git_identity_action=container.save_git_identity_action,
-        can_write_global_git_identity_action=container.can_write_global_git_identity_action,
-        ui_state=ui_state,
+        application_state=application_state,
         clear_doc_diffs=diff_presenter.clear_doc_diff,
+        workbench_command_presenter=command_presenter,
     )
     ui_registry.register_git_repository_presenter(git_repo_presenter)
+
+    bind_ui_events(view, diff_presenter, git_repo_presenter)
+
     # Trigger git repository detection on workbench activation
     git_repo_presenter.on_workbench_activated()
 

@@ -1,26 +1,24 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-"""File responsibility: FreeCAD command entry points for the Diff Workbench.
-
-This module defines the FreeCAD commands that bridge user interactions
-(toolbar/menu clicks) with application layer actions and UI presenters.
-"""
+# File responsibility: FreeCAD command entry points for the Diff Workbench.
+# Commands delegate to the app-scoped WorkbenchCommandPresenter for shared
+# command flows, keeping them usable after the diff panel is closed.
+"""FreeCAD command entry points for the Diff Workbench."""
 
 from __future__ import annotations
 
 import os
 from typing import TYPE_CHECKING, TypedDict
 
-from ..qt import QtCore, QtWidgets
+from ..qt import QtCore
 from ..resources import ICONPATH
-from ..utils import translate
+from ..utils import Log, translate
 
 
 if TYPE_CHECKING:
-    QWidget = QtWidgets.QWidget
+    from ..qt import QtWidgets
+    from ..ui.views.diff_panel import DialogView
 
-    from ..application.di.container import ApplicationContainer
-    from ..domain.git.models import GitRepositoryInitCandidate
-    from ..ui.presenters.git_repository_presenter import GitRepositoryPresenter
+    QWidget = QtWidgets.QWidget
 
 
 def _main_window_parent(container) -> QWidget | None:
@@ -36,29 +34,27 @@ def _main_window_parent(container) -> QWidget | None:
     return main_window  # type: ignore[return-value]
 
 
-def _ensure_git_repository_presenter_available(container: ApplicationContainer) -> GitRepositoryPresenter | None:
-    """Return git repository presenter, composing UI panel first when needed."""
+def _create_dialog_view(container) -> DialogView:
+    """Create a DialogView anchored to the FreeCAD main window.
+
+    Used by the command that needs to show a warning when no repo exists
+    but are not covered by the command presenter flows.
+    """
+    from ..ui.views.diff_panel import DialogView
+
+    parent = _main_window_parent(container)
+    if parent is None:
+        raise RuntimeError("FreeCAD main window not available")
+    return DialogView(parent)
+
+
+def _refresh_git_repository_presenter_if_open() -> None:
+    """Refresh the git repository presenter if the panel is currently open."""
     from ..ui.registry import ui_registry
 
-    try:
-        return ui_registry.git_repository_presenter
-    except RuntimeError:
-        pass
-
-    try:
-        import FreeCADGui as Gui  # pylint: disable=import-error
-    except ImportError:
-        return None
-
-    workbench = Gui.getWorkbench("HistoryWorkbench")
-    if workbench is None:
-        return None
-
-    workbench.create_or_show_diff_panel()
-    try:
-        return ui_registry.git_repository_presenter
-    except RuntimeError:
-        return None
+    presenter = ui_registry.git_repository_presenter
+    if presenter is not None:
+        presenter.refresh_repository_and_commits()
 
 
 class CommandResources(TypedDict):
@@ -86,18 +82,9 @@ class _ConfigureAuthorCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
+        from ..ui.registry import ui_registry
 
-        container = get_container()
-        presenter = _ensure_git_repository_presenter_available(container)
-        if presenter is None:
-            QtWidgets.QMessageBox.warning(
-                _main_window_parent(container),  # type: ignore[arg-type]
-                translate("History", "History Panel Unavailable"),
-                translate("History", "Open History Panel before configuring author."),
-            )
-            return
-        presenter.on_configure_author_requested()
+        ui_registry.workbench_command_presenter.configure_author()
 
 
 class _CommitCommand:
@@ -117,19 +104,12 @@ class _CommitCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
+        from ..ui.registry import ui_registry
 
-        container = get_container()
-        presenter = _ensure_git_repository_presenter_available(container)
-        if presenter is None:
-            QtWidgets.QMessageBox.warning(
-                _main_window_parent(container),  # type: ignore[arg-type]
-                translate("History", "History Panel Unavailable"),
-                translate("History", "Open History Panel before saving an iteration."),
-            )
-            return
-
-        presenter.on_save_iteration_requested()
+        success = ui_registry.workbench_command_presenter.save_iteration()
+        if success:
+            Log.info("Commit successful")
+            _refresh_git_repository_presenter_if_open()
 
 
 class _RefreshRepositoryCommand:
@@ -156,9 +136,23 @@ class _RefreshRepositoryCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
+        from .._container import get_container
         from ..ui.registry import ui_registry
 
-        ui_registry.git_repository_presenter.refresh_repository_and_commits()
+        presenter = ui_registry.git_repository_presenter
+        if presenter is not None:
+            presenter.refresh_repository_and_commits()
+            return
+
+        # Panel closed; run repository detection directly and update application state
+        container = get_container()
+        result = container.find_active_git_repository_action.execute()
+
+        if result.is_success:
+            ui_registry.application_state.git_repository = result.data
+        else:
+            # Clear stale repo state when refresh fails
+            ui_registry.application_state.git_repository = None
 
 
 class _InitializeGitRepositoryCommand:
@@ -181,124 +175,11 @@ class _InitializeGitRepositoryCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
         from ..ui.registry import ui_registry
 
-        container = get_container()
-        parent = _main_window_parent(container)
-        candidates_result = container.get_git_repository_init_candidates_action.execute()
-        if not candidates_result.is_success:
-            QtWidgets.QMessageBox.information(
-                parent,  # type: ignore[arg-type]
-                translate("History", "No Directories Available"),
-                translate(
-                    "History",
-                    "No open documents are available for project initialization. "
-                    "Please open at least one saved document in the root location "
-                    "you'd like to initialize a new project.",
-                ),
-            )
-            return
-
-        selected_directory = self._show_init_dialog(parent, candidates_result.data)
-        if selected_directory is None:
-            return
-
-        init_result = container.initialize_git_repository_action.execute(selected_directory)
-        if not init_result.is_success:
-            QtWidgets.QMessageBox.critical(
-                parent,  # type: ignore[arg-type]
-                translate("History", "Initialization Failed"),
-                init_result.message or translate("History", "Unknown error occurred"),
-            )
-            return
-
-        repository = init_result.data
-        self._store_initialized_repository(repository)
-
-        success_template = translate("History", "Initialized project: %1")
-        success_message = success_template.replace("%1", repository.absolute_path)
-        QtWidgets.QMessageBox.information(
-            parent,  # type: ignore[arg-type]
-            translate("History", "Project Initialized"),
-            success_message,
-        )
-        ui_registry.git_repository_presenter.refresh_repository_and_commits()
-
-    def _show_init_dialog(self, parent: QWidget | None, candidates: list[GitRepositoryInitCandidate]) -> str | None:
-        """Show initialization selection dialog and return selected directory."""
-        dialog = QtWidgets.QDialog(parent)  # type: ignore[arg-type]
-        dialog.setWindowTitle(translate("History", "Initialize Project"))
-        dialog.setSizeGripEnabled(True)
-        layout = QtWidgets.QVBoxLayout(dialog)
-        layout.addWidget(
-            QtWidgets.QLabel(
-                translate(
-                    "History",
-                    "Choose a directory to initialize based on currently open documents. "
-                    "The selected directory will be the root of your project:",
-                )
-            )
-        )
-
-        button_group = QtWidgets.QButtonGroup(dialog)
-        first_available_button = None
-
-        for index, candidate in enumerate(candidates):
-            row_layout = QtWidgets.QHBoxLayout()
-            radio = QtWidgets.QRadioButton(candidate.path, dialog)
-            radio.setEnabled(candidate.is_available)
-            button_group.addButton(radio, index)
-            row_layout.addWidget(radio)
-            if candidate.is_available and first_available_button is None:
-                first_available_button = radio
-
-            if not candidate.is_available:
-                reason_label = QtWidgets.QLabel(
-                    translate("History", "Already inside project"),
-                    dialog,
-                )
-                reason_label.setEnabled(False)
-                row_layout.addWidget(reason_label)
-
-            row_layout.addStretch()
-            layout.addLayout(row_layout)
-
-        if first_available_button is not None:
-            first_available_button.setChecked(True)
-        else:
-            no_available_text = translate("History", "All listed directories are already inside projects.")
-            layout.addWidget(QtWidgets.QLabel(no_available_text))
-
-        button_layout = QtWidgets.QHBoxLayout()
-        initialize_button = QtWidgets.QPushButton(translate("History", "Initialize"))
-        initialize_button.setEnabled(first_available_button is not None)
-        cancel_button = QtWidgets.QPushButton(translate("History", "Cancel"))
-        initialize_button.clicked.connect(dialog.accept)
-        cancel_button.clicked.connect(dialog.reject)
-
-        button_layout.addStretch()
-        button_layout.addWidget(initialize_button)
-        button_layout.addWidget(cancel_button)
-        layout.addLayout(button_layout)
-
-        dialog.setMinimumWidth(680)
-        dialog.adjustSize()
-        target_height = min(360, dialog.sizeHint().height() + 8)
-        dialog.resize(dialog.width(), target_height)
-        if dialog.exec() != 1:
-            return None
-
-        selected_id = button_group.checkedId()
-        if selected_id < 0:
-            return None
-        return candidates[selected_id].path
-
-    def _store_initialized_repository(self, repository) -> None:
-        """Store initialized repository in UI state before refresh."""
-        from ..ui.registry import ui_registry
-
-        ui_registry.ui_state.git_repository = repository
+        initialized = ui_registry.workbench_command_presenter.initialize_repository()
+        if initialized:
+            _refresh_git_repository_presenter_if_open()
 
 
 class _OpenAllDocumentsInRepositoryCommand:
@@ -328,12 +209,14 @@ class _OpenAllDocumentsInRepositoryCommand:
         from ..ui.registry import ui_registry
 
         container = get_container()
-        parent = _main_window_parent(container)
-        repo = ui_registry.ui_state.git_repository
+        try:
+            dialog_view = _create_dialog_view(container)
+        except RuntimeError:
+            return
 
+        repo = ui_registry.application_state.git_repository
         if repo is None:
-            QtWidgets.QMessageBox.warning(
-                parent,  # type: ignore[arg-type]
+            dialog_view.show_warning_message(
                 translate("History", "No Project"),
                 translate("History", "No project detected. Open a FreeCAD document in a project first."),
             )
@@ -362,79 +245,9 @@ class _UpdateGitIgnoreCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
         from ..ui.registry import ui_registry
 
-        container = get_container()
-        parent = _main_window_parent(container)
-        repo = ui_registry.ui_state.git_repository
-
-        if repo is None:
-            QtWidgets.QMessageBox.warning(
-                parent,  # type: ignore[arg-type]
-                translate("History", "No Project"),
-                translate("History", "No project detected. Open a FreeCAD document in a project first."),
-            )
-            return
-
-        content_result = container.get_gitignore_content_action.execute(repo)
-        if not content_result.is_success:
-            QtWidgets.QMessageBox.critical(
-                parent,  # type: ignore[arg-type]
-                translate("History", "Failed to Read Ignored Files"),
-                content_result.message or translate("History", "Unknown error occurred"),
-            )
-            return
-
-        dialog = QtWidgets.QDialog(parent)  # type: ignore[arg-type]
-        dialog.setWindowTitle(translate("History", "Edit Ignored Files"))
-        dialog.setMinimumWidth(680)
-        dialog.setMinimumHeight(460)
-
-        layout = QtWidgets.QVBoxLayout(dialog)
-        help_template = translate(
-            "History",
-            'Update the ignored files list. Lines starting with a "#" are considered comments. '
-            'Click <a href="%1">here</a> to learn about the full syntax.',
-        )
-        help_label = QtWidgets.QLabel(help_template.replace("%1", "https://www.w3schools.com/git/git_ignore.asp"))
-        help_label.setOpenExternalLinks(True)
-        layout.addWidget(help_label)
-
-        text_edit = QtWidgets.QPlainTextEdit(dialog)
-        text_edit.setPlainText(str(content_result.data))
-        layout.addWidget(text_edit)
-
-        button_box = QtWidgets.QDialogButtonBox(dialog)
-        save_button = button_box.addButton(
-            translate("History", "Save"),
-            QtWidgets.QDialogButtonBox.ButtonRole.AcceptRole,
-        )
-        cancel_button = button_box.addButton(
-            translate("History", "Cancel"),
-            QtWidgets.QDialogButtonBox.ButtonRole.RejectRole,
-        )
-        save_button.clicked.connect(dialog.accept)
-        cancel_button.clicked.connect(dialog.reject)
-        layout.addWidget(button_box)
-
-        if dialog.exec() != 1:
-            return
-
-        save_result = container.update_gitignore_action.execute(repo, text_edit.toPlainText())
-        if not save_result.is_success:
-            QtWidgets.QMessageBox.critical(
-                parent,  # type: ignore[arg-type]
-                translate("History", "Failed to Save Ignored Files"),
-                save_result.message or translate("History", "Unknown error occurred"),
-            )
-            return
-
-        QtWidgets.QMessageBox.information(
-            parent,  # type: ignore[arg-type]
-            translate("History", "Ignored Files Updated"),
-            translate("History", "Updated ignored files list."),
-        )
+        ui_registry.workbench_command_presenter.update_gitignore()
 
 
 class _RecomputeAllOpenDocumentsCommand:

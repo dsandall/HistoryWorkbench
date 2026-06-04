@@ -217,7 +217,7 @@ class TestPropertyViewerIntegration:
             app = QtWidgets.QApplication([])
 
         from freecad.history_wb.domain.snapshots.gui_extractor import SnapshotExtractor
-        from freecad.history_wb.ui import DiffPanelView
+        from freecad.history_wb.ui import HistoryPanelView
         from freecad.history_wb.ui.presenters.presentation_models import PropertyPresentation
 
         # Open BasicFile
@@ -237,8 +237,8 @@ class TestPropertyViewerIntegration:
                 if obj:
                     nodes_by_name[obj.name].append((occ, obj))
 
-            # Create DiffPanelView
-            panel = DiffPanelView()
+            # Create HistoryPanelView
+            panel = HistoryPanelView()
 
             # Get properties from first node with properties
             test_node = None
@@ -269,10 +269,10 @@ class TestPropertyViewerIntegration:
                 )
 
             # Call show_property_diff - should not raise
-            panel.show_property_diff(properties)
+            panel.property_diff_panel.show_property_diff(properties)
 
             # Verify tree has items
-            root_count = panel._property_diff_tree.topLevelItemCount()
+            root_count = panel.property_diff_panel.topLevelItemCount()
             assert root_count > 0, "Properties tree should have items"
 
             # Verify groups are present (should be at least 1)

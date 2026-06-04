@@ -59,7 +59,7 @@ Run this after changing user-facing strings so locale `.ts` files receive new an
 Use Taskfile task:
 
 ```bash
-task translations:refresh
+task translate
 ```
 
 This updates `History.ts`, merges new strings into locale `.ts` files, and compiles locale `.ts` files.

@@ -207,7 +207,7 @@ def initialized_workbench(project_root: Path) -> Any:
     sys.path.insert(0, project_path)
 
     # Import and initialize
-    from freecad.history_wb.application.di.container import create_application_container
+    from freecad.history_wb.application.container import create_application_container
     from freecad.history_wb.domain.snapshots import InMemorySnapshotRepository
     from freecad.history_wb.entrypoints.workbench import HistoryWorkbench
     from freecad.history_wb.infrastructure.freecad.ports import get_freecad_runtime_context

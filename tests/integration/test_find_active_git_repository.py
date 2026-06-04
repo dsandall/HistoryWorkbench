@@ -35,7 +35,7 @@ class TestFindActiveGitRepositoryAction:
         2. Executes the FindActiveGitRepositoryAction
         3. Verifies the result contains a valid GitRepository with correct name and path
         """
-        from freecad.history_wb.application.actions.find_active_git_repository import (
+        from freecad.history_wb.application.actions.git_repo.find_active_git_repository import (
             FindActiveGitRepositoryAction,
         )
 
@@ -75,7 +75,7 @@ class TestFindActiveGitRepositoryAction:
         freecad_gui: GuiLike,
     ) -> None:
         """Test that action returns failure when document is not saved."""
-        from freecad.history_wb.application.actions.find_active_git_repository import (
+        from freecad.history_wb.application.actions.git_repo.find_active_git_repository import (
             FindActiveGitRepositoryAction,
         )
 
@@ -113,7 +113,7 @@ class TestFindActiveGitRepositoryAction:
         freecad_gui: GuiLike,
     ) -> None:
         """Test that action returns failure when no document is active."""
-        from freecad.history_wb.application.actions.find_active_git_repository import (
+        from freecad.history_wb.application.actions.git_repo.find_active_git_repository import (
             FindActiveGitRepositoryAction,
         )
 

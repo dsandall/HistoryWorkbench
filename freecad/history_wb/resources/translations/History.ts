@@ -4,281 +4,261 @@
 <context>
     <name>History</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="337"/>
-        <location filename="../../entrypoints/commands.py" line="375"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="111"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="159"/>
+        <location filename="../../entrypoints/commands.py" line="220"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="123"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="139"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="159"/>
         <source>No Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="112"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="160"/>
-        <source>No project detected. Please open a document from a project.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="146"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="195"/>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="210"/>
+        <location filename="../../ui/presenters/git_repository/author_configuration_handler.py" line="68"/>
+        <location filename="../../ui/presenters/git_repository/author_configuration_handler.py" line="84"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="88"/>
         <source>Save Iteration Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="196"/>
+        <location filename="../../ui/presenters/git_repository/author_configuration_handler.py" line="69"/>
         <source>Name and email are required to save iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="211"/>
+        <location filename="../../ui/presenters/git_repository/author_configuration_handler.py" line="85"/>
         <source>Git identity could not be saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="215"/>
+        <location filename="../../ui/presenters/git_repository/author_configuration_handler.py" line="90"/>
         <source>Could not save git identity for all projects. Uncheck the global option to save it only for this project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="406"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="64"/>
         <source>Configure Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="410"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="68"/>
         <source>Enter the name and email you&apos;d like to use for your git identity, which is used for authoring project iterations.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="427"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="87"/>
         <source>Configure globally for all projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="438"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="102"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="439"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="103"/>
         <source>Email:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="444"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="110"/>
         <source>Global configuration option disabled because global config file not writable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="496"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="86"/>
-        <source>Restore All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="500"/>
-        <source>Which files would you like to restore?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="505"/>
-        <source>Restore only the FreeCAD files changed in the selected iteration. Other files on disk are left unchanged.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="514"/>
-        <source>Restore all previously saved FreeCAD files to how they were in this iteration. Any previously saved FreeCAD files that did not exist in this iteration are removed. New files not yet saved to history are kept.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="503"/>
-        <source>Listed FreeCAD files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="475"/>
-        <source>This operation will overwrite the current files on disk with the selected saved copies.
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
+        <source>This operation will overwrite the current file(s) on disk with the selected saved copies.
 
 Open FreeCAD documents will be closed and reopened to ensure links are updated.
 
 Unsaved in-memory changes in open files will be lost.
 
-Saved history is not affected.</source>
+Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="512"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="169"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="48"/>
+        <source>Restore All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="173"/>
+        <source>Which files would you like to restore?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="178"/>
+        <source>Restore only the FreeCAD files changed in the selected iteration. Other files on disk are left unchanged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="186"/>
+        <source>Restore all previously saved FreeCAD files to how they were in this iteration. Any previously saved FreeCAD files that did not exist in this iteration are removed. New files not yet saved to history are kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="176"/>
+        <source>Listed FreeCAD files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="184"/>
         <source>All FreeCAD files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="382"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="454"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="40"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="120"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="276"/>
-        <location filename="../../entrypoints/commands.py" line="414"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="383"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="455"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="482"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="552"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="41"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="121"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="154"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="220"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="292"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="338"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="96"/>
-        <location filename="../../entrypoints/commands.py" line="127"/>
-        <source>History Panel Unavailable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../entrypoints/commands.py" line="97"/>
-        <source>Open History Panel before configuring author.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../entrypoints/commands.py" line="128"/>
-        <source>Open History Panel before saving an iteration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="119"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="59"/>
         <source>No Reviewed Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="120"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="60"/>
         <source>There are no reviewed files to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="147"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="89"/>
         <source>Git commit failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="134"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="78"/>
         <source>Empty Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/git_repository_presenter.py" line="135"/>
+        <location filename="../../ui/presenters/git_repository/commit_iteration_handler.py" line="79"/>
         <source>Iteration notes cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="367"/>
-        <location filename="../../ui/views/history_panel_widget.py" line="169"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="25"/>
+        <location filename="../../ui/views/history/repository_header.py" line="93"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="371"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="29"/>
         <source>Enter iteration notes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel_view.py" line="375"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="33"/>
         <source>Enter iteration notes (subject and optional body)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="193"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="39"/>
         <source>No Directories Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="194"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="40"/>
         <source>No open documents are available for project initialization. Please open at least one saved document in the root location you&apos;d like to initialize a new project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="211"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="56"/>
         <source>Initialization Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="212"/>
-        <location filename="../../entrypoints/commands.py" line="385"/>
-        <location filename="../../entrypoints/commands.py" line="429"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="36"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="48"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="57"/>
         <source>Unknown error occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="219"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="64"/>
         <source>Initialized project: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="223"/>
+        <location filename="../../ui/presenters/git_repository/initialize_repository_handler.py" line="67"/>
         <source>Project Initialized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="231"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="247"/>
         <source>Initialize Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="236"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="252"/>
         <source>Choose a directory to initialize based on currently open documents. The selected directory will be the root of your project:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="258"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="274"/>
         <source>Already inside project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="270"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="286"/>
         <source>All listed directories are already inside projects.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="274"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="290"/>
         <source>Initialize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="338"/>
-        <location filename="../../entrypoints/commands.py" line="376"/>
+        <location filename="../../entrypoints/commands.py" line="221"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="124"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="140"/>
+        <location filename="../../ui/presenters/workbench_command_presenter.py" line="160"/>
         <source>No project detected. Open a FreeCAD document in a project first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="384"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="35"/>
         <source>Failed to Read Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="390"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="318"/>
         <source>Edit Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="436"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="54"/>
         <source>Updated ignored files list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="410"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="337"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="395"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="323"/>
         <source>Update the ignored files list. Lines starting with a &quot;#&quot; are considered comments. Click &lt;a href=&quot;%1&quot;&gt;here&lt;/a&gt; to learn about the full syntax.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="428"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="47"/>
         <source>Failed to Save Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="435"/>
+        <location filename="../../ui/presenters/git_repository/gitignore_handler.py" line="53"/>
         <source>Ignored Files Updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -318,181 +298,181 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="458"/>
+        <location filename="../../ui/views/history/history_list.py" line="149"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="78"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="38"/>
         <source>+ Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="103"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="49"/>
+        <source>Choose which files to restore from the selected iteration.
+Current files on disk can be overwritten or removed.
+Saved history will not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="64"/>
         <source>Remove All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="34"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="19"/>
         <source>Remove document(s) from Reviewed.
 The current file(s) stay unchanged.
 They will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="91"/>
-        <source>Choose which files to restore from the selected iteration.
-Current files on disk can be overwritten or removed.
-Saved history is not affected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="116"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="86"/>
         <source>Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="123"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="91"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="92"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="124"/>
-        <source>Collapse all tree nodes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="244"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="271"/>
+        <location filename="../../ui/views/document_diff/tree.py" line="48"/>
+        <location filename="../../ui/views/document_diff/tree_items.py" line="24"/>
         <source>Unnamed Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="322"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="101"/>
         <source>+ Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="335"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="111"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="356"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="120"/>
         <source>Restore the selected file.
 This overwrites %1 on disk with a copy of the file as it was saved in the selected iteration.
 THE CURRENT FILE WILL BE OVERWRITTEN BY THIS OPERATION.
-Saved history is not affected.</source>
+Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="370"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="577"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="77"/>
         <source>No changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="413"/>
+        <location filename="../../ui/views/document_diff/status_indicators.py" line="51"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="519"/>
+        <location filename="../../ui/views/document_diff/node_row.py" line="57"/>
         <source>Open 3D comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="580"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="80"/>
         <source>Modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="581"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="81"/>
         <source>Deleted:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="582"/>
+        <location filename="../../ui/views/document_diff/summary_bar.py" line="82"/>
         <source>Added:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="143"/>
+        <location filename="../../ui/views/history/panel.py" line="91"/>
         <source>Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="158"/>
+        <location filename="../../ui/views/history/repository_header.py" line="83"/>
         <source>Refresh Project and Iterations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="276"/>
+        <location filename="../../ui/views/history/panel.py" line="138"/>
         <source>Current Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="277"/>
+        <location filename="../../ui/views/history/panel.py" line="144"/>
         <source>Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="306"/>
+        <location filename="../../ui/views/history/panel.py" line="62"/>
         <source>No iterations to display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="451"/>
+        <location filename="../../ui/views/history/history_list.py" line="141"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="465"/>
+        <location filename="../../ui/views/history/history_list.py" line="156"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="466"/>
+        <location filename="../../ui/views/history/history_list.py" line="157"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="478"/>
+        <location filename="../../ui/views/history/history_list.py" line="171"/>
         <source>Restore all files from iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="581"/>
+        <location filename="../../ui/views/history/history_list.py" line="172"/>
+        <source>Copy iteration ID to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/formatters.py" line="27"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="598"/>
+        <location filename="../../ui/views/history/repository_header.py" line="63"/>
         <source>No project detected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history_panel_widget.py" line="607"/>
+        <location filename="../../ui/views/history/repository_header.py" line="70"/>
         <source>Project: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="154"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="36"/>
         <source>Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="155"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="37"/>
         <source>Old Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="156"/>
+        <location filename="../../ui/views/property_diff/tree.py" line="38"/>
         <source>New Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/property_diff_tree_widget.py" line="184"/>
+        <location filename="../../ui/views/property_diff/tree_items.py" line="27"/>
         <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
@@ -557,22 +537,22 @@ Saved history is not affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="206"/>
+        <location filename="../../entrypoints/workbench.py" line="213"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/diff_presenter.py" line="863"/>
-        <location filename="../../ui/presenters/diff_presenter.py" line="865"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="474"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="481"/>
-        <location filename="../../ui/views/diff_panel_view.py" line="548"/>
-        <location filename="../../ui/views/document_diff_tree_widget.py" line="352"/>
+        <location filename="../../ui/presenters/document_diff/restore_handler.py" line="104"/>
+        <location filename="../../ui/presenters/document_diff/restore_handler.py" line="108"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="141"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="153"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="219"/>
+        <location filename="../../ui/views/document_diff/document_row.py" line="128"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/presenters/diff_presenter.py" line="865"/>
+        <location filename="../../ui/presenters/document_diff/restore_handler.py" line="109"/>
         <source>Restoration complete.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -580,12 +560,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryCloseDiffWindows</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="519"/>
+        <location filename="../../entrypoints/commands.py" line="332"/>
         <source>Close Comparison Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="520"/>
+        <location filename="../../entrypoints/commands.py" line="333"/>
         <source>Close every document starting with &apos;Diff_&apos; without saving</source>
         <translation type="unfinished"></translation>
     </message>
@@ -593,12 +573,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryCommit</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="109"/>
+        <location filename="../../entrypoints/commands.py" line="96"/>
         <source>Save Iteration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="110"/>
+        <location filename="../../entrypoints/commands.py" line="97"/>
         <source>Save reviewed changes as an iteration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -606,12 +586,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryConfigureAuthorCommand</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="78"/>
+        <location filename="../../entrypoints/commands.py" line="74"/>
         <source>Configure Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="79"/>
+        <location filename="../../entrypoints/commands.py" line="75"/>
         <source>Configure author name and email</source>
         <translation type="unfinished"></translation>
     </message>
@@ -619,12 +599,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryInitializeGitRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="170"/>
+        <location filename="../../entrypoints/commands.py" line="164"/>
         <source>Initialize Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="171"/>
+        <location filename="../../entrypoints/commands.py" line="165"/>
         <source>Initialize a new project in the selected directory</source>
         <translation type="unfinished"></translation>
     </message>
@@ -632,12 +612,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryOpenAllDocumentsInRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="310"/>
+        <location filename="../../entrypoints/commands.py" line="191"/>
         <source>Open All Documents in Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="314"/>
+        <location filename="../../entrypoints/commands.py" line="195"/>
         <source>Open every .FCStd file found in the project. Useful for generating en masse.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -645,12 +625,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryOpenDiffWindow</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="494"/>
+        <location filename="../../entrypoints/commands.py" line="307"/>
         <source>Open History Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="495"/>
+        <location filename="../../entrypoints/commands.py" line="308"/>
         <source>Open history panel view</source>
         <translation type="unfinished"></translation>
     </message>
@@ -658,12 +638,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryRecomputeActiveDocument</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="469"/>
+        <location filename="../../entrypoints/commands.py" line="282"/>
         <source>Recompute Active Document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="470"/>
+        <location filename="../../entrypoints/commands.py" line="283"/>
         <source>Recompute the active document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -671,12 +651,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryRecomputeAllOpenDocuments</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="446"/>
+        <location filename="../../entrypoints/commands.py" line="259"/>
         <source>Recompute All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="447"/>
+        <location filename="../../entrypoints/commands.py" line="260"/>
         <source>Recompute every open document</source>
         <translation type="unfinished"></translation>
     </message>
@@ -684,12 +664,12 @@ Saved history is not affected.</source>
 <context>
     <name>HistoryRefreshRepository</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="141"/>
+        <location filename="../../entrypoints/commands.py" line="121"/>
         <source>Refresh Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="142"/>
+        <location filename="../../entrypoints/commands.py" line="122"/>
         <source>Refresh the detected project and reload iterations.
 Open at least one FreeCAD document located within a project before running this command.
 How it works: open FreeCAD documents are checked one by one until one is found to be located within a project.</source>
@@ -699,12 +679,12 @@ How it works: open FreeCAD documents are checked one by one until one is found t
 <context>
     <name>HistoryUpdateGitIgnore</name>
     <message>
-        <location filename="../../entrypoints/commands.py" line="351"/>
+        <location filename="../../entrypoints/commands.py" line="234"/>
         <source>Edit Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/commands.py" line="352"/>
+        <location filename="../../entrypoints/commands.py" line="235"/>
         <source>Edit project ignored files list (.gitignore)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -712,15 +692,15 @@ How it works: open FreeCAD documents are checked one by one until one is found t
 <context>
     <name>Workbench</name>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="64"/>
+        <location filename="../../entrypoints/workbench.py" line="60"/>
+        <location filename="../../entrypoints/workbench.py" line="78"/>
         <location filename="../../entrypoints/workbench.py" line="82"/>
-        <location filename="../../entrypoints/workbench.py" line="86"/>
-        <location filename="../../entrypoints/workbench.py" line="107"/>
+        <location filename="../../entrypoints/workbench.py" line="103"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="65"/>
+        <location filename="../../entrypoints/workbench.py" line="61"/>
         <source>Track project iterations and history</source>
         <translation type="unfinished"></translation>
     </message>

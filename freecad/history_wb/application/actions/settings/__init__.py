@@ -1,0 +1,1 @@
+"""Diff settings persistence actions."""

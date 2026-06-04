@@ -24,6 +24,8 @@ from .colors import (
 __all__ = [
     "DIFF_STATE_ROLE",
     "DiffItemDelegate",
+    "apply_diff_state_to_item",
+    "apply_diff_state_to_widget",
     "background_for_state",
     "foreground_for_background",
 ]
@@ -130,6 +132,49 @@ def foreground_for_background(background: QtGui.QColor, palette: QtGui.QPalette)
     Prefer the theme text color when possible, then fall back to black or white.
     """
     return _cached_foreground_for_background(_color_key(background), _palette_key(palette))
+
+
+def apply_diff_state_to_item(
+    item: QtWidgets.QTreeWidgetItem,
+    state: DiffState,
+    palette: QtGui.QPalette,
+    *,
+    columns: range | list[int] | tuple[int, ...] = (0,),
+) -> QtGui.QColor | None:
+    """Apply semantic diff colors to one tree item across target columns."""
+    background = background_for_state(state, palette)
+    if background is None:
+        return None
+
+    foreground = foreground_for_background(background, palette)
+    for column in columns:
+        item.setData(column, DIFF_STATE_ROLE, state)
+        item.setBackground(column, QtGui.QBrush(background))
+        item.setForeground(column, QtGui.QBrush(foreground))
+    return background
+
+
+def apply_diff_state_to_widget(
+    widget: QtWidgets.QWidget,
+    state: DiffState,
+    palette: QtGui.QPalette,
+    *,
+    container_object_name: str,
+    label_object_name: str,
+) -> None:
+    """Apply diff colors to row widget container and its label text."""
+    background = background_for_state(state, palette)
+
+    # Clear style when row inherits normal theme colors.
+    if background is None:
+        widget.setStyleSheet("")
+        return
+
+    foreground = foreground_for_background(background, palette)
+    widget.setStyleSheet(
+        f"QWidget#{container_object_name} {{ background-color: {background.name()}; }} "
+        f"QLabel#{label_object_name} {{ color: {foreground.name()}; }}"
+    )
 
 
 @lru_cache(maxsize=256)

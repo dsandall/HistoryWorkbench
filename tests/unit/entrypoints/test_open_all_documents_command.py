@@ -24,7 +24,7 @@ class TestOpenAllDocumentsInRepositoryCommand:
         mock_container = MagicMock()
         mock_container.translate.side_effect = lambda _ctx, text: text
         mock_get_container.return_value = mock_container
-        mock_ui_registry.ui_state.git_repository = None
+        mock_ui_registry.application_state.git_repository = None
 
         command = _OpenAllDocumentsInRepositoryCommand()
 
@@ -49,7 +49,7 @@ class TestOpenAllDocumentsInRepositoryCommand:
         mock_get_container.return_value = mock_container
 
         repo = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
-        mock_ui_registry.ui_state.git_repository = repo
+        mock_ui_registry.application_state.git_repository = repo
 
         command = _OpenAllDocumentsInRepositoryCommand()
 
