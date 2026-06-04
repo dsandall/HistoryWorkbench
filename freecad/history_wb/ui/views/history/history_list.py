@@ -1,5 +1,7 @@
 """File responsibility: History list widget, selection routing, context menus, and scroll-bottom detection."""
 
+from typing import cast
+
 from ....qt import QtCore, QtGui, QtWidgets
 from ....utils import translate
 from .models import HistorySelection
@@ -164,10 +166,17 @@ class HistoryList(QtWidgets.QListWidget):
             self.remove_all_from_reviewed_requested.emit()
 
     def _show_commit_context_menu(self, pos: QtCore.QPoint, selection: HistorySelection) -> None:
-        """Show commit-row restore action."""
+        """Show commit-row context actions."""
         menu = QtWidgets.QMenu(self)
         restore_action = menu.addAction(translate("History", "Restore all files from iteration"))
+        copy_id_action = menu.addAction(translate("History", "Copy iteration ID to clipboard"))
         selected_action = menu.exec(self.mapToGlobal(pos))
 
         if selected_action == restore_action:
             self.restore_all_from_history_context_requested.emit(selection)
+
+        if selected_action == copy_id_action and selection.commit_hash:
+            app = QtWidgets.QApplication.instance()
+            if app is not None:
+                app = cast(QtWidgets.QApplication, app)
+                app.clipboard().setText(selection.commit_hash)

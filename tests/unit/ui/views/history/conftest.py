@@ -67,8 +67,11 @@ class FakeMenuAction:
         return
 
 
-def build_fake_menu_class() -> type:
-    """Return fake QMenu class tracking creation and exec calls."""
+def build_fake_menu_class(select_action_index: int = 0) -> type:
+    """Return fake QMenu class tracking creation and exec calls.
+
+    select_action_index controls which addAction return value is returned by exec.
+    """
 
     class _FakeMenu:
         created = False
@@ -76,7 +79,7 @@ def build_fake_menu_class() -> type:
 
         def __init__(self, *_args, **_kwargs) -> None:
             _FakeMenu.created = True
-            self._action = FakeMenuAction()
+            self._actions: list[FakeMenuAction] = []
 
         def setToolTipsVisible(self, _visible: bool) -> None:
             """Ignore tooltip visibility in fake menu."""
@@ -84,11 +87,13 @@ def build_fake_menu_class() -> type:
 
         def addAction(self, _text: str) -> FakeMenuAction:
             """Return tracked fake action."""
-            return self._action
+            action = FakeMenuAction()
+            self._actions.append(action)
+            return action
 
         def exec(self, *_args, **_kwargs) -> FakeMenuAction:
-            """Record menu execution and return tracked action."""
+            """Record menu execution and return the selected action."""
             _FakeMenu.exec_called = True
-            return self._action
+            return self._actions[select_action_index] if self._actions else FakeMenuAction()
 
     return _FakeMenu

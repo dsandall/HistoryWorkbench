@@ -298,7 +298,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="147"/>
+        <location filename="../../ui/views/history/history_list.py" line="149"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -417,23 +417,28 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="139"/>
+        <location filename="../../ui/views/history/history_list.py" line="141"/>
         <source>Mark All Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="154"/>
+        <location filename="../../ui/views/history/history_list.py" line="156"/>
         <source>Restore reviewed files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="155"/>
+        <location filename="../../ui/views/history/history_list.py" line="157"/>
         <source>Remove All from Reviewed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="169"/>
+        <location filename="../../ui/views/history/history_list.py" line="171"/>
         <source>Restore all files from iteration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/history_list.py" line="172"/>
+        <source>Copy iteration ID to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

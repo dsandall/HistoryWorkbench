@@ -68,7 +68,7 @@ def test_reviewed_context_menu_emits_remove_all_signal(history_list_widget) -> N
     history_list_widget.remove_all_from_reviewed_requested.connect(
         lambda: called.__setitem__("count", called["count"] + 1)
     )
-    fake_menu = build_fake_menu_class()
+    fake_menu = build_fake_menu_class(select_action_index=1)
     pos = history_list_widget.visualItemRect(item).center()
 
     with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QMenu", fake_menu):
@@ -96,6 +96,28 @@ def test_commit_context_menu_emits_restore_signal(history_list_widget) -> None: 
     assert fake_menu.created is True
     assert fake_menu.exec_called is True
     assert received == [commit_selection]
+
+
+def test_commit_context_menu_copies_iteration_id_to_clipboard(history_list_widget) -> None:  # type: ignore[no-untyped-def]
+    """Commit context menu copy action writes commit hash to clipboard."""
+    commit_hash = "deadbeef12345678"
+    item, widget = create_commit_history_item(make_commit(commit_id=commit_hash, author="a", message="m"))
+    history_list_widget.addItem(item)
+    history_list_widget.setItemWidget(item, widget)
+
+    clipboard = MagicMock()
+    fake_app = MagicMock()
+    fake_app.clipboard.return_value = clipboard
+
+    # select_action_index=1 selects the second menu action (Copy Iteration ID).
+    fake_menu = build_fake_menu_class(select_action_index=1)
+    pos = history_list_widget.visualItemRect(item).center()
+
+    with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QMenu", fake_menu):
+        with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QApplication.instance", return_value=fake_app):
+            history_list_widget._on_context_menu_requested(pos)
+
+    clipboard.setText.assert_called_once_with(commit_hash)
 
 
 def test_working_tree_context_menu_emits_mark_all_reviewed_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
