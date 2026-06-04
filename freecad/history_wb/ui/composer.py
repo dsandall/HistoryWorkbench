@@ -29,6 +29,7 @@ def compose_and_register_workbench_commands(
     command_presenter = WorkbenchCommandPresenter(
         application_state=application_state,
         get_main_window=lambda: getMainWindow(),  # noqa: B026
+        find_active_git_repository_action=container.find_active_git_repository_action,
         get_staged_file_paths_action=container.get_staged_file_paths_action,
         commit_staging_action=container.commit_staging_action,
         get_git_identity_action=container.get_git_identity_action,
@@ -97,7 +98,6 @@ def compose_and_register_panel(
     git_repo_presenter = GitRepositoryPresenter(
         history_view=view.history_panel,
         dialog_view=dialog_view,
-        find_git_repo_action=container.find_active_git_repository_action,
         get_commits_action=container.get_commits_action,
         application_state=application_state,
         clear_doc_diffs=diff_presenter.clear_doc_diff,

@@ -5,10 +5,18 @@
 # to find the first document that is in a git repository.
 """Application action for finding active git repository."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ....domain.freecad_ports import FreeCadPort
 from ....domain.git.git_service import GitService
 from ....utils import Log
 from ..result_models import Result
+
+
+if TYPE_CHECKING:
+    from ....domain.git.models import GitRepository
 
 
 class FindActiveGitRepositoryAction:
@@ -39,33 +47,48 @@ class FindActiveGitRepositoryAction:
         self._freecad_port = freecad_port
         self._git_service = git_service
 
-    def execute(self) -> Result:
+    def execute(self, current_repository: GitRepository | None = None) -> Result:
         """Find active git repository from open documents.
 
-        Iterates through all open documents, skipping unsaved ones,
-        and returns the first document that is in a git repository.
+        Uses sticky repository logic: once a repository is detected, it is
+        retained as long as at least one open document belongs to it. This
+        prevents accidental switches when multiple files from different
+        repositories are open simultaneously.
+
+        Args:
+            current_repository: The currently active repository, if any.
+                When provided, returned immediately if any open document
+                belongs to it.
 
         Returns:
             Result with GitRepository if found, or failure result with error message.
         """
-        # Get all open documents
         docs = self._freecad_port.get_all_open_documents()
         if not docs:
             return Result.failure("No documents are open")
 
-        # Iterate through all documents, skipping unsaved ones
+        first_repo: GitRepository | None = None
         for doc in docs:
-            doc_path = doc.FileName  # FreeCAD documents have FileName property
-
-            # Skip unsaved documents (empty FileName)
+            doc_path = doc.FileName
             if not doc_path:
                 Log.debug("Skipping unsaved document")
                 continue
 
-            # Try to find git repository for this document
             repo = self._git_service.get_repository(doc_path)
-            if repo is not None:
-                Log.info(f"Git repository detected: {repo.name} ({repo.absolute_path})")
-                return Result.success(repo)
+            if repo is None:
+                continue
 
-        return Result.failure("No git repository found for open documents")
+            # Sticky repo: return current immediately if we encounter it
+            if current_repository is not None and repo.absolute_path == current_repository.absolute_path:
+                Log.debug(f"Keeping current repository: {current_repository.name}")
+                return Result.success(current_repository)
+
+            # Track first repo found as fallback
+            if first_repo is None:
+                first_repo = repo
+
+        if first_repo is None:
+            return Result.failure("No git repository found for open documents")
+
+        Log.info(f"Git repository detected: {first_repo.name} ({first_repo.absolute_path})")
+        return Result.success(first_repo)

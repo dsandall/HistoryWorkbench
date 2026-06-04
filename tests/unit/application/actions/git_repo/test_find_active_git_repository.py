@@ -94,3 +94,66 @@ class TestFindActiveGitRepositoryAction:
 
         assert result.is_success is False
         assert result.message == "No git repository found for open documents"
+
+    def test_execute_keeps_current_repo_when_documents_still_belong_to_it(self) -> None:
+        """Sticky repo: keeps current repo when open documents still belong to it."""
+        fake_freecad = FakeFreeCadPort()
+        fake_git = FakeGitPort()
+        fake_git.add_git_repo("/home/user/project1")
+        fake_git.add_git_repo("/home/user/project2")
+
+        doc1 = MagicMock()
+        doc1.FileName = "/home/user/project2/file2.FCStd"
+        doc2 = MagicMock()
+        doc2.FileName = "/home/user/project1/file1.FCStd"
+        fake_freecad._open_documents = [doc1, doc2]
+
+        service = GitService(fake_git)
+        action = FindActiveGitRepositoryAction(fake_freecad, service)
+
+        current_repo = GitRepository(name="project1", absolute_path="/home/user/project1")
+        result = action.execute(current_repository=current_repo)
+
+        assert result.is_success is True
+        assert result.data.absolute_path == "/home/user/project1"
+
+    def test_execute_switches_repo_when_current_has_no_open_documents(self) -> None:
+        """Sticky repo: switches to new repo when current repo has no open documents."""
+        fake_freecad = FakeFreeCadPort()
+        fake_git = FakeGitPort()
+        fake_git.add_git_repo("/home/user/project1")
+        fake_git.add_git_repo("/home/user/project2")
+
+        doc = MagicMock()
+        doc.FileName = "/home/user/project2/file.FCStd"
+        fake_freecad._open_documents = [doc]
+
+        service = GitService(fake_git)
+        action = FindActiveGitRepositoryAction(fake_freecad, service)
+
+        current_repo = GitRepository(name="project1", absolute_path="/home/user/project1")
+        result = action.execute(current_repository=current_repo)
+
+        assert result.is_success is True
+        assert result.data.absolute_path == "/home/user/project2"
+
+    def test_execute_finds_first_repo_when_no_current_repo(self) -> None:
+        """Without a current repo, picks the first repository found."""
+        fake_freecad = FakeFreeCadPort()
+        fake_git = FakeGitPort()
+        fake_git.add_git_repo("/home/user/project1")
+        fake_git.add_git_repo("/home/user/project2")
+
+        doc1 = MagicMock()
+        doc1.FileName = "/home/user/project2/file2.FCStd"
+        doc2 = MagicMock()
+        doc2.FileName = "/home/user/project1/file1.FCStd"
+        fake_freecad._open_documents = [doc1, doc2]
+
+        service = GitService(fake_git)
+        action = FindActiveGitRepositoryAction(fake_freecad, service)
+
+        result = action.execute()
+
+        assert result.is_success is True
+        assert result.data.absolute_path == "/home/user/project2"

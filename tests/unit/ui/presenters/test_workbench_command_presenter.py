@@ -35,6 +35,7 @@ def mock_get_main_window(mock_main_window: MagicMock) -> MagicMock:
 def mock_actions() -> dict:
     """Create a dict of mock container actions."""
     return {
+        "find_active_git_repository_action": MagicMock(),
         "get_staged_file_paths_action": MagicMock(),
         "commit_staging_action": MagicMock(),
         "get_git_identity_action": MagicMock(),
@@ -217,6 +218,83 @@ class TestUpdateGitignore:
             presenter.update_gitignore()
 
         mock_exec.assert_called_once_with(repo)
+
+
+class TestRefreshGitRepository:
+    """Tests for refresh_git_repository flow."""
+
+    def test_refresh_returns_repository_on_success(
+        self,
+        presenter: WorkbenchCommandPresenter,
+        mock_application_state: MagicMock,
+        mock_actions: dict,
+    ) -> None:
+        """refresh_git_repository() returns and stores the detected repository."""
+        mock_application_state.git_repository = None
+        repo = GitRepository(name="proj", absolute_path="/home/user/proj")
+        mock_result = MagicMock()
+        mock_result.is_success = True
+        mock_result.data = repo
+        mock_actions["find_active_git_repository_action"].execute.return_value = mock_result
+
+        result = presenter.refresh_git_repository()
+
+        assert result is repo
+        assert mock_application_state.git_repository is repo
+
+    def test_refresh_passes_current_repository_to_action(
+        self,
+        presenter: WorkbenchCommandPresenter,
+        mock_application_state: MagicMock,
+        mock_actions: dict,
+    ) -> None:
+        """refresh_git_repository() passes the current repository to the action."""
+        current_repo = GitRepository(name="current", absolute_path="/home/user/current")
+        mock_application_state.git_repository = current_repo
+        mock_result = MagicMock()
+        mock_result.is_success = True
+        mock_result.data = current_repo
+        mock_actions["find_active_git_repository_action"].execute.return_value = mock_result
+
+        presenter.refresh_git_repository()
+
+        mock_actions["find_active_git_repository_action"].execute.assert_called_once_with(
+            current_repository=current_repo
+        )
+
+    def test_refresh_returns_current_repo_on_failure(
+        self,
+        presenter: WorkbenchCommandPresenter,
+        mock_application_state: MagicMock,
+        mock_actions: dict,
+    ) -> None:
+        """refresh_git_repository() returns the current repository when detection fails."""
+        current_repo = GitRepository(name="current", absolute_path="/home/user/current")
+        mock_application_state.git_repository = current_repo
+        mock_result = MagicMock()
+        mock_result.is_success = False
+        mock_actions["find_active_git_repository_action"].execute.return_value = mock_result
+
+        result = presenter.refresh_git_repository()
+
+        assert result is current_repo
+        assert mock_application_state.git_repository is current_repo
+
+    def test_refresh_returns_none_when_no_repo_and_detection_fails(
+        self,
+        presenter: WorkbenchCommandPresenter,
+        mock_application_state: MagicMock,
+        mock_actions: dict,
+    ) -> None:
+        """refresh_git_repository() returns None when no repo exists and detection fails."""
+        mock_application_state.git_repository = None
+        mock_result = MagicMock()
+        mock_result.is_success = False
+        mock_actions["find_active_git_repository_action"].execute.return_value = mock_result
+
+        result = presenter.refresh_git_repository()
+
+        assert result is None
 
 
 class TestDialogHelpers:

@@ -6,9 +6,6 @@ from collections.abc import Callable
 from time import monotonic
 
 from freecad.history_wb.application.actions.git_history.get_commits import GetCommitsAction
-from freecad.history_wb.application.actions.git_repo.find_active_git_repository import (
-    FindActiveGitRepositoryAction,
-)
 from freecad.history_wb.domain.git.models import GitRepository
 from freecad.history_wb.ui.state import ApplicationState
 from freecad.history_wb.ui.views.diff_panel.dialog_view import DialogView
@@ -19,29 +16,21 @@ from .workbench_command_presenter import WorkbenchCommandPresenter
 
 
 class GitRepositoryPresenter:
-    """Handles git repository detection and UI display.
+    """Handles git repository UI display and commit loading.
 
     This presenter is responsible for:
-    1. Detecting the active git repository when the workbench is activated
-    2. Updating the UI state with the detected repository
-    3. Displaying the repository information in the view
-    4. Loading and displaying commits for the repository
+    1. Displaying the repository information in the view
+    2. Loading and displaying commits for the repository
 
-    Shared command flows (save iteration, configure author, initialize repo,
-    update gitignore) are delegated to WorkbenchCommandPresenter to avoid
-    duplicating handler construction and dialog lifecycle management.
-
-    Attributes:
-        _view: The HistoryPanelView instance for displaying repository info.
-        _find_git_repo_action: The action for finding the active git repository.
-        _application_state: The application-scoped state holder for storing repository.
+    Repository detection and application state updates are delegated to
+    WorkbenchCommandPresenter. This presenter connects to the
+    repository_changed signal to update the panel UI reactively.
     """
 
     def __init__(
         self,
         history_view: HistoryPanelWidget,
         dialog_view: DialogView,
-        find_git_repo_action: FindActiveGitRepositoryAction,
         get_commits_action: GetCommitsAction,
         application_state: ApplicationState,
         clear_doc_diffs: Callable[[], None],
@@ -52,15 +41,13 @@ class GitRepositoryPresenter:
         Args:
             history_view: History-column view implementation.
             dialog_view: Dialog and message view implementation.
-            find_git_repo_action: The action for finding the active git repository.
             get_commits_action: The action for getting git commits.
             application_state: Application-scoped state holder for storing repository.
             clear_doc_diffs: Callback to clear document diffs.
-            workbench_command_presenter: App-scoped presenter for shared command flows.
+            workbench_command_presenter: App-scoped presenter for detection and shared command flows.
         """
         self._history_view = history_view
         self._dialog_view = dialog_view
-        self._find_git_repo_action = find_git_repo_action
         self._get_commits_action = get_commits_action
         self._application_state = application_state
         self._clear_doc_diffs = clear_doc_diffs
@@ -73,22 +60,19 @@ class GitRepositoryPresenter:
         self._last_scroll_load_ts = 0.0
         self._scroll_load_interval_seconds = 0.2
 
-    def on_workbench_activated(self) -> None:
-        """Detect and display git repository when workbench activates.
+        # Listen for repository changes from the command presenter
+        workbench_command_presenter.repository_changed.connect(self._on_repository_changed)
 
-        This method is called when the workbench is activated to detect
-        the current git repository and display it in the UI.
-        """
+    def on_workbench_activated(self) -> None:
+        """Detect and display git repository when workbench activates."""
         self.refresh_repository_and_commits()
 
     def refresh_repository_and_commits(self) -> None:
-        """Refresh repository detection and reload commit list.
+        """Trigger repository detection via the command presenter.
 
-        This method provides a UI-agnostic entry point for any caller
-        that needs to re-detect the current repository, update UI state,
-        and repopulate commits in the view.
+        The repository_changed signal will fire and update the panel UI.
         """
-        self._detect_git_repository()
+        self._command_presenter.refresh_git_repository()
 
     def save_iteration(self) -> None:
         """Execute save-iteration flow from toolbar or panel button."""
@@ -107,30 +91,17 @@ class GitRepositoryPresenter:
         """Execute gitignore editor flow from toolbar command."""
         self._command_presenter.update_gitignore()
 
-    def _detect_git_repository(self) -> None:
-        """Detect git repository and update UI and application state.
-
-        This protected method encapsulates the common logic for git repository
-        detection used by both workbench activation and refresh button clicks.
-        """
-        result = self._find_git_repo_action.execute()
-
-        if result.is_success:
-            repo = result.data
-            self._application_state.git_repository = repo
+    def _on_repository_changed(self, repo: GitRepository | None) -> None:
+        """Update panel UI when the command presenter refreshes the repository."""
+        if repo is not None:
             self._history_view.show_repository(repo)
             self._reset_commit_pagination(repo)
-
-            # After detecting repository, load commits
-            if repo is not None:
-                self._load_initial_commits(repo)
+            self._load_initial_commits(repo)
         else:
-            self._application_state.git_repository = None
             self._reset_commit_pagination(None)
             self._history_view.show_repository(None)
             self._history_view.show_commits([], show_special_items=False)
             self._clear_doc_diffs()
-            Log.info(f"Git detection failed: {result.message}")
 
     def _load_initial_commits(self, repo: GitRepository) -> None:
         """Load first commit page and replace list content.
@@ -154,7 +125,6 @@ class GitRepositoryPresenter:
             self._loaded_commit_count = 0
             self._has_more_commits = False
             self._clear_doc_diffs()
-            # Show empty list on failure
             self._history_view.show_commits([])
             Log.warning(f"Failed to load commits: {result.message}")
 

@@ -22,68 +22,15 @@ class TestRefreshRepositoryCommand:
     """Tests for _RefreshRepositoryCommand."""
 
     @patch("freecad.history_wb.ui.registry.ui_registry")
-    def test_activated_calls_presenter_when_available(
+    def test_activated_delegates_to_command_presenter(
         self,
         mock_ui_registry: Mock,
     ) -> None:
-        """Activated delegates to presenter when panel is open."""
-        mock_presenter = MagicMock()
-        mock_ui_registry.git_repository_presenter = mock_presenter
-
+        """Activated delegates to workbench_command_presenter regardless of panel state."""
         command = _RefreshRepositoryCommand()
         command.Activated()
 
-        mock_presenter.refresh_repository_and_commits.assert_called_once_with()
-
-    @patch("freecad.history_wb.ui.registry.ui_registry")
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_runs_detection_directly_when_presenter_none(
-        self,
-        mock_get_container: Mock,
-        mock_ui_registry: Mock,
-    ) -> None:
-        """Activated runs find action directly and updates state when panel is closed."""
-        mock_ui_registry.git_repository_presenter = None
-        mock_container = MagicMock()
-        mock_get_container.return_value = mock_container
-
-        repo = GitRepository(name="test", absolute_path="/home/user/test")
-        mock_result = MagicMock()
-        mock_result.is_success = True
-        mock_result.data = repo
-        mock_container.find_active_git_repository_action.execute.return_value = mock_result
-
-        command = _RefreshRepositoryCommand()
-        command.Activated()
-
-        mock_container.find_active_git_repository_action.execute.assert_called_once()
-        assert mock_ui_registry.application_state.git_repository == repo
-
-    @patch("freecad.history_wb.ui.registry.ui_registry")
-    @patch("freecad.history_wb._container.get_container")
-    def test_activated_clears_stale_repo_on_detection_failure(
-        self,
-        mock_get_container: Mock,
-        mock_ui_registry: Mock,
-    ) -> None:
-        """Activated clears stale repo state when detection fails and panel is closed."""
-        mock_ui_registry.git_repository_presenter = None
-        mock_container = MagicMock()
-        mock_get_container.return_value = mock_container
-
-        mock_result = MagicMock()
-        mock_result.is_success = False
-        mock_container.find_active_git_repository_action.execute.return_value = mock_result
-
-        # Pre-set stale repo
-        mock_ui_registry.application_state.git_repository = GitRepository(
-            name="old", absolute_path="/home/user/old"
-        )
-
-        command = _RefreshRepositoryCommand()
-        command.Activated()
-
-        assert mock_ui_registry.application_state.git_repository is None
+        mock_ui_registry.workbench_command_presenter.refresh_git_repository.assert_called_once()
 
 
 class TestRecomputeAllOpenDocumentsCommand:

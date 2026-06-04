@@ -215,7 +215,6 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         git_kwargs = MockGitPresenter.call_args.kwargs
         assert git_kwargs["history_view"] is mock_view.history_panel
         assert git_kwargs["dialog_view"] is mock_dialog_view
-        assert git_kwargs["find_git_repo_action"] is mock_container.find_active_git_repository_action
         assert git_kwargs["get_commits_action"] is mock_container.get_commits_action
         assert git_kwargs["application_state"] is mock_application_state
         assert git_kwargs["workbench_command_presenter"] is mock_command_presenter
@@ -288,6 +287,7 @@ def test_compose_and_register_workbench_commands() -> None:
         assert MockWCP.call_count == 1
         wcp_kwargs = MockWCP.call_args.kwargs
         assert wcp_kwargs["application_state"] is mock_application_state
+        assert wcp_kwargs["find_active_git_repository_action"] is mock_container.find_active_git_repository_action
         assert wcp_kwargs["get_staged_file_paths_action"] is mock_container.get_staged_file_paths_action
         assert wcp_kwargs["commit_staging_action"] is mock_container.commit_staging_action
         assert wcp_kwargs["get_git_identity_action"] is mock_container.get_git_identity_action

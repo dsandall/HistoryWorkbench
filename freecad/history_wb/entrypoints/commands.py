@@ -136,23 +136,9 @@ class _RefreshRepositoryCommand:
 
     def Activated(self) -> None:
         """FreeCAD calls this when user clicks toolbar button."""
-        from .._container import get_container
         from ..ui.registry import ui_registry
 
-        presenter = ui_registry.git_repository_presenter
-        if presenter is not None:
-            presenter.refresh_repository_and_commits()
-            return
-
-        # Panel closed; run repository detection directly and update application state
-        container = get_container()
-        result = container.find_active_git_repository_action.execute()
-
-        if result.is_success:
-            ui_registry.application_state.git_repository = result.data
-        else:
-            # Clear stale repo state when refresh fails
-            ui_registry.application_state.git_repository = None
+        ui_registry.workbench_command_presenter.refresh_git_repository()
 
 
 class _InitializeGitRepositoryCommand:

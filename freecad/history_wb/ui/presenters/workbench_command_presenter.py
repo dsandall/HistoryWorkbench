@@ -19,11 +19,16 @@ from ...application.actions.git_config.get_gitignore_content import GetGitIgnore
 from ...application.actions.git_config.save_git_identity import SaveGitIdentityAction
 from ...application.actions.git_config.update_gitignore import UpdateGitIgnoreAction
 from ...application.actions.git_history.get_staged_file_paths import GetStagedFilePathsAction
+from ...application.actions.git_repo.find_active_git_repository import (
+    FindActiveGitRepositoryAction,
+)
 from ...application.actions.git_repo.get_git_repository_init_candidates import (
     GetGitRepositoryInitCandidatesAction,
 )
 from ...application.actions.git_repo.initialize_git_repository import InitializeGitRepositoryAction
 from ...application.actions.git_workflow.commit_staging import CommitStagingAction
+from ...domain.git.models import GitRepository
+from ...qt import QtCore
 from ...utils import Log, translate
 from ..state import ApplicationState
 from ..views.diff_panel.dialog_view import DialogView
@@ -34,20 +39,24 @@ from .git_repository.gitignore_handler import GitIgnoreHandler
 from .git_repository.initialize_repository_handler import InitializeRepositoryHandler
 
 
-class WorkbenchCommandPresenter:
+class WorkbenchCommandPresenter(QtCore.QObject):
     """App-scoped presenter that owns single handler instances for workbench commands.
 
-    This presenter lives for the lifetime of the workbench and owns one instance
-    each of AuthorConfigurationHandler, CommitIterationHandler,
-    InitializeRepositoryHandler, and GitIgnoreHandler. It creates temporary
+    This presenter lives for the lifetime of the workbench. It creates temporary
     DialogView instances parented to the FreeCAD main window at call time,
     avoiding stale Qt references from panel widgets that get destroyed on close.
+
+    Emits repository_changed when the active git repository is refreshed,
+    so panel presenters can react.
     """
+
+    repository_changed = QtCore.Signal(object)  # git_repo
 
     def __init__(
         self,
         application_state: ApplicationState,
         get_main_window: Callable[[], "QtWidgets.QWidget | None"],
+        find_active_git_repository_action: FindActiveGitRepositoryAction,
         get_staged_file_paths_action: GetStagedFilePathsAction,
         commit_staging_action: CommitStagingAction,
         get_git_identity_action: GetGitIdentityAction,
@@ -63,6 +72,7 @@ class WorkbenchCommandPresenter:
         Args:
             application_state: Application-scoped state holder.
             get_main_window: Callable that returns the FreeCAD main window widget.
+            find_active_git_repository_action: Action to find the active git repository.
             get_staged_file_paths_action: Action to get staged file paths.
             commit_staging_action: Action to commit staging area.
             get_git_identity_action: Action to get git identity.
@@ -73,8 +83,10 @@ class WorkbenchCommandPresenter:
             get_gitignore_content_action: Action to read gitignore content.
             update_gitignore_action: Action to update gitignore content.
         """
+        super().__init__()
         self._application_state = application_state
         self._get_main_window = get_main_window
+        self._find_active_git_repository_action = find_active_git_repository_action
 
         # Create handlers with dialog callbacks that create DialogView at call time
         self._author_handler = AuthorConfigurationHandler(
@@ -162,6 +174,29 @@ class WorkbenchCommandPresenter:
             return
 
         self._gitignore_handler.execute(repo)
+
+    def refresh_git_repository(self) -> GitRepository | None:
+        """Detect and update the active git repository in application state.
+
+        Uses sticky repository logic: the current repository is retained
+        as long as at least one open document belongs to it.
+
+        Emits repository_changed with the resulting repository (or None).
+
+        Returns:
+            The detected GitRepository, or None if no repository found.
+        """
+        current_repo = self._application_state.git_repository
+        result = self._find_active_git_repository_action.execute(current_repository=current_repo)
+
+        if result.is_success:
+            self._application_state.git_repository = result.data
+            self.repository_changed.emit(result.data)
+            return result.data
+
+        # Detection failed; keep existing repo in state (sticky behavior)
+        self.repository_changed.emit(current_repo)
+        return current_repo
 
     # --- Dialog helpers ---
 

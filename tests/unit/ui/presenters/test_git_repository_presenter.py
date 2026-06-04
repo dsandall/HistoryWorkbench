@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitRepositoryPresenter.
-# These tests verify that the presenter correctly orchestrates git repository
-# detection and commit loading.
+# These tests verify that the presenter connects to the command presenter's
+# repository_changed signal and updates the panel UI reactively.
 """Unit tests for GitRepositoryPresenter."""
 
 from datetime import datetime
@@ -26,12 +26,6 @@ def mock_dialog_view() -> MagicMock:
 
 
 @pytest.fixture
-def mock_find_action() -> MagicMock:
-    """Create a mock FindActiveGitRepositoryAction."""
-    return MagicMock()
-
-
-@pytest.fixture
 def mock_get_commits_action() -> MagicMock:
     """Create a mock GetCommitsAction."""
     return MagicMock()
@@ -45,15 +39,16 @@ def mock_application_state() -> MagicMock:
 
 @pytest.fixture
 def mock_command_presenter() -> MagicMock:
-    """Create a mock WorkbenchCommandPresenter."""
-    return MagicMock()
+    """Create a mock WorkbenchCommandPresenter with repository_changed signal."""
+    mock = MagicMock()
+    mock.repository_changed = MagicMock()
+    return mock
 
 
 @pytest.fixture
 def presenter(
     mock_view: MagicMock,
     mock_dialog_view: MagicMock,
-    mock_find_action: MagicMock,
     mock_get_commits_action: MagicMock,
     mock_application_state: MagicMock,
     mock_command_presenter: MagicMock,
@@ -62,7 +57,6 @@ def presenter(
     return GitRepositoryPresenter(
         history_view=mock_view,
         dialog_view=mock_dialog_view,
-        find_git_repo_action=mock_find_action,
         get_commits_action=mock_get_commits_action,
         application_state=mock_application_state,
         clear_doc_diffs=MagicMock(),
@@ -73,70 +67,76 @@ def presenter(
 class TestGitRepositoryPresenter:
     """Tests for GitRepositoryPresenter."""
 
-    def test_on_workbench_activated_with_successful_detection(
+    def test_connects_to_repository_changed_signal(
+        self,
+        mock_command_presenter: MagicMock,
+        presenter: GitRepositoryPresenter,
+    ) -> None:
+        """Presenter connects _on_repository_changed to repository_changed signal on init."""
+        mock_command_presenter.repository_changed.connect.assert_called_once_with(
+            presenter._on_repository_changed
+        )
+
+    def test_on_workbench_activated_calls_refresh(
+        self,
+        presenter: GitRepositoryPresenter,
+        mock_command_presenter: MagicMock,
+    ) -> None:
+        """on_workbench_activated() delegates to refresh_repository_and_commits()."""
+        presenter.on_workbench_activated()
+        mock_command_presenter.refresh_git_repository.assert_called_once()
+
+    def test_refresh_repository_and_commits_delegates_to_command_presenter(
+        self,
+        presenter: GitRepositoryPresenter,
+        mock_command_presenter: MagicMock,
+    ) -> None:
+        """refresh_repository_and_commits() triggers detection via command presenter."""
+        presenter.refresh_repository_and_commits()
+        mock_command_presenter.refresh_git_repository.assert_called_once()
+
+    def test_on_repository_changed_with_repository_updates_view(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
+        mock_get_commits_action: MagicMock,
     ) -> None:
-        """on_workbench_activated() updates state and view when detection succeeds."""
+        """_on_repository_changed() shows repo and loads commits when repo is provided."""
         repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
+
+        commits = [
+            GitCommit(
+                id="a1b2c3d",
+                message="Test",
+                author="Test",
+                timestamp=datetime.fromisoformat("2024-01-15T10:30:00+00:00"),
+            )
+        ]
         mock_result = MagicMock()
         mock_result.is_success = True
-        mock_result.data = repo
-        mock_find_action.execute.return_value = mock_result
+        mock_result.data = commits
+        mock_get_commits_action.execute.return_value = mock_result
 
-        presenter.on_workbench_activated()
+        presenter._on_repository_changed(repo)
 
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = repo
         mock_view.show_repository.assert_called_once_with(repo)
+        mock_get_commits_action.execute.assert_called_once_with(repo)
 
-    def test_on_workbench_activated_with_failed_detection(
+    def test_on_repository_changed_with_none_shows_empty(
         self,
         presenter: GitRepositoryPresenter,
         mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
     ) -> None:
-        """on_workbench_activated() sets state to None and shows no repo message on failure."""
-        mock_result = MagicMock()
-        mock_result.is_success = False
-        mock_result.message = "No active document"
-        mock_find_action.execute.return_value = mock_result
+        """_on_repository_changed() shows empty state when None is passed."""
+        presenter._on_repository_changed(None)
 
-        presenter.on_workbench_activated()
-
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = None
         mock_view.show_repository.assert_called_once_with(None)
         mock_view.show_commits.assert_called_once_with([], show_special_items=False)
-
-    def test_on_workbench_activated_with_none_repository(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """on_workbench_activated() handles case where action returns None repository."""
-        mock_result = MagicMock()
-        mock_result.is_success = True
-        mock_result.data = None  # Action succeeded but found no repo
-        mock_find_action.execute.return_value = mock_result
-
-        presenter.on_workbench_activated()
-
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = None
-        mock_view.show_repository.assert_called_once_with(None)
 
     def test_presenter_initialization_stores_dependencies(
         self,
         mock_view: MagicMock,
         mock_dialog_view: MagicMock,
-        mock_find_action: MagicMock,
         mock_get_commits_action: MagicMock,
         mock_application_state: MagicMock,
         mock_command_presenter: MagicMock,
@@ -145,7 +145,6 @@ class TestGitRepositoryPresenter:
         presenter = GitRepositoryPresenter(
             history_view=mock_view,
             dialog_view=mock_dialog_view,
-            find_git_repo_action=mock_find_action,
             get_commits_action=mock_get_commits_action,
             application_state=mock_application_state,
             clear_doc_diffs=MagicMock(),
@@ -154,79 +153,9 @@ class TestGitRepositoryPresenter:
 
         assert presenter._history_view is mock_view
         assert presenter._dialog_view is mock_dialog_view
-        assert presenter._find_git_repo_action is mock_find_action
         assert presenter._get_commits_action is mock_get_commits_action
         assert presenter._application_state is mock_application_state
         assert presenter._command_presenter is mock_command_presenter
-
-    def test_refresh_repository_and_commits_with_successful_detection(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """refresh_repository_and_commits() updates state and view when detection succeeds."""
-        repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
-        mock_result = MagicMock()
-        mock_result.is_success = True
-        mock_result.data = repo
-        mock_find_action.execute.return_value = mock_result
-
-        presenter.refresh_repository_and_commits()
-
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = repo
-        mock_view.show_repository.assert_called_once_with(repo)
-
-    def test_refresh_repository_and_commits_with_failed_detection(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """refresh_repository_and_commits() sets state to None and shows no repo message on failure."""
-        mock_result = MagicMock()
-        mock_result.is_success = False
-        mock_result.message = "No active document"
-        mock_find_action.execute.return_value = mock_result
-
-        presenter.refresh_repository_and_commits()
-
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = None
-        mock_view.show_repository.assert_called_once_with(None)
-        mock_view.show_commits.assert_called_once_with([], show_special_items=False)
-
-    def test_refresh_repository_and_commits_with_none_repository(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """refresh_repository_and_commits() handles case where action returns None repository."""
-        mock_result = MagicMock()
-        mock_result.is_success = True
-        mock_result.data = None  # Action succeeded but found no repo
-        mock_find_action.execute.return_value = mock_result
-
-        presenter.refresh_repository_and_commits()
-
-        mock_find_action.execute.assert_called_once()
-        mock_application_state.git_repository = None
-        mock_view.show_repository.assert_called_once_with(None)
-
-    def test_on_workbench_activated_delegates_to_refresh_repository_and_commits(
-        self,
-        presenter: GitRepositoryPresenter,
-    ) -> None:
-        """on_workbench_activated() delegates to refresh_repository_and_commits()."""
-        with patch.object(presenter, "refresh_repository_and_commits") as mock_refresh:
-            presenter.on_workbench_activated()
-
-        mock_refresh.assert_called_once_with()
 
 
 class TestSaveIterationFlow:
@@ -354,42 +283,6 @@ class TestCommitLoading:
         presenter._load_initial_commits(repo)
 
         mock_view.show_commits.assert_called_once_with([])
-
-    def test_detect_git_repository_loads_commits_on_success(
-        self,
-        presenter: GitRepositoryPresenter,
-        mock_view: MagicMock,
-        mock_find_action: MagicMock,
-        mock_get_commits_action: MagicMock,
-        mock_application_state: MagicMock,
-    ) -> None:
-        """_detect_git_repository() loads commits after detecting repository."""
-        repo = GitRepository(name="test_project", absolute_path="/home/user/test_project")
-
-        # Mock find action to return repo
-        mock_find_result = MagicMock()
-        mock_find_result.is_success = True
-        mock_find_result.data = repo
-        mock_find_action.execute.return_value = mock_find_result
-
-        # Mock get commits action to return commits
-        commits = [
-            GitCommit(
-                id="a1b2c3d",
-                message="Test",
-                author="Test",
-                timestamp=datetime.fromisoformat("2024-01-15T10:30:00+00:00"),
-            )
-        ]
-        mock_commit_result = MagicMock()
-        mock_commit_result.is_success = True
-        mock_commit_result.data = commits
-        mock_get_commits_action.execute.return_value = mock_commit_result
-
-        presenter._detect_git_repository()
-
-        mock_get_commits_action.execute.assert_called_once_with(repo)
-        mock_view.show_commits.assert_called_once()
 
     def test_load_more_commits_loads_next_page(self, presenter: GitRepositoryPresenter) -> None:
         """Scroll near bottom loads next commit page with skip offset."""
