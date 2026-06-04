@@ -54,7 +54,7 @@ History Workbench is not yet available in the official FreeCAD Addon Manager rep
 3. Add this repository URL: `https://github.com/eblanshey/HistoryWorkbench`
 4. Set the branch to `master`.
 5. Open **Tools > Addon Manager**.
-6. Search for **History Workbench** and install it.
+6. Search for **History** and install it.
 7. Restart FreeCAD.
 
 ### Upgrading
@@ -62,11 +62,11 @@ History Workbench is not yet available in the official FreeCAD Addon Manager rep
 When upgrading from an existing Addon Manager installation:
 
 1. Open **Tools > Addon Manager**.
-2. Uninstall **History Workbench**.
+2. Uninstall **History**.
 3. Close FreeCAD.
 4. Reopen FreeCAD.
 5. Open **Tools > Addon Manager**.
-6. Install **History Workbench** again.
+6. Install **History** again.
 7. Restart FreeCAD.
 
 ## First Run: Project Initialization
