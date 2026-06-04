@@ -71,6 +71,7 @@ class DiffPresenter:
         open_visual_feature_diff_action: OpenVisualDiffAction,
         open_document_action: OpenDocumentAction,
         restore_documents_action: RestoreDocumentsAction,
+        focus_history_window_callback: Callable[[], None],
         settings_repo: SettingsRepository | None = None,
     ) -> None:
         """Initialize with required dependencies.
@@ -112,7 +113,7 @@ class DiffPresenter:
         )
         self._visual_diff_handler = DocumentVisualDiffHandler(open_visual_feature_diff_action)
         self._current_history_selection: HistorySelection | None = None
-        self._focus_history_window_callback: Callable[[], None] | None = None
+        self._focus_history_window_callback = focus_history_window_callback
 
     def track_history_selection(self, selection: HistorySelection | None) -> None:
         """Track effective history selection state for non-click refresh paths."""
@@ -131,12 +132,7 @@ class DiffPresenter:
                 Log.warning(result.message)
             return
         self._on_working_tree_selected()
-        if self._focus_history_window_callback is not None:
-            self._focus_history_window_callback()
-
-    def set_focus_history_window_callback(self, callback: Callable[[], None]) -> None:
-        """Set callback that focuses history host window after async FreeCAD actions."""
-        self._focus_history_window_callback = callback
+        self._focus_history_window_callback()
 
     def _get_precision(self) -> int:
         """Get the current float precision from settings or use default.
@@ -301,12 +297,19 @@ class DiffPresenter:
         """Restore one document for current staging/commit source."""
         current = self._current_history_selection
         repo = self._application_state.git_repository
+
         if current is None or repo is None:
             return
+
         if current.item_kind not in ("STAGING", "COMMIT"):
             return
+
         restore_success = self._restore_handler.restore_document(repo, current, git_path)
         self._property_view.clear_property_diff()
+
+        if restore_success:
+            self._focus_history_window_callback()
+
         if (
             restore_success
             and self._current_history_selection is not None
@@ -324,13 +327,20 @@ class DiffPresenter:
     def restore_all_from_history(self, selection: HistorySelection) -> None:
         """Restore from history context selection without changing selected row."""
         repo = self._application_state.git_repository
+
         if repo is None:
             return
+
         if selection.item_kind not in ("STAGING", "COMMIT"):
             return
 
         restore_success = self._restore_handler.restore_all(repo, selection)
+
         self._property_view.clear_property_diff()
+
+        if restore_success:
+            self._focus_history_window_callback()
+
         if (
             restore_success
             and self._current_history_selection is not None

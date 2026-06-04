@@ -98,7 +98,7 @@ class HistoryList(QtWidgets.QListWidget):
             return
 
         if self._is_working_tree_selection(item_data):
-            self._show_mark_all_reviewed_menu(pos)
+            self._show_working_tree_context_menu(pos)
             return
 
         if self._is_staging_selection(item_data):
@@ -134,11 +134,11 @@ class HistoryList(QtWidgets.QListWidget):
         """Return whether selection points to Reviewed pseudo-row."""
         return selection.item_kind == "STAGING" and selection.commit_hash is None
 
-    def _show_mark_all_reviewed_menu(self, pos: QtCore.QPoint) -> None:
+    def _show_working_tree_context_menu(self, pos: QtCore.QPoint) -> None:
         """Show Current Files bulk-review context action."""
         menu = QtWidgets.QMenu(self)
         menu.setToolTipsVisible(True)
-        action = menu.addAction(translate("History", "Mark All Reviewed"))
+        action = menu.addAction(translate("History", "Mark All Files Reviewed"))
         selected_action = menu.exec(self.mapToGlobal(pos))
 
         if selected_action == action:
@@ -153,8 +153,8 @@ class HistoryList(QtWidgets.QListWidget):
         )
         menu = QtWidgets.QMenu(self)
         menu.setToolTipsVisible(True)
-        restore_action = menu.addAction(translate("History", "Restore reviewed files"))
-        action = menu.addAction(translate("History", "Remove All from Reviewed"))
+        action = menu.addAction(translate("History", "Remove All Files From Reviewed"))
+        restore_action = menu.addAction(translate("History", "Restore All Reviewed Files"))
         action.setToolTip(tooltip)
         action.setStatusTip(tooltip)
         selected_action = menu.exec(self.mapToGlobal(pos))
@@ -168,8 +168,8 @@ class HistoryList(QtWidgets.QListWidget):
     def _show_commit_context_menu(self, pos: QtCore.QPoint, selection: HistorySelection) -> None:
         """Show commit-row context actions."""
         menu = QtWidgets.QMenu(self)
-        restore_action = menu.addAction(translate("History", "Restore all files from iteration"))
-        copy_id_action = menu.addAction(translate("History", "Copy iteration ID to clipboard"))
+        restore_action = menu.addAction(translate("History", "Restore All Files From Iteration"))
+        copy_id_action = menu.addAction(translate("History", "Copy Iteration ID to Clipboard"))
         selected_action = menu.exec(self.mapToGlobal(pos))
 
         if selected_action == restore_action:

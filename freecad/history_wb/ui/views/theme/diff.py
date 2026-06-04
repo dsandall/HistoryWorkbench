@@ -53,12 +53,12 @@ _LAST_FALLBACK_BLEND = 0.52
 # variants preserve the original bright pastel highlights. Dark variants are
 # brighter saturated targets so they remain visible when blended into dark
 # palettes.
-_ADDED_LIGHT_ACCENT = QtGui.QColor(200, 255, 200)
-_ADDED_DARK_ACCENT = QtGui.QColor(48, 219, 91)
-_DELETED_LIGHT_ACCENT = QtGui.QColor(255, 200, 200)
-_DELETED_DARK_ACCENT = QtGui.QColor(255, 105, 97)
-_MODIFIED_LIGHT_ACCENT = QtGui.QColor(200, 200, 255)
-_MODIFIED_DARK_ACCENT = QtGui.QColor(116, 192, 252)
+_ADDED_LIGHT_ACCENT = QtGui.QColor(200, 255, 200)  # #C8FFC8
+_ADDED_DARK_ACCENT = QtGui.QColor(48, 219, 91)  # #30DB5B
+_DELETED_LIGHT_ACCENT = QtGui.QColor(255, 200, 200)  # #FFC8C8
+_DELETED_DARK_ACCENT = QtGui.QColor(255, 105, 97)  # #FF6961
+_MODIFIED_LIGHT_ACCENT = QtGui.QColor(200, 200, 255)  # #C8C8FF
+_MODIFIED_DARK_ACCENT = QtGui.QColor(116, 192, 252)  # #74C0FC
 
 
 class DiffItemDelegate(QtWidgets.QStyledItemDelegate):
@@ -183,11 +183,11 @@ def _cached_foreground_for_background(background_key: _ColorKey, palette_cache_k
     background = _color_from_key(background_key)
     palette = _palette_from_key(palette_cache_key)
     if not _theme_is_dark(palette):
-        return QtGui.QColor(0, 0, 0)
+        return QtGui.QColor(0, 0, 0)  # #000000
 
     palette_text = _color_from_key(palette_cache_key[1])
-    black = QtGui.QColor(0, 0, 0)
-    white = QtGui.QColor(255, 255, 255)
+    black = QtGui.QColor(0, 0, 0)  # #000000
+    white = QtGui.QColor(255, 255, 255)  # #FFFFFF
     candidates = [palette_text, black, white]
     best = max(candidates, key=lambda color: _contrast_ratio(color, background))
     if _contrast_ratio(best, background) >= _MIN_CONTRAST:

@@ -68,7 +68,7 @@ def test_reviewed_context_menu_emits_remove_all_signal(history_list_widget) -> N
     history_list_widget.remove_all_from_reviewed_requested.connect(
         lambda: called.__setitem__("count", called["count"] + 1)
     )
-    fake_menu = build_fake_menu_class(select_action_index=1)
+    fake_menu = build_fake_menu_class(select_action_index=0)
     pos = history_list_widget.visualItemRect(item).center()
 
     with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QMenu", fake_menu):
@@ -114,7 +114,9 @@ def test_commit_context_menu_copies_iteration_id_to_clipboard(history_list_widge
     pos = history_list_widget.visualItemRect(item).center()
 
     with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QMenu", fake_menu):
-        with patch("freecad.history_wb.ui.views.history.history_list.QtWidgets.QApplication.instance", return_value=fake_app):
+        with patch(
+            "freecad.history_wb.ui.views.history.history_list.QtWidgets.QApplication.instance", return_value=fake_app
+        ):
             history_list_widget._on_context_menu_requested(pos)
 
     clipboard.setText.assert_called_once_with(commit_hash)
@@ -160,7 +162,9 @@ def test_scroll_bottom_callback_fires_near_bottom_once_until_rearmed(history_lis
 def test_right_click_does_not_change_current_selection(history_list_widget) -> None:  # type: ignore[no-untyped-def]
     """Right-click press does not alter list current row."""
     item_one, widget_one = create_commit_history_item(make_commit(commit_id="a1b2c3d4e5f67890", message="First commit"))
-    item_two, widget_two = create_commit_history_item(make_commit(commit_id="b2c3d4e5f6789012", message="Second commit"))
+    item_two, widget_two = create_commit_history_item(
+        make_commit(commit_id="b2c3d4e5f6789012", message="Second commit")
+    )
     history_list_widget.addItem(item_one)
     history_list_widget.setItemWidget(item_one, widget_one)
     history_list_widget.addItem(item_two)

@@ -6,6 +6,8 @@
 # own state lifecycle.
 """UI Composer - Composes and registers UI components."""
 
+from collections.abc import Callable
+
 from ..application.container import ApplicationContainer
 from ..ui.registry import ui_registry
 from ..ui.state import ApplicationState
@@ -46,6 +48,7 @@ def compose_and_register_workbench_commands(
 def compose_and_register_panel(
     container: ApplicationContainer,
     application_state: ApplicationState,
+    focus_history_window_callback: Callable[[], None],
 ) -> HistoryPanelView:
     """Create and register the diff panel UI components.
 
@@ -60,6 +63,7 @@ def compose_and_register_panel(
     Args:
         container: Application container with actions wired (backend only)
         application_state: Pre-created application state (survives panel close)
+        focus_history_window_callback: Callback that refocuses the history host window
     Returns:
         The configured HistoryPanelView
 
@@ -87,6 +91,7 @@ def compose_and_register_panel(
         open_visual_feature_diff_action=container.open_visual_feature_diff_action,
         open_document_action=container.open_document_action,
         restore_documents_action=container.restore_documents_action,
+        focus_history_window_callback=focus_history_window_callback,
         settings_repo=container.settings_repo,
     )
     ui_registry.register_diff_presenter(diff_presenter)

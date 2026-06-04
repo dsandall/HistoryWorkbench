@@ -119,7 +119,7 @@ def test_compose_creates_and_registers_ui_components() -> None:
         # Register command presenter before compose
         ui_registry.register_workbench_command_presenter(mock_command_presenter)
 
-        result = compose_and_register_panel(mock_container, mock_application_state)
+        result = compose_and_register_panel(mock_container, mock_application_state, MagicMock())
 
         # Returns the view
         assert result is mock_view
@@ -158,7 +158,7 @@ def test_compose_uses_externally_provided_application_state() -> None:
         # Register command presenter before compose
         ui_registry.register_workbench_command_presenter(mock_command_presenter)
 
-        compose_and_register_panel(mock_container, mock_application_state)
+        compose_and_register_panel(mock_container, mock_application_state, MagicMock())
 
         # Both presenters receive the same ApplicationState instance
         diff_kwargs = MockDiffPresenter.call_args.kwargs
@@ -194,7 +194,9 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         # Register command presenter before compose
         ui_registry.register_workbench_command_presenter(mock_command_presenter)
 
-        compose_and_register_panel(mock_container, mock_application_state)
+        focus_history_window_callback = MagicMock()
+
+        compose_and_register_panel(mock_container, mock_application_state, focus_history_window_callback)
 
         # DiffPresenter receives correct concrete collaborators and actions from container
         diff_kwargs = MockDiffPresenter.call_args.kwargs
@@ -210,6 +212,7 @@ def test_compose_wires_action_dependencies_and_callbacks() -> None:
         assert diff_kwargs["open_visual_feature_diff_action"] is mock_container.open_visual_feature_diff_action
         assert diff_kwargs["open_document_action"] is mock_container.open_document_action
         assert diff_kwargs["restore_documents_action"] is mock_container.restore_documents_action
+        assert diff_kwargs["focus_history_window_callback"] is focus_history_window_callback
 
         # GitRepositoryPresenter receives correct collaborators and command presenter
         git_kwargs = MockGitPresenter.call_args.kwargs

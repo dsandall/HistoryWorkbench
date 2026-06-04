@@ -48,6 +48,7 @@ def _make_presenter() -> tuple[FakeDocumentDiffView, FakePropertyDiffView, FakeD
         open_visual_feature_diff_action=MagicMock(spec=OpenVisualDiffAction),
         open_document_action=MagicMock(spec=OpenDocumentAction),
         restore_documents_action=MagicMock(spec=RestoreDocumentsAction),
+        focus_history_window_callback=lambda: None,
     )
     return document_view, property_view, dialog_view, presenter
 
@@ -104,7 +105,7 @@ def test_open_document_click_focuses_history_window_after_refresh() -> None:
     presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
     presenter._open_document.execute.return_value = Result.success("/home/user/dir/repo/doc.FCStd")
     focused: list[bool] = []
-    presenter.set_focus_history_window_callback(lambda: focused.append(True))
+    presenter._focus_history_window_callback = lambda: focused.append(True)
 
     with patch.object(presenter, "_on_working_tree_selected") as on_working_tree_selected:
         presenter.open_document_for_comparison("doc.FCStd")
@@ -144,6 +145,21 @@ def test_restore_document_click_clears_property_diff_after_handler_call() -> Non
 
     presenter._restore_handler.restore_document.assert_called_once()
     assert any(call["method"] == "clear_property_diff" for call in property_view.get_calls())
+
+
+def test_restore_document_focuses_history_window_after_successful_restore() -> None:
+    """Successful single-file restore refocuses history host window."""
+    _, _, _, presenter = _make_presenter()
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._current_history_selection = HistorySelection(item_kind="STAGING", commit_hash=None)
+    presenter._restore_handler = MagicMock()
+    presenter._restore_handler.restore_document.return_value = True
+    focused: list[bool] = []
+    presenter._focus_history_window_callback = lambda: focused.append(True)
+
+    presenter.restore_document("doc.FCStd")
+
+    assert focused == [True]
 
 
 def test_clear_doc_diff_clears_document_and_property_panels() -> None:
@@ -254,6 +270,29 @@ def test_restore_all_from_history_clears_property_diff_after_handler_call() -> N
 
     presenter._restore_handler.restore_all.assert_called_once_with(presenter._application_state.git_repository, selection)
     assert any(call["method"] == "clear_property_diff" for call in property_view.get_calls())
+
+
+@pytest.mark.parametrize(
+    "selection",
+    [
+        HistorySelection(item_kind="STAGING", commit_hash=None),
+        HistorySelection(item_kind="COMMIT", commit_hash="abc123"),
+    ],
+)
+def test_restore_all_from_history_focuses_history_window_after_success(
+    selection: HistorySelection,
+) -> None:
+    """Successful bulk restore refocuses history window for both UI entry points."""
+    _, _, _, presenter = _make_presenter()
+    presenter._application_state.git_repository = GitRepository(name="repo", absolute_path="/home/user/dir/repo")
+    presenter._restore_handler = MagicMock()
+    presenter._restore_handler.restore_all.return_value = True
+    focused: list[bool] = []
+    presenter._focus_history_window_callback = lambda: focused.append(True)
+
+    presenter.restore_all_from_history(selection)
+
+    assert focused == [True]
 
 
 def test_visual_diff_click_delegates_to_visual_diff_handler() -> None:

@@ -206,7 +206,11 @@ if Gui is not None:
 
                 # Compose UI and register presenters globally
                 # Application state is pre-created during container init; passed in here
-                view = compose_and_register_panel(_container, ui_registry.application_state)
+                view = compose_and_register_panel(
+                    _container,
+                    ui_registry.application_state,
+                    self._focus_diff_panel_deferred,
+                )
 
                 # Add as MDI subwindow
                 self._subwindow = mdi_area.addSubWindow(view)
@@ -215,10 +219,6 @@ if Gui is not None:
                 self._subwindow.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose, True)
                 self._subwindow.resize(900, 600)
                 self._subwindow.show()
-
-                diff_presenter = ui_registry.diff_presenter
-                if diff_presenter is not None:
-                    diff_presenter.set_focus_history_window_callback(self._focus_diff_panel_deferred)
 
                 # Connect window close cleanup
                 self._subwindow.destroyed.connect(self._on_subwindow_closed)

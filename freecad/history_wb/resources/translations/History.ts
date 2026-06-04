@@ -298,8 +298,33 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../ui/views/history/history_list.py" line="141"/>
+        <source>Mark All Files Reviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../ui/views/history/history_list.py" line="149"/>
         <source>Remove document(s) from Reviewed. The current file(s) stay unchanged and will not be saved in the next iteration until reviewed again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/history_list.py" line="156"/>
+        <source>Remove All Files From Reviewed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/history_list.py" line="157"/>
+        <source>Restore All Reviewed Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/history_list.py" line="171"/>
+        <source>Restore All Files From Iteration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/history/history_list.py" line="172"/>
+        <source>Copy Iteration ID to Clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -412,31 +437,6 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/history/history_list.py" line="141"/>
-        <source>Mark All Reviewed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/history/history_list.py" line="156"/>
-        <source>Restore reviewed files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/history/history_list.py" line="157"/>
-        <source>Remove All from Reviewed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/history/history_list.py" line="171"/>
-        <source>Restore all files from iteration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/history/history_list.py" line="172"/>
-        <source>Copy iteration ID to clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../ui/views/history/formatters.py" line="27"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
@@ -532,7 +532,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../entrypoints/workbench.py" line="213"/>
+        <location filename="../../entrypoints/workbench.py" line="217"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
