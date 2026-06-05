@@ -176,7 +176,7 @@ Log.error("Snapshot could not be loaded")
 Behavior:
 
 - Before FreeCAD initialization, logging falls back to stdout/stderr.
-- After workbench initialization, logs go through `FreeCADLogger` to the FreeCAD console.
+- After first workbench activation, logs go through `FreeCADLogger` to the FreeCAD console.
 - Tests can install `FakeLogger` with `set_logger()`.
 - Log messages are developer-facing and do not need translation.
 

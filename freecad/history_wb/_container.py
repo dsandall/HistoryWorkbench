@@ -20,11 +20,10 @@ else:
 
 
 # Module-level variable for entry point compatibility.
-# This can be set by tests or by workbench.Initialize().
-# IMPORTANT: _container is set by workbench.Activated() on first activation (deferred
-# from Initialize() for faster startup). It can also be set by tests via set_container()
-# before importing entry
-# points. Initialized to None for module loading, but guaranteed to be set before
+# This can be set by tests or by first workbench activation.
+# IMPORTANT: _container is set by workbench.Activated() on first activation. It can
+# also be set by tests via set_container() before importing entry points. Initialized
+# to None for module loading, but guaranteed to be set before
 # any command execution occurs during normal FreeCAD operation.
 _container: ApplicationContainer | None = None
 

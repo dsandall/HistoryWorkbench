@@ -27,5 +27,5 @@ if Gui is not None:
     # Check Python and FreeCAD version compatibility
     check_python_and_freecad_version()
 
-    # Register workbench (container creation happens in workbench.Initialize())
+    # Register workbench; container creation happens on first workbench activation.
     Gui.addWorkbench(HistoryWorkbench())

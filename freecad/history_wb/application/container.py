@@ -59,8 +59,8 @@ __all__ = [
 class ApplicationContainer:
     """Holds all wired application layer dependencies ONLY.
 
-    This container is created at workbench Initialize() time,
-    BEFORE any GUI components exist. It contains only:
+    This container is created during first workbench activation,
+    before panel GUI components exist. It contains only:
     - Actions (application layer - API endpoint handlers)
     - Domain services
     - Ports/Repositories
@@ -137,8 +137,8 @@ class ApplicationContainer:
 def create_application_container(ctx: FreeCadContext) -> ApplicationContainer:
     """Wire ONLY application layer dependencies.
 
-    No UI components are created here - this runs before GUI exists.
-    ApplicationState is created by the workbench during container initialization.
+    No UI components are created here. ApplicationState is created by the
+    workbench during container initialization.
 
     Args:
         ctx: FreeCAD runtime context

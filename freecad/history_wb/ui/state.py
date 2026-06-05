@@ -21,7 +21,7 @@ class ApplicationState:
     by presenters and commands but never by domain or application layer components.
 
     This class stores the currently detected GitRepository.
-    Created once at workbench initialization and reused across all entry points.
+    Created once during first workbench activation and reused across all entry points.
     Survives diff-panel close cycles and is accessible to commands even when
     the panel is closed.
 

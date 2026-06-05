@@ -68,7 +68,7 @@ _logger: LoggerProtocol = StdoutLogger()
 def set_logger(logger: LoggerProtocol) -> None:
     """Set the global logger instance.
 
-    This should be called once during application startup (in workbench.Initialize()).
+    This should be called once during first workbench activation.
     After initialization, all logging calls will use the configured logger.
 
     Args:

@@ -11,9 +11,9 @@ History Workbench uses a layered architecture with domain-driven and ports-and-a
 - External systems are represented through ports. Real FreeCAD, git, YAML, and filesystem implementations live in infrastructure; tests usually use fakes.
 - FreeCAD startup work stays minimal. The workbench registers commands first, then creates the diff panel when activated or opened.
 
-## Desktop Layer Model
+## Desktop Call Flow
 
-History Workbench is a desktop FreeCAD workbench hosted inside another application. Use the project layer names when deciding where code belongs.
+History Workbench is a desktop FreeCAD workbench hosted inside another application. These flows show how host callbacks move through project layers; use the layer names below when deciding where code belongs.
 
 ```text
 FreeCAD command/workbench callback -> entry point -> WorkbenchCommandPresenter or application action
@@ -37,15 +37,19 @@ FreeCAD loads init_gui.py
         v
 Workbench.Initialize()
         |
+        |-- register FreeCAD commands
+        |-- register toolbar and menu
+        v
+First Workbench.Activated()
+        |
         |-- create FreeCAD runtime context
         |-- create ApplicationContainer
+        |-- configure Log with FreeCADLogger
         |-- create and register ApplicationState
         |-- create and register WorkbenchCommandPresenter
-        |-- configure Log with FreeCADLogger
-        |-- register FreeCAD commands
-        |-- register preferences page
+        |-- configure and register preferences page
         v
-Workbench.Activated() or Open Diff Window command
+Workbench.Activated() or Open Diff Window command after activation
         |
         v
 compose_and_register_panel(container, application_state)
@@ -69,7 +73,7 @@ Location: `freecad/history_wb/entrypoints/`
 
 Entry points integrate with FreeCAD's workbench and command APIs. They are driving adapters from the host desktop application into History Workbench.
 
-- `workbench.py` defines `HistoryWorkbench`, registers toolbars/menus, creates the application container, registers preferences, and opens the diff panel.
+- `workbench.py` defines `HistoryWorkbench`, registers toolbars/menus, lazily creates the application container, registers preferences, and opens the diff panel.
 - `commands.py` defines FreeCAD command classes and delegates work to `WorkbenchCommandPresenter` or application actions.
 - Entry points may access the global container through `freecad/history_wb/_container.py`.
 - Entry points should stay thin. They translate FreeCAD callbacks into application or UI calls.
@@ -81,7 +85,7 @@ Location: `freecad/history_wb/ui/`
 
 The UI layer owns presenter state, Qt views, dialog flow, display feedback, signal wiring, and UI-only session state.
 
-- `composer.py` is UI composition root. Creates views and presenters, consuming a pre-created `ApplicationState`.
+- `composer.py` composes app-scoped command presenters and panel-scoped views/presenters, consuming a pre-created `ApplicationState`.
 - `wiring.py` binds public widget/component signals to presenter listener methods.
 - `state.py` stores application-scoped `ApplicationState` such as detected `GitRepository`. Survives panel close and is accessible to commands even when the panel is closed.
 - `registry.py` stores globally reachable `ApplicationState`, app-scoped `WorkbenchCommandPresenter`, and nullable panel-scoped presenters.
@@ -251,7 +255,7 @@ History Workbench has two composition roots.
 
 ### Application Composition
 
-`workbench.Initialize()` creates the FreeCAD runtime context and calls `create_application_container(ctx)`. The container wires:
+On first `workbench.Activated()`, `_initialize_container()` creates the FreeCAD runtime context and calls `create_application_container(ctx)`. The container wires:
 
 - FreeCAD adapters
 - git adapter and git service
@@ -260,7 +264,7 @@ History Workbench has two composition roots.
 - diff engine
 - application actions
 
-The container is stored through `set_container()` so FreeCAD command instances can access it at execution time.
+The container is stored through `set_container()` so FreeCAD command instances can access it at execution time. `workbench.Initialize()` stays lightweight: it registers commands, toolbar, and menu only.
 
 ### UI Composition
 
@@ -270,7 +274,7 @@ The container is stored through `set_container()` so FreeCAD command instances c
 - `DiffPresenter`
 - `GitRepositoryPresenter`
 
-`ApplicationState` and `WorkbenchCommandPresenter` are created externally during workbench/container initialization. The command presenter is registered in the UI registry before composition, and the composer fetches it to pass into `GitRepositoryPresenter`. This keeps both state and command flows alive across panel open/close cycles.
+`ApplicationState` and `WorkbenchCommandPresenter` are created during first activation before panel composition. The command presenter is registered in the UI registry before composition, and the composer fetches it to pass into `GitRepositoryPresenter`. This keeps both state and command flows alive across panel open/close cycles.
 
 It then registers UI objects in `ui_registry` for command access. UI composition happens when the diff panel is created, not during initial FreeCAD module import.
 
@@ -368,6 +372,5 @@ Direct file imports are acceptable when a symbol is not part of a package API or
 | Port | Protocol that describes an external dependency. |
 | Presenter | UI coordinator that turns application results into view updates. |
 | Snapshot | Text-friendly representation of a FreeCAD document's model state. |
-| ApplicationState | Session state owned by the UI layer, such as detected repository. |
-| ApplicationState | Application-scoped state shared across entry points and UI. Survives panel close. |
+| ApplicationState | Application-scoped UI state, such as detected repository, shared across entry points and UI. Survives panel close. |
 | Handler | Focused workflow class inside presenter subdirectories. Owns multi-step dialog flows and action orchestration for a single use case. |
