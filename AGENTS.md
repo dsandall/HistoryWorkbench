@@ -21,7 +21,7 @@
 - Encode invariants in types and function signatures: if `None` is not valid, do not use optional return types. Validate preconditions at entry points, then keep inner helpers strict and non-optional.
 - All user-facing English words and phrases must use `translate("History", "...")` literals at display sites, or `QT_TRANSLATE_NOOP` with correct context when deferred (command `GetResources()` uses exact command context; workbench labels use `Workbench`; property descriptions use `App::Property`). Logs do not require translation.
 - When changing user-facing text, run `task translate` before the completion of your work.
-- Read the `docs/Architecture.md` guidelines when planning new features.
+- Read the `docs/development/Architecture.md` guidelines when planning new features.
 - Do not remove useful line comments when refactoring
 - DO add comments for all public functions/methods, and private/internal methods when their name doesn't describe their logic well enough
 - Add comments on if-statements and other code-path decisions, when semantics are not immediately clear

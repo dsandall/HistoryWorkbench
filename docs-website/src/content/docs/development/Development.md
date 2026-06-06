@@ -1,6 +1,11 @@
-# Development Guidelines
+---
+title: Development Guidelines
+description: Guidelines for making maintainable changes to History Workbench, including UI terminology, code style, and testing conventions.
+sidebar:
+    order: 3
+---
 
-This guide describes how to make maintainable changes to History Workbench. For environment setup, see [Development Setup](DevSetup.md). For system structure, see [Architecture](Architecture.md).
+This guide describes how to make maintainable changes to History Workbench.
 
 ## UI Terminology Mapping
 
@@ -315,10 +320,3 @@ Use the extracted AppImage runtime for live API checks:
 ```
 
 The `FreeCADGui` module is not generally available through `run_with_freecad.sh`. GUI behavior often needs manual FreeCAD testing or integration tests that run through FreeCAD's runtime.
-
-## Additional Resources
-
-- [Development Setup](DevSetup.md)
-- [Architecture](Architecture.md)
-- [FreeCAD preferences page API exploration](api-exploration/freecad-preferences-page-api.md)
-- [FreeCAD document structure exploration](api-exploration/document-structure.md)

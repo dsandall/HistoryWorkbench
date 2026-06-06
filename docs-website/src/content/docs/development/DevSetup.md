@@ -1,5 +1,9 @@
-# Development Setup
-
+---
+title: Development Setup
+description: Install dependencies, connect your checkout to FreeCAD, and configure runtime scripts for local development.
+sidebar:
+    order: 1
+---
 This guide sets up History Workbench for local development. It installs Python dependencies, connects the checkout to FreeCAD, and configures the FreeCAD runtime scripts used by tests and API exploration.
 
 ## Prerequisites
@@ -8,9 +12,7 @@ This guide sets up History Workbench for local development. It installs Python d
 - Git
 - `uv`
 - `task`
-- Python 3.11 for the local development environment
-
-History Workbench integration tests use FreeCAD's bundled Python 3.11 on Linux. That is separate from the local `uv` environment.
+- Python 3.11 for the local development environment (matches FreeCAD's bundled Python)
 
 ## Clone The Repository
 

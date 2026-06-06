@@ -1,4 +1,7 @@
-# Concepts
+---
+title: Concepts
+description: This page details the foundational concepts of FreeCAD, document snapshots, and version control for those who have never worked with it before.
+---
 
 ## Intro
 

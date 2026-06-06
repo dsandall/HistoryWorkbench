@@ -1,5 +1,7 @@
-# In-Depth Document Diff And Staging Testing
-
+---
+title: In-Depth Document Diff And Staging Testing
+description: In-depth manual test plan for document diff behavior across working tree, staging, and commit modes with a reusable git repository.
+---
 This plan creates one reusable git repository that exercises document diff behavior across working tree, staging, and commit modes, plus staging behavior for snapshots and deleted files. The flow is designed so one repository can be kept and reused for regression checks after code changes.
 
 It includes testing snapshot error scenarios, such as snapshot missing or corrupted, and how diffs behave in each.

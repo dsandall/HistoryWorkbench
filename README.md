@@ -224,6 +224,6 @@ History Workbench still needs to be used to mark FreeCAD documents as **Reviewed
 
 This workbench is made for all FreeCAD users. Please open an issue to report bugs, confusing comparisons, setup problems, documentation gaps, or feature requests. Development so far has happened on Linux, so additional platform setup notes and test instructions are also welcome as contributions.
 
-- [Development setup](docs/DevSetup.md): Set up a live FreeCAD workbench checkout, install dependencies, and configure the FreeCAD AppImage runtime for tests.
-- [Development guidelines](docs/Development.md): Coding standards, testing strategy, logging, translations, dependency injection, and common contributor workflows.
-- [Architecture](docs/Architecture.md): Layer responsibilities, runtime flow, composition roots, and snapshot/comparison pipeline.
+- [Development setup](docs/development/DevSetup.md): Set up a live FreeCAD workbench checkout, install dependencies, and configure the FreeCAD AppImage runtime for tests.
+- [Development guidelines](docs/development/Development.md): Coding standards, testing strategy, logging, translations, dependency injection, and common contributor workflows.
+- [Architecture](docs/development/Architecture.md): Layer responsibilities, runtime flow, composition roots, and snapshot/comparison pipeline.

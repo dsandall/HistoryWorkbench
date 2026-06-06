@@ -1,4 +1,7 @@
-# 1-Minute Quick-Start
+---
+title: 1-Minute Quick-Start
+description: Don't have time? Start here.
+---
 
 Don't have time? Start here.
 

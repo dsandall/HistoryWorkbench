@@ -1,6 +1,7 @@
-# Getting Started
-
-## Recommended: Turn Off Document Compression
+---
+title: First Steps
+description: Actionable steps to get started with the History Workbench
+---
 
 Before initializing a project, it's recommended to turn off file compression. FreeCAD documents are binary files by default, which means small model edits can produce large file changes. Turning off file compression results in larger files on disk, but smaller overall disk usage when saving iterations over time, as only the differences between files need to be stored each time.
 
@@ -64,4 +65,4 @@ Now you are ready to work on your project.
 
 ### Existing Git Project
 
-If you already use git in your project and want to start using the workbench, you need to create a baseline commit that contains all the snapshots for your FreeCAD documents. Simply follow the steps from "Existing Project" above, starting at step 3, [3. Open All Project Documents](#3-open-all-project-documents).
+If you already use git in your project and want to start using the workbench, you need to create a baseline commit that contains all the snapshots for your FreeCAD documents. Simply follow the steps from "Existing Project" above, starting at step 3.

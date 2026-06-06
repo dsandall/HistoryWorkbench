@@ -1,4 +1,9 @@
-# Installation
+---
+title: Installation
+description: How to install the workbench.
+---
+
+## Addon Manager
 
 History Workbench is available in the FreeCAD Addon Manager.
 
@@ -13,3 +18,8 @@ If you frequently use the workbench, you may find it helpful to position the His
 
 - Open workbench preferences from Edit -> Preferences -> Workbenches in the left side menu
 - Find History in the list, and draw it toward the top of the workbench list.
+
+## Development Installation
+
+If you'd like to contribute code to the History addon, follow the setup procedure in the [development docs](../development/DevSetup.md).
+

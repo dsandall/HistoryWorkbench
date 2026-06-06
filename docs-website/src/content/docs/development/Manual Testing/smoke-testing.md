@@ -1,5 +1,7 @@
-# List of Features For Testing
-
+---
+title: Smoke Testing
+description: Checklist of features to verify manually, covering project detection, initialization, git identity, and iteration operations.
+---
 ## Project Detection
 
 - Detect project from open FreeCAD documents on workbench activation

@@ -1,5 +1,9 @@
-# Architecture
-
+---
+title: Architecture
+description: Layered architecture with domain-driven and ports-and-adapters patterns for the History Workbench project.
+sidebar:
+    order: 2
+---
 History Workbench uses a layered architecture with domain-driven and ports-and-adapters patterns. The goal is to keep FreeCAD, Qt, git, and filesystem details at the edges while core CAD-history behavior remains understandable and testable.
 
 ## Design Principles
