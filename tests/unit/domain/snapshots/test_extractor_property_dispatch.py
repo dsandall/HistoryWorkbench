@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for _extract_property_value function verifying it uses
 # the new Property.from_freecad API with expression maps instead of the legacy API.
 """Tests for extractor property dispatch using new Property.from_freecad API."""

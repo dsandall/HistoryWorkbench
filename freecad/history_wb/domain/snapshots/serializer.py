@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Snapshot serialization/deserialization domain port contracts.
 """Snapshot serialization/deserialization port contracts."""
 

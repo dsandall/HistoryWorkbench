@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for open-all-repository-documents FreeCAD command entry point.
 """Unit tests for _OpenAllDocumentsInRepositoryCommand."""
 

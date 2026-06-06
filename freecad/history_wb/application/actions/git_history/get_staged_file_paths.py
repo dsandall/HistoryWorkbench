@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for getting list of staged FCStd files.
 """Application action for getting staged file paths."""
 

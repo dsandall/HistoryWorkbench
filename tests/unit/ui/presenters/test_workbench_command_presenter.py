@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for WorkbenchCommandPresenter.
 # These tests verify that the presenter correctly delegates to its handler
 # instances, shows no-project warnings when no repo is set, and creates

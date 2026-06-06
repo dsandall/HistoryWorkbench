@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GetOpenEligibleDocumentsAction using fake
 # FreeCAD and Git service implementations. Tests cover success scenarios, empty
 # results, and filtering behavior.

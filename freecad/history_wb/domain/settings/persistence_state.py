@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Defines persistence-state contracts for diff settings
 # editing flows across application, UI, and infrastructure layers.
 """Persistence-state contracts for diff settings preferences."""

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Pytest configuration and shared fixtures for Diff Workbench tests,
 # including mock FreeCAD app, GUI, context fixtures, and fake implementations for testing.
 """Pytest configuration and shared fixtures for Diff Workbench tests."""

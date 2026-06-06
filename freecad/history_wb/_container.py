@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: Container helper module for entry point tests.
 """Container helper module for testable entry points.
 

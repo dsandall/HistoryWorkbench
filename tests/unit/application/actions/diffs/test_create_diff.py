@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for CreateDiffAction using fake DiffEngine.
 # Tests cover success scenarios and error handling.
 """Unit tests for CreateDiffAction."""

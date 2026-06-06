@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides the FindActiveGitRepositoryAction class
 # which is responsible for finding the active git repository from open FreeCAD documents.
 # It iterates through all open documents, skipping unsaved ones, and uses GitService

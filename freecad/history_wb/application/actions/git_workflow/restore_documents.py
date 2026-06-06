@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Restore FreeCAD documents from commit/index into
 # working tree and recover FreeCAD open-document state.
 """Application action for destructive document restore from history sources."""

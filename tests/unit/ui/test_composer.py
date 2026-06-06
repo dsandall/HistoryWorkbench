@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Verify UI composer wiring, registration, and constructed dependencies.
 
 from unittest.mock import MagicMock, patch

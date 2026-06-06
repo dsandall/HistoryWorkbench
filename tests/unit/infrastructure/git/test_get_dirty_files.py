@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitPortAdapter.get_dirty_files method.
 # This module verifies dirty FCStd classification into DirtyFile records and
 # filtering of staged-only and non-FCStd entries.

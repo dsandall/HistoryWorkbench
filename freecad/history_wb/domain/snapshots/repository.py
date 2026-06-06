@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module defines the SnapshotRepository protocol (interface)
 # for snapshot persistence and provides an InMemorySnapshotRepository implementation.
 # It also includes the SnapshotMetadata dataclass for snapshot metadata.

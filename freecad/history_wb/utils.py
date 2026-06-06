@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Utility functions and classes for the Diff Workbench.
 """Utility functions and classes for the Diff Workbench.
 

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Preferences page UI for editing diff settings and saving/loading via application actions.
 """Diff settings preferences page for FreeCAD preferences dialog."""
 

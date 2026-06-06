@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for getting eligible open documents.
 # This module provides the GetOpenEligibleDocumentsAction which retrieves all
 # open FreeCAD documents and filters them to those within the git repository.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module contains git domain dataclasses that represent
 # repositories, identities, initialization candidates, and commits. These are core domain
 # models with no external dependencies.

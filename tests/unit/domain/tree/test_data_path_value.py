@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for PropertyPathValue including factory creation
 # from Python values and precision-based float equality behavior.
 """Unit tests for PropertyPathValue class."""

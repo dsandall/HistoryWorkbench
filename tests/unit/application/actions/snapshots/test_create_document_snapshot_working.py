@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for CreateDocumentSnapshotForWorkingTreeAction using fake
 # FreeCAD and Git service implementations. Tests cover success scenarios, failure when
 # document not in git repo, and correct git_path, document_name, and nodes handling.

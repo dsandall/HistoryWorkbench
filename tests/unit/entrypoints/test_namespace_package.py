@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Ensures the freecad/ directory remains a namespace package
 # without an __init__.py file, preventing shadowing of FreeCAD's internal freecad package.
 """Tests for build and deployment configuration."""

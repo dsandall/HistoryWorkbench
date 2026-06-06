@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for creating snapshot from git commit or index.
 """Application action for creating snapshot from a git commit or index."""
 

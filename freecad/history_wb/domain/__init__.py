@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: Domain layer containing core business logic
 # including tree models, snapshot management, diff computation engines,
 # and port interfaces for external system interactions.

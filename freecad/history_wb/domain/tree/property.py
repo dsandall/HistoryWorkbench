@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: DataPath-based Property wrapper for path-based property values.
 """DataPath-based Property wrapper for path-based property values.
 

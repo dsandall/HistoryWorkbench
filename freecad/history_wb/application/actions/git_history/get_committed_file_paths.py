@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for getting FCStd file paths changed in a commit.
 """Application action for getting FCStd file paths changed in a commit."""
 

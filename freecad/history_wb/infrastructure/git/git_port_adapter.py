@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides the GitPortAdapter class that implements
 # the GitPort protocol using git CLI via subprocess. It handles git repository
 # detection, commit listing, file staging, commit creation, and committed file path

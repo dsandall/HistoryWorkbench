@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for preferences page UI behavior and save/load wiring.
 """Tests for Diff settings preferences page behavior."""
 

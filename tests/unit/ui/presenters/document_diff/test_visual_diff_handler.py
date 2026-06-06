@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for document-diff visual diff handler.
 
 from __future__ import annotations

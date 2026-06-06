@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: This module provides git domain models and contracts,
 # including repository representations, initialization candidates, git paths,
 # the GitPort protocol, and the GitService orchestration helpers.

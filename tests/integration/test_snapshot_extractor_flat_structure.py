@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Integration test for SnapshotExtractor BasicFile.FCStd snapshot contract.
 # Verifies the complete flat node structure produced by extracting the canonical test document.
 """Integration test for SnapshotExtractor BasicFile.FCStd snapshot contract."""

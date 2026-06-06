@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Global registry for UI components.
 # Provides thread-safe access to application state, app-scoped command presenter,
 # and nullable panel-scoped presenters from entry points without tight coupling

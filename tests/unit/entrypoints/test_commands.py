@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for FreeCAD command entry points.
 # These tests verify that commands delegate to ui_registry.workbench_command_presenter
 # for shared command flows, keeping them usable after the diff panel is closed.

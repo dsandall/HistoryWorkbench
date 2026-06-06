@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitRepository frozen dataclass contracts.
 """Unit tests for the GitRepository model."""
 

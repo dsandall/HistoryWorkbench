@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: This module provides the core snapshot domain models including
 # Snapshot, SnapshotRepository protocol, and InMemorySnapshotRepository implementation.
 # It also provides utility functions like get_snapshot_yaml_path_for_document for

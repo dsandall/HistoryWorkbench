@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitPortAdapter restore/query methods.
 """Unit tests for git restore and FCStd path queries."""
 

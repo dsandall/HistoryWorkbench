@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: Ultra-thin GUI initialization module that only sets up translation
 support, performs version checks, provides runtime context, and registers the HistoryWorkbench
 class with FreeCAD. No container creation, no command registration, no global state manipulation."""

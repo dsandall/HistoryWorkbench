@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Efficient snapshot occurrence comparison using normalized
 # object/occurrence structures. Compares two document snapshots and produces a
 # hierarchical structure of NodeDiff objects representing added, deleted, and modified nodes.

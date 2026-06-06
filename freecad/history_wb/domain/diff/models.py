@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides models for representing the differences between two
 # document snapshots, including property-level, node-level, and path-level comparisons.
 #

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Provides utilities for locating package resources
 # including icons, UI files, and translation files.
 """Resource path management for the Diff Workbench."""

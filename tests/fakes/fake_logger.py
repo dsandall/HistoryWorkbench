@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Fake logger implementation that captures log messages for testing
 # verification without relying on FreeCAD Console or standard logging.
 """Fake logger implementation for testing."""

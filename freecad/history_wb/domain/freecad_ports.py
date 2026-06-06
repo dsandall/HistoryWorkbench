@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Port interfaces for the Diff Workbench.
 # This module defines all Protocol interfaces (contracts) for external system
 # interactions. These interfaces belong in the domain layer so that application

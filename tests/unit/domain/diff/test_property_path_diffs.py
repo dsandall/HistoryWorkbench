@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for PropertyPathDiff public behavior including
 # value/expression state calculation and precision-aware float comparison.
 """Tests for PropertyPathDiff public behavior."""

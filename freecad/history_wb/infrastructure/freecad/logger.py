@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: FreeCAD logger implementation using FreeCadPort.
 
 This module provides a FreeCADLogger class that wraps FreeCadPort to provide

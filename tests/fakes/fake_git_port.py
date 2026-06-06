@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Fake GitPort implementation for testing git repository detection
 # and commit retrieval. This provides an in-memory simulation of git operations
 # without requiring actual git repositories or subprocess calls.

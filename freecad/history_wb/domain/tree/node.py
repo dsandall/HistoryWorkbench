@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module contains the TreeNode class, which represents
 # a node in the FreeCAD document tree structure. It is used by both the snapshot
 # and diff domains to represent document objects in a flat structure.

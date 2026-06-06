@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Open one FreeCAD document in the runtime session.
 """Application action for opening one document in FreeCAD."""
 

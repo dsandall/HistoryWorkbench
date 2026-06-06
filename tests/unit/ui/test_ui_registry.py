@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for UIRegistry.
 # These tests verify that the UIRegistry correctly manages presenter registration,
 # application state, and provides proper error handling when components are not initialized.

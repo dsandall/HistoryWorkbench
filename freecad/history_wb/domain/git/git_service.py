@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides the GitService class which combines
 # GitPort interface with GitRepository model creation. It is responsible for
 # providing a convenient method to get GitRepository objects from file or

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Git path helpers that normalize repository-relative paths
 # across operating systems while preserving Git's POSIX-style path convention.
 """Git path normalization helpers."""

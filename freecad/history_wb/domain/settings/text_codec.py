@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Shared parsing and serialization helpers for line-based
 # Diff Workbench settings text persisted in preferences and edited in UI.
 """Shared codecs for line-based settings text formats."""

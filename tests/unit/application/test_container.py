@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for dependency injection container composition.
 
 from freecad.history_wb.application.container import (

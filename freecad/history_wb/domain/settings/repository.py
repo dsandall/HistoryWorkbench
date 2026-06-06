@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Defines domain repository Protocols for reading effective
 # diff settings and reading/writing raw persistence state.
 """Settings repository interface (port)."""

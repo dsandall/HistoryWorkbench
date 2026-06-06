@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for UnstageDocumentsAction behavior and path expansion.
 """Unit tests for unstage_documents action."""
 

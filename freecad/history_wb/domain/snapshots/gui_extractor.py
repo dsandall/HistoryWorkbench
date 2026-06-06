@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module contains the SnapshotExtractor class which extracts
 # tree structure from FreeCAD documents and converts them to Snapshot domain models.
 # It uses FreeCAD GUI-level claimChildren() API via injected GuiLike.

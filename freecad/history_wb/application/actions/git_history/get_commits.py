@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides the GetCommitsAction class which is
 # responsible for retrieving git commits from a repository. It uses GitService
 # to fetch commits and returns them as a Result.

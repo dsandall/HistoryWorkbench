@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for snapshot path computation functions.
 """Unit tests for snapshot YAML path computation."""
 

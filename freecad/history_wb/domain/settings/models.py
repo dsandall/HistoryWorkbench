@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Defines the Settings dataclass containing user
 # configuration for diff computation including excluded types, properties,
 # and type-specific property exclusions.

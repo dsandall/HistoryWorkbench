@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides hard-coded configuration defaults for the
 # diff workbench, including excluded types, excluded properties, and float precision.
 # These values serve as fallback defaults when no user preferences are configured.

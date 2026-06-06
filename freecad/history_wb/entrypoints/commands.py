@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: FreeCAD command entry points for the Diff Workbench.
 # Commands delegate to the app-scoped WorkbenchCommandPresenter for shared
 # command flows, keeping them usable after the diff panel is closed.

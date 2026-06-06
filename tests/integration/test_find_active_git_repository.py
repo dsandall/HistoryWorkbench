@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Integration tests for the FindActiveGitRepositoryAction.
 # These tests verify that the action correctly detects git repositories using
 # the actual FreeCAD runtime and git CLI.

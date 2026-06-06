@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for Git path normalization helpers.
 """Unit tests for Git path helpers."""
 

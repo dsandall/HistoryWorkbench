@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: YAML serialization and deserialization for normalized
 # Snapshot objects using DataPath-based Property model.
 """YAML persistence for snapshot storage and retrieval."""

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for round-trip serialization/deserialization of
 # all DataPath types through their serialize() and from_serialized_value() methods.
 """Unit tests for DataPath round-trip serialization."""

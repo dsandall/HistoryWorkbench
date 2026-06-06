@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action orchestrating document-level diff results by mode.
 """Application action for document-level diff orchestration."""
 

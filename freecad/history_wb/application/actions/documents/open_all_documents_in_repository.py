@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Open all FreeCAD documents in a detected repository.
 """Application action for opening all .FCStd documents in a repository."""
 

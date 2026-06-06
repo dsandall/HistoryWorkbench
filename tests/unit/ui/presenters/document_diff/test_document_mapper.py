@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for pure document-diff presentation mapping helpers.
 
 from freecad.history_wb.application.actions.result_models import (

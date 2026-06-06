@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for opening all FreeCAD documents in repository action.
 """Unit tests for OpenAllDocumentsInRepositoryAction."""
 

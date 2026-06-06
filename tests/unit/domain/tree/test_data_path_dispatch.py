@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for data_path dispatch functions including
 # Python type dispatch and unknown type fallback behavior.
 """Unit tests for data_path dispatch functions."""

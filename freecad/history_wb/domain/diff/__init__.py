@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: Diff subdomain containing diff engine, comparators,
 # and diff result models for comparing document snapshots.
 """Diff domain module."""

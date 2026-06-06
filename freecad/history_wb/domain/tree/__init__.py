@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: Exports all tree-related domain models including
 # TreeNode, the DataPath-based Property wrapper, and the DataPath hierarchy
 # (PrimitiveData, VectorData, RotationData, PlacementData,

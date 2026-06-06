@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module contains unit tests for the GitPortAdapter.get_committed_files()
 # method. Tests use subprocess mocking to verify git diff-tree output parsing without
 # actual git commands, ensuring reliable and fast test execution.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for unstaging reviewed documents from git index only.
 """Application action for removing reviewed documents from git staging."""
 

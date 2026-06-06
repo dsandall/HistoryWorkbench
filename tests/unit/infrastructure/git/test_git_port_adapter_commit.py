@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module contains unit tests for GitPortAdapter commit and identity methods.
 # Tests use subprocess mocking to verify git commit invocation, error handling,
 # and logging behavior without actual git commands.

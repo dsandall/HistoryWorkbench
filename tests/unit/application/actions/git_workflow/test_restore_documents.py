@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for restore_documents action orchestration and restore scopes.
 """Unit tests for RestoreDocumentsAction."""
 

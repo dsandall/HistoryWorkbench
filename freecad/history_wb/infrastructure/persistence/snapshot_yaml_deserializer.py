@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Infrastructure adapter implementing snapshot YAML deserialization port.
 """Infrastructure snapshot deserializer backed by SnapshotYamlSerializer."""
 

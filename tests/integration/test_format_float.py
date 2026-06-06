@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Integration tests for Qt-backed float formatting.
 
 import pytest

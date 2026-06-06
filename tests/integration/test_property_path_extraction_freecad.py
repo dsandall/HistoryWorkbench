@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Integration tests for FreeCAD property path extraction.
 # Tests verify placement nested expressions, constraint item expressions,
 # and quantity primitive dispatch with real FreeCAD runtime.

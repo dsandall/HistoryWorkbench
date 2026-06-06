@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Composes and registers UI components.
 # Provides two composition roots: one for the app-scoped workbench command
 # presenter, and one for the panel-scoped diff panel (views + presenters +

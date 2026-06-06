@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # Module responsibility: Provide fake implementations for testing including FakeLogger,
 # FakeSnapshotRepository, FakeSettingsRepository, FakeDiffEngine, fake UI views,
 # FakeGitPort, MockDocument, and InMemorySnapshotRepository.

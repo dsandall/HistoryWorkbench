@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: Integration tests for property extraction and rendering with real FreeCAD runtime.
 
 Tests verify:

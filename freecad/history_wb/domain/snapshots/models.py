@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Snapshot domain models for normalized snapshot storage
 # with unique object payloads and path-based occurrences.
 """Snapshot domain models."""

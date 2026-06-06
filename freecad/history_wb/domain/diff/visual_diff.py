@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Visual diff port interfaces for BREP diff document creation.
 """Visual diff port interfaces."""
 

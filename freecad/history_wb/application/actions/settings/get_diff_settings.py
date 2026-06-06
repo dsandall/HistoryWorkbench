@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for reading persisted diff settings state.
 """Application action for retrieving diff settings persistence state."""
 

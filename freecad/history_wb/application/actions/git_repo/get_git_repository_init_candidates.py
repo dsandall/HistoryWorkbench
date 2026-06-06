@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Discover saved open-document parent directories and mark
 # which can be initialized as new git repositories.
 """Application action for git repository initialization candidates."""

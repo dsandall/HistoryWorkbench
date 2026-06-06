@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: Integration tests for workbench loading and toolbox behavior."""
 
 from __future__ import annotations

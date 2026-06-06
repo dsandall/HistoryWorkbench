@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for DiffEngine and related domain models including
 # DiffState, PropertyDiff, NodeDiff, and DiffResult.
 """Unit tests for DiffEngine and diff domain models."""

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for FreeCadPortAdapter modified-save behavior.
 """Unit tests for FreeCadPortAdapter.save_document_if_modified."""
 

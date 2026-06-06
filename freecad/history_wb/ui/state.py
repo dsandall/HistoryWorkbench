@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application-scoped state holder (frontend state, like Pinia/Redux).
 # This module contains the ApplicationState dataclass which serves as an in-memory state
 # holder for the UI layer. It stores the currently detected GitRepository and survives

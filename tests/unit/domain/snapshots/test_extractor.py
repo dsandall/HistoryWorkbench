@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for SnapshotExtractor, including tree extraction from
 # documents, nested children (via ViewProvider.claimChildren()), property extraction,
 # and expression handling.

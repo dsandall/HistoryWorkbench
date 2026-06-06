@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: App-scoped UI presenter that owns single instances of
 # command handlers and creates temporary dialogs parented to the FreeCAD main
 # window at call time. This avoids stale Qt references from panel widgets.

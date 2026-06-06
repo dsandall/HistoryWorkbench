@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Presents git repository information and manages commit loading in the UI.
 """Git repository presenter for UI layer."""
 

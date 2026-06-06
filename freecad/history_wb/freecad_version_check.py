@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Validates that running FreeCAD and Python versions meet minimum requirements for the workbench.
 """Runtime version checks for supported FreeCAD and Python versions.
 

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for workbench lifecycle, state registration, and presenter cleanup.
 """Unit tests for HistoryWorkbench."""
 

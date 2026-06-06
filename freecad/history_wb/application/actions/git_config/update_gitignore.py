@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Write and stage repository .gitignore contents.
 """Application action for persisting repository .gitignore content."""
 

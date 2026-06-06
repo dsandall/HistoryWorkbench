@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for document status indicator mapping helpers.
 
 from freecad.history_wb.application.actions.result_models import DiffIssues, GeneralDiffIssue, SnapshotIssue

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for git repository initialization candidate discovery.
 """Unit tests for GetGitRepositoryInitCandidatesAction."""
 

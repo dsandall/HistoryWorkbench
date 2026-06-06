@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for GitRepositoryPresenter.
 # These tests verify that the presenter connects to the command presenter's
 # repository_changed signal and updates the panel UI reactively.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Defines the HistoryWorkbench class that integrates
 # the workbench into FreeCAD's GUI with menus, toolbars, and UI panels.
 # Container initialization is deferred to Activated() for faster startup.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for visual-diff eligibility checks in node mapper.
 
 import pytest

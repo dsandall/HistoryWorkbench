@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Initialize a new git repository in a selected directory
 # after validating it is not already inside an existing repository.
 """Application action for git repository initialization."""

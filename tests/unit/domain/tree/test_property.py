@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for Property class including creation, equality,
 # expression support, serialization roundtrip, and list comparison behavior.
 """Unit tests for the Property class."""

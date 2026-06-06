@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for creating snapshot from working tree document.
 # This module provides the CreateDocumentSnapshotForWorkingTreeAction which creates
 # a Snapshot domain model from a FreeCAD document that is currently open and within

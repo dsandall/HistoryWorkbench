@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for opening one missing document for working-tree comparison.
 """Unit tests for OpenDocumentAction."""
 

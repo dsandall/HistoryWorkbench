@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Path-based domain value classes for deterministic
 # property extraction, expression preservation, and YAML round-trip behavior.
 """Path-based domain value classes for deterministic property extraction,

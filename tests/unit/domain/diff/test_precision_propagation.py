@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for float precision propagation from settings through
 # diff computation. Verifies that runtime precision settings affect float equality
 # comparisons consistently across the comparison stack.

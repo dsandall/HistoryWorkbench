@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Run integration tests using FreeCAD's Python interpreter.
 #
 # This script runs pytest using FreeCAD's Python interpreter instead of the system Python.

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module defines the GitPort protocol interface for git
 # repository operations. It provides a contract for git port implementations that
 # can be used by the domain layer without coupling to specific implementations.

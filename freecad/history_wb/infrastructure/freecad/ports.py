@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: FreeCAD port adapters and factory functions.
 
 This module provides adapter classes and factory functions that implement

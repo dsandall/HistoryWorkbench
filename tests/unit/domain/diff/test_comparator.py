@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for the tree-comparison algorithm with path-based indexing.
 """Unit tests for tree_diff module.
 

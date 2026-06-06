@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for FreeCadPort protocol and adapter implementation.
 # These tests verify that the FreeCadPort interface correctly exposes document operations
 # and that the adapter properly wraps FreeCAD's runtime API.

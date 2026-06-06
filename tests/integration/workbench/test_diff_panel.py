@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """File responsibility: Integration smoke test for HistoryPanelView instantiation and public methods."""
 
 from __future__ import annotations

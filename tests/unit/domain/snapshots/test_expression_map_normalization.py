@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for expression path normalization and expression map
 # building functions used by the gui_extractor to parse FreeCAD ExpressionEngine entries.
 """Tests for expression path normalization and expression map building."""

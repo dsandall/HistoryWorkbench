@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Facade-focused unit tests for DiffPresenter coordinator behavior.
 
 from __future__ import annotations

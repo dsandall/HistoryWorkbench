@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Application action for staging documents to git.
 # This module provides the StageDocumentsAction which persists snapshot YAML files
 # and stages both the original FCStd files and their corresponding YAML snapshots

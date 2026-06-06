@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module provides the DiffEngine class that orchestrates
 # diff computation between two snapshots. It coordinates between TreeComparator
 # and PropertyComparator, applies filtering based on excluded types and properties,

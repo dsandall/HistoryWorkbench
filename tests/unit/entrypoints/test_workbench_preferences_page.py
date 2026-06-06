@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for workbench preference page registration behavior.
 """Tests for HistoryWorkbench preferences page registration."""
 

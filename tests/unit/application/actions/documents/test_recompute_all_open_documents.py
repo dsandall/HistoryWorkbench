@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Tests for recomputing all open FreeCAD documents action.
 """Unit tests for RecomputeAllOpenDocumentsAction."""
 

@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 """Module responsibility: Pytest fixtures for FreeCAD integration tests.
 
 These fixtures provide access to FreeCAD runtime components and help initialize

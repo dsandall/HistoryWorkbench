@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Fake repository implementations for testing that provide in-memory
 # and hardcoded value implementations of SnapshotRepository and SettingsRepository.
 """Fake repository implementations for testing."""

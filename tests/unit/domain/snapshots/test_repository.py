@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: Unit tests for InMemorySnapshotRepository including store creation,
 # snapshot addition/retrieval/deletion, metadata listing, and nested children handling.
 """Unit tests for InMemorySnapshotRepository."""

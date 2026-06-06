@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
 # File responsibility: This module implements the FreeCAD settings persistence model,
 # including mode flags, custom values, initialization markers, and float precision
 # normalization for Diff Workbench preferences stored via FreeCAD ParamGet.
