@@ -21,5 +21,5 @@ If you frequently use the workbench, you may find it helpful to position the His
 
 ## Development Installation
 
-If you'd like to contribute code to the History addon, follow the setup procedure in the [development docs](../development/DevSetup.md).
+If you'd like to contribute code to the History addon, follow the setup procedure in the Development section in the sidebar.
 

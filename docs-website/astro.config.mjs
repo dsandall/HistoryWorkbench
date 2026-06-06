@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 
 // https://astro.build/config
 export default defineConfig({
+    site: 'https://eblanshey.github.io',
+    base: '/HistoryWorkbench',
     vite: {
         server: {
             fs: {
