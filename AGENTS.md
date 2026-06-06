@@ -68,7 +68,7 @@ Write only meaningful, long-term tests. Avoid "dumb tests" that serve no purpose
 
 ## Type Information
 
-FreeCAD type stubs are installed via `uv` at `.venv/lib/python3.12/site-packages/`. Check these `.pyi` files before assuming FreeCAD API behavior or when implementing FreeCAD integration code.
+FreeCAD type stubs are installed via `uv` at `.venv/lib/python3.11/site-packages/`. Check these `.pyi` files before assuming FreeCAD API behavior or when implementing FreeCAD integration code.
 
 ## FreeCAD Runtime
 

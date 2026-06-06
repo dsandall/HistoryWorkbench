@@ -8,7 +8,7 @@ This guide sets up History Workbench for local development. It installs Python d
 - Git
 - `uv`
 - `task`
-- Python 3.12 for the local development environment
+- Python 3.11 for the local development environment
 
 History Workbench integration tests use FreeCAD's bundled Python 3.11 on Linux. That is separate from the local `uv` environment.
 
@@ -161,7 +161,7 @@ Use `run_with_freecad.sh` to inspect FreeCAD's App APIs from the extracted runti
 
 `FreeCADGui` is not generally available through this script. GUI API debugging usually needs instrumentation inside the workbench and a manual FreeCAD run.
 
-FreeCAD type stubs are installed in the local `uv` environment under `.venv/lib/python3.12/site-packages/`. Check those stubs before assuming FreeCAD API signatures.
+FreeCAD type stubs are installed in the local `uv` environment under `.venv/lib/python3.11/site-packages/`. Check those stubs before assuming FreeCAD API signatures.
 
 ## Troubleshooting
 

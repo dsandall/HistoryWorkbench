@@ -306,7 +306,7 @@ task test
 
 ## FreeCAD Runtime Notes
 
-FreeCAD type stubs are installed by `uv` under `.venv/lib/python3.12/site-packages/`. Check them before assuming FreeCAD signatures.
+FreeCAD type stubs are installed by `uv` under `.venv/lib/python3.11/site-packages/`. Check them before assuming FreeCAD signatures.
 
 Use the extracted AppImage runtime for live API checks:
 
