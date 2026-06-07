@@ -14,8 +14,8 @@ def test_show_commits_keeps_special_rows_and_appends_commit_rows(history_panel_w
     history_panel_widget.show_commits([make_commit()])
 
     assert history_panel_widget._history_list.count() == 3
-    assert history_row_text(history_panel_widget._history_list, 0) == "Current Files"
-    assert history_row_text(history_panel_widget._history_list, 1) == "Reviewed"
+    assert history_row_text(history_panel_widget._history_list, 0) == "Current Files Area"
+    assert history_row_text(history_panel_widget._history_list, 1) == "Reviewed Area"
     assert "a1b2c3d" in history_row_text(history_panel_widget._history_list, 2)
 
 
@@ -26,8 +26,8 @@ def test_append_commits_keeps_existing_special_rows(history_panel_widget) -> Non
     history_panel_widget.append_commits([make_commit(commit_id="abc1234", message="Older commit", author="Author")])
 
     assert history_panel_widget._history_list.count() == 3
-    assert history_row_text(history_panel_widget._history_list, 0) == "Current Files"
-    assert history_row_text(history_panel_widget._history_list, 1) == "Reviewed"
+    assert history_row_text(history_panel_widget._history_list, 0) == "Current Files Area"
+    assert history_row_text(history_panel_widget._history_list, 1) == "Reviewed Area"
     assert "Older commit" in history_row_text(history_panel_widget._history_list, 2)
 
 

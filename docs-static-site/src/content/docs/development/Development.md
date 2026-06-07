@@ -16,8 +16,8 @@ The user-facing UI uses CAD-oriented terminology while internal code keeps Git/d
 | Project | Git repository |
 | Iteration | Git commit |
 | Save Iteration | git commit operation |
-| Reviewed | Git staging/index |
-| Current Files | Git working tree |
+| Reviewed Area | Git staging/index |
+| Current Files Area | Git working tree |
 | Tree Comparison | snapshot/tree/property diff |
 | 3D Comparison | visual/BREP diff |
 | History Panel | Diff panel window |

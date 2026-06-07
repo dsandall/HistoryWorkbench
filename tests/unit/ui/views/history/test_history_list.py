@@ -14,7 +14,7 @@ from .conftest import build_fake_menu_class, make_commit
 def test_item_click_emits_user_requested_and_effective_selection_signals(history_list_widget) -> None:  # type: ignore[no-untyped-def]
     """Clicking selection row emits both user-intent and effective-state signals."""
     selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
-    item, widget = create_special_history_item("Current Files", selection)
+    item, widget = create_special_history_item("Current Files Area", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     requested: list[HistorySelection] = []
@@ -31,7 +31,7 @@ def test_item_click_emits_user_requested_and_effective_selection_signals(history
 def test_apply_effective_selection_if_present_sets_current_item_and_emits_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
     """Applying existing selection updates current item and effective-state signal."""
     selection = HistorySelection(item_kind="STAGING", commit_hash=None)
-    item, widget = create_special_history_item("Reviewed", selection)
+    item, widget = create_special_history_item("Reviewed Area", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     changed: list[HistorySelection | None] = []
@@ -45,7 +45,7 @@ def test_apply_effective_selection_if_present_sets_current_item_and_emits_signal
 def test_clear_effective_selection_clears_current_item_and_emits_none(history_list_widget) -> None:  # type: ignore[no-untyped-def]
     """Clearing list selection emits null effective-selection state."""
     selection = HistorySelection(item_kind="STAGING", commit_hash=None)
-    item, widget = create_special_history_item("Reviewed", selection)
+    item, widget = create_special_history_item("Reviewed Area", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     history_list_widget.setCurrentItem(item)
@@ -59,9 +59,9 @@ def test_clear_effective_selection_clears_current_item_and_emits_none(history_li
 
 
 def test_reviewed_context_menu_emits_remove_all_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
-    """Reviewed context menu emits remove-all signal."""
+    """Reviewed Area context menu emits remove-all signal."""
     selection = HistorySelection(item_kind="STAGING", commit_hash=None)
-    item, widget = create_special_history_item("Reviewed", selection)
+    item, widget = create_special_history_item("Reviewed Area", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     called = {"count": 0}
@@ -123,9 +123,9 @@ def test_commit_context_menu_copies_iteration_id_to_clipboard(history_list_widge
 
 
 def test_working_tree_context_menu_emits_mark_all_reviewed_signal(history_list_widget) -> None:  # type: ignore[no-untyped-def]
-    """Current Files context menu emits mark-all-reviewed signal."""
+    """Current Files Area context menu emits mark-all-reviewed signal."""
     selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
-    item, widget = create_special_history_item("Current Files", selection)
+    item, widget = create_special_history_item("Current Files Area", selection)
     history_list_widget.addItem(item)
     history_list_widget.setItemWidget(item, widget)
     called = {"count": 0}

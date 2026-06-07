@@ -29,7 +29,7 @@ def _button_texts(widget: DocumentDiffRowWidget) -> list[str]:
 
 
 def test_working_tree_selection_shows_only_stage_button(application) -> None:  # type: ignore[no-untyped-def]
-    """Current Files rows show only + Reviewed action."""
+    """Current Files Area rows show only + Reviewed action."""
     row = DocumentDiffRowWidget(
         _diff(stage_button_enabled=False),
         "parts/A.FCStd",
@@ -43,7 +43,7 @@ def test_working_tree_selection_shows_only_stage_button(application) -> None:  #
 
 
 def test_staging_selection_shows_restore_and_remove(application) -> None:  # type: ignore[no-untyped-def]
-    """Reviewed rows show Restore and Remove actions."""
+    """Reviewed Area rows show Restore and Remove actions."""
     row = DocumentDiffRowWidget(
         _diff(),
         "parts/A.FCStd",

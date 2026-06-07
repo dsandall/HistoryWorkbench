@@ -40,21 +40,21 @@ description: Checklist of features to verify manually, covering project detectio
 - Right-click commit: restore all files from iteration
 - Right-click commit: copy iteration ID (commit hash) to clipboard
 
-## Current Files (Working Tree) View
+## Current Files Area (Working Tree) View
 
-- Select Current Files row to show working tree diffs
+- Select Current Files Area row to show working tree diffs
 - Display document diff tree with status indicators (modified, added, deleted)
 - Display summary counts: Modified, Deleted, Added
 - Display "No changes" state when working tree is clean
 - Expand/collapse document nodes in diff tree
-- Right-click Current Files: mark all reviewed
+- Right-click Current Files Area: mark all reviewed
 
-## Reviewed (Staging) View
+## Reviewed Area (Staging) View
 
-- Select Reviewed row to show staged diffs
+- Select Reviewed Area row to show staged diffs
 - Display staged document diff tree
-- Right-click Reviewed: restore reviewed files
-- Right-click Reviewed: remove all from Reviewed
+- Right-click Reviewed Area: restore reviewed files
+- Right-click Reviewed Area: remove all from Reviewed
 
 ## Document Staging
 
@@ -74,8 +74,8 @@ description: Checklist of features to verify manually, covering project detectio
 
 ## Visual Diff (3D Comparison)
 
-- Open 3D comparison for node from Current Files view
-- Open 3D comparison for node from Reviewed view
+- Open 3D comparison for node from Current Files Area view
+- Open 3D comparison for node from Reviewed Area view
 - Open 3D comparison for node from commit view
 - Visual diff button per node row in diff tree
 

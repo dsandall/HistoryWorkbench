@@ -18,11 +18,11 @@ from .conftest import history_row_text, make_commit
 def test_create_special_history_item_builds_centered_selection_row() -> None:
     """Special-item builder stores HistorySelection and centered text."""
     selection = HistorySelection(item_kind="WORKING_TREE", commit_hash=None)
-    item, widget = create_special_history_item("Current Files", selection)
+    item, widget = create_special_history_item("Current Files Area", selection)
 
     assert item.data(QtCore.Qt.ItemDataRole.UserRole) == selection
     assert item.data(QtCore.Qt.ItemDataRole.TextAlignmentRole) == QtCore.Qt.AlignmentFlag.AlignCenter
-    assert history_row_text(_list_with_widget(item, widget), 0) == "Current Files"
+    assert history_row_text(_list_with_widget(item, widget), 0) == "Current Files Area"
 
 
 def test_create_no_iterations_history_item_builds_italic_placeholder() -> None:

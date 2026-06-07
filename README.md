@@ -2,9 +2,7 @@
 
 ## Track CAD model history and review changes using 3D and tree comparisons.
 
-[Documentation](https://eblanshey.github.io/HistoryWorkbench/)
-
-<a href="https://www.freecad.org/"><img alt="FreeCAD 1.1+" src="https://img.shields.io/badge/FreeCAD-1.1%2B-blue"></a> <a href="https://www.freecad.org/"><img alt="LGPL-2.1 License" src="https://img.shields.io/badge/License-LGPL 2.1-green"></a>
+<a href="https://www.freecad.org/"><img alt="FreeCAD 1.1+" src="https://img.shields.io/badge/FreeCAD-1.1%2B-blue"></a> <img alt="LGPL-2.1 License" src="https://img.shields.io/badge/License-LGPL 2.1-green"> <img alt="Made With Love" src="https://img.shields.io/badge/Made%20With%20❤️-gray">
 
 ![3d comparison image](https://raw.githubusercontent.com/eblanshey/HistoryWorkbench/master/freecad/history_wb/resources/media/3d-comparison.png)
 
@@ -51,7 +49,7 @@ Don't have time? Start here.
 - **Initialize your project:** open a FreeCAD folder you want to designate as your project, then click <img src="https://eblanshey.github.io/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Initialize Project**.
 - **Make changes and review them:** work on your CAD models. Use History panel's Current Files Area to view your changes as compared to the last iteration. Click the 3d icon to compare models in 3d view. Click "Reviewed" to save a copy to the Reviewed Area.
 - **Make more changes:** now new changes will be compared to the file you already reviewed. Work iteratively. Keep making changes, keep reviewing.
-- **Save an iteration:** go to Reviewed to do a final check. Click <img src="https://eblanshey.github.io/HistoryWorkbench/icons/Commit.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Save Iteration** to finalize an iteration using the reviewed files.
+- **Save an iteration:** go to Reviewed Area to do a final check. Click <img src="https://eblanshey.github.io/HistoryWorkbench/icons/Commit.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Save Iteration** to finalize an iteration using the reviewed files.
 - **Rinse and repeat:** keep working and adding new iterations.
 - **View and restore files:** click any iteration to see the changes that happened in it, and use Restore buttons to restore files. History is not affected.
 

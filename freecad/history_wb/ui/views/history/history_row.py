@@ -74,7 +74,7 @@ class HistoryListItemWidget(QtWidgets.QWidget):
 def create_special_history_item(
     text: str, selection: HistorySelection
 ) -> tuple[QtWidgets.QListWidgetItem, QtWidgets.QWidget]:
-    """Create Current Files or Reviewed pseudo-row."""
+    """Create Current Files Area or Reviewed Area pseudo-row."""
     item = QtWidgets.QListWidgetItem(text)
     item.setData(QtCore.Qt.ItemDataRole.TextAlignmentRole, QtCore.Qt.AlignmentFlag.AlignCenter)
     item.setData(QtCore.Qt.ItemDataRole.UserRole, selection)

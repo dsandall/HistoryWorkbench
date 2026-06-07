@@ -133,15 +133,15 @@ class HistoryPanelWidget(QtWidgets.QWidget):
         self.save_iteration_requested.emit()
 
     def _add_special_items(self) -> None:
-        """Insert Current Files and Reviewed pseudo-rows."""
+        """Insert Current Files Area and Reviewed Area pseudo-rows."""
         working_tree_item, working_tree_widget = create_special_history_item(
-            translate("History", "Current Files"),
+            translate("History", "Current Files Area"),
             HistorySelection(item_kind="WORKING_TREE", commit_hash=None),
         )
         self._add_list_item(working_tree_item, working_tree_widget)
 
         staging_item, staging_widget = create_special_history_item(
-            translate("History", "Reviewed"),
+            translate("History", "Reviewed Area"),
             HistorySelection(item_kind="STAGING", commit_hash=None),
         )
         self._add_list_item(staging_item, staging_widget)

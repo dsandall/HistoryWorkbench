@@ -84,11 +84,11 @@ class DocumentDiffRowWidget(QtWidgets.QWidget):
             self._add_remove_from_reviewed_button(layout)
 
     def _is_working_tree_selected(self) -> bool:
-        """Return True when Current Files history row selected."""
+        """Return True when Current Files Area history row selected."""
         return self._current_selection is not None and self._current_selection.item_kind == "WORKING_TREE"
 
     def _is_staging_selected(self) -> bool:
-        """Return True when Reviewed history row selected."""
+        """Return True when Reviewed Area history row selected."""
         return self._current_selection is not None and self._current_selection.item_kind == "STAGING"
 
     def _is_commit_selected(self) -> bool:

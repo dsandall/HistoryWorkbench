@@ -57,7 +57,7 @@ Click <img src="/HistoryWorkbench/icons/RecomputeAll.svg" width="16" alt="" clas
 
 #### 5. Create the First Iteration
 
-Select **Current Files** in the iteration list, then click **Mark All Reviewed**. This prepares both the documents and their snapshots.
+Select **Current Files Area** in the iteration list, then click **Mark All Reviewed**. This prepares both the documents and their snapshots.
 
 Finally, use the <img src="/HistoryWorkbench/icons/Commit.svg" width="16" alt="" class="command-icon" /> **Save Iteration** command to write an initial message like "My first iteration", and press Save.
 

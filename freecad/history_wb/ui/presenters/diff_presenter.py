@@ -120,7 +120,7 @@ class DiffPresenter:
         self._current_history_selection = selection
 
     def open_document_for_comparison(self, git_path: str) -> None:
-        """Open missing working-tree document in FreeCAD, then recompute Current Files diff."""
+        """Open missing working-tree document in FreeCAD, then recompute Current Files Area diff."""
         repo = self._application_state.git_repository
         if repo is None:
             Log.warning("No git repository detected")

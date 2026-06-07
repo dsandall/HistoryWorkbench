@@ -49,7 +49,7 @@ class DocumentDiffTreeWidget(QtWidgets.QWidget):
         layout.addWidget(self._tree)
 
     def set_current_history_selection(self, selection: HistorySelection | None) -> None:
-        """Set current history selection for conditional Current Files controls."""
+        """Set current history selection for conditional Current Files Area controls."""
         self._current_selection = selection
 
     def collapse_all_tree_items(self) -> None:

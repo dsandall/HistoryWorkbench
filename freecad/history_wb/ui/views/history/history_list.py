@@ -127,15 +127,15 @@ class HistoryList(QtWidgets.QListWidget):
             self.near_bottom_requested.emit()
 
     def _is_working_tree_selection(self, selection: HistorySelection) -> bool:
-        """Return whether selection points to Current Files pseudo-row."""
+        """Return whether selection points to Current Files Area pseudo-row."""
         return selection.item_kind == "WORKING_TREE" and selection.commit_hash is None
 
     def _is_staging_selection(self, selection: HistorySelection) -> bool:
-        """Return whether selection points to Reviewed pseudo-row."""
+        """Return whether selection points to Reviewed Area pseudo-row."""
         return selection.item_kind == "STAGING" and selection.commit_hash is None
 
     def _show_working_tree_context_menu(self, pos: QtCore.QPoint) -> None:
-        """Show Current Files bulk-review context action."""
+        """Show Current Files Area bulk-review context action."""
         menu = QtWidgets.QMenu(self)
         menu.setToolTipsVisible(True)
         action = menu.addAction(translate("History", "Mark All Files Reviewed"))
@@ -145,7 +145,7 @@ class HistoryList(QtWidgets.QListWidget):
             self.mark_all_reviewed_from_in_progress_requested.emit()
 
     def _show_reviewed_context_menu(self, pos: QtCore.QPoint, selection: HistorySelection) -> None:
-        """Show Reviewed context menu actions."""
+        """Show Reviewed Area context menu actions."""
         tooltip = translate(
             "History",
             "Remove document(s) from Reviewed. The current file(s) stay unchanged "

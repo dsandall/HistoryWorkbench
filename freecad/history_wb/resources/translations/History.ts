@@ -423,12 +423,12 @@ Saved history will not be affected.</source>
     </message>
     <message>
         <location filename="../../ui/views/history/panel.py" line="138"/>
-        <source>Current Files</source>
+        <source>Current Files Area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/views/history/panel.py" line="144"/>
-        <source>Reviewed</source>
+        <source>Reviewed Area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
