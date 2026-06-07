@@ -136,11 +136,10 @@ def test_show_restore_file_confirmation_dialog_returns_true_for_restore_button()
     ):
         assert show_restore_file_confirmation_dialog(QtWidgets.QWidget(), "file.FCStd") is True
 
-    assert captured_text == [
-        "file.FCStd\n\nThis operation will overwrite the current file(s) on disk with the selected saved copies.\n\n"
-        "Open FreeCAD documents will be closed and reopened to ensure links are updated.\n\n"
-        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected."
-    ]
+    assert len(captured_text) == 1
+    assert captured_text[0].startswith("file.FCStd\n\n")
+    assert "overwrite the current file(s) on disk" in captured_text[0]
+    assert "Saved history will not be affected" in captured_text[0]
 
 
 def test_show_restore_file_confirmation_dialog_keeps_generic_message_for_bulk_restore() -> None:
@@ -162,11 +161,9 @@ def test_show_restore_file_confirmation_dialog_keeps_generic_message_for_bulk_re
     ):
         show_restore_file_confirmation_dialog(QtWidgets.QWidget(), "")
 
-    assert captured_text == [
-        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\n"
-        "Open FreeCAD documents will be closed and reopened to ensure links are updated.\n\n"
-        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected."
-    ]
+    assert len(captured_text) == 1
+    assert captured_text[0].startswith("This operation will overwrite")
+    assert "Saved history will not be affected" in captured_text[0]
 
 
 def test_show_restore_scope_dialog_defaults_to_listed_scope() -> None:

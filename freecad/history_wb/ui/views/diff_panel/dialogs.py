@@ -141,9 +141,9 @@ def show_restore_file_confirmation_dialog(parent: QtWidgets.QWidget, git_path: s
     title = translate("History", "Restore")
     message = translate(
         "History",
-        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\nALL open FreeCAD "
-        "documents will be closed and reopened to ensure links are updated.\n\n"
-        "Unsaved in-memory changes in open files will be lost. Please save all your documents before proceeding."
+        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\n"
+        "All open FreeCAD documents will be closed and reopened to ensure links are updated.\n\n"
+        "Unsaved changes in open files will be lost. Before proceeding, save any documents that will not be restored."
         "\n\nSaved history will not be affected.",
     )
 
@@ -186,9 +186,9 @@ def show_restore_scope_dialog(parent: QtWidgets.QWidget) -> str | None:
     all_desc = QtWidgets.QLabel(
         translate(
             "History",
-            "Restore all previously saved FreeCAD files to how they were in this iteration. "
-            "Any previously saved FreeCAD files that did not exist in this iteration are removed. "
-            "New files not yet saved to history are kept.",
+            "Restore all saved FreeCAD files to their state in this history entry. "
+            "Saved FreeCAD files that did not exist in this entry will be removed. "
+            "Files that have not been saved to history will be kept.",
         )
     )
     all_desc.setWordWrap(True)

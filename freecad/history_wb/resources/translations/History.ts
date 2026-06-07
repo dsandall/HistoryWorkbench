@@ -64,6 +64,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
+        <source>This operation will overwrite the current file(s) on disk with the selected saved copies.
+
+All open FreeCAD documents will be closed and reopened to ensure links are updated.
+
+Unsaved changes in open files will be lost. Before proceeding, save any documents that will not be restored.
+
+Saved history will not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="170"/>
         <location filename="../../ui/views/document_diff/summary_bar.py" line="66"/>
         <source>Restore All</source>
@@ -81,23 +92,12 @@
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="187"/>
-        <source>Restore all previously saved FreeCAD files to how they were in this iteration. Any previously saved FreeCAD files that did not exist in this iteration are removed. New files not yet saved to history are kept.</source>
+        <source>Restore all saved FreeCAD files to their state in this history entry. Saved FreeCAD files that did not exist in this entry will be removed. Files that have not been saved to history will be kept.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="177"/>
         <source>Listed FreeCAD files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
-        <source>This operation will overwrite the current file(s) on disk with the selected saved copies.
-
-ALL open FreeCAD documents will be closed and reopened to ensure links are updated.
-
-Unsaved in-memory changes in open files will be lost. Please save all your documents before proceeding.
-
-Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
