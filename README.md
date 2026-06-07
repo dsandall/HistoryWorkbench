@@ -45,7 +45,7 @@ History Workbench uses Git internally for version control, but Git knowledge is 
 
 Don't have time? Start here.
 
-- **Install the addon:** search "History" in FreeCAD's addon manager.
+- **Install the addon:** search "History" in FreeCAD's addon manager. Ensure [git](https://git-scm.com/install) is installed on your computer.
 - **Initialize your project:** open a FreeCAD folder you want to designate as your project, then click <img src="https://eblanshey.github.io/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Initialize Project**.
 - **Make changes and review them:** work on your CAD models. Use History panel's Current Files Area to view your changes as compared to the last iteration. Click the 3d icon to compare models in 3d view. Click "Reviewed" to save a copy to the Reviewed Area.
 - **Make more changes:** now new changes will be compared to the file you already reviewed. Work iteratively. Keep making changes, keep reviewing.
