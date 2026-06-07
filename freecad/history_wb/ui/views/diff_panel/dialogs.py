@@ -141,9 +141,10 @@ def show_restore_file_confirmation_dialog(parent: QtWidgets.QWidget, git_path: s
     title = translate("History", "Restore")
     message = translate(
         "History",
-        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\nOpen FreeCAD "
+        "This operation will overwrite the current file(s) on disk with the selected saved copies.\n\nALL open FreeCAD "
         "documents will be closed and reopened to ensure links are updated.\n\n"
-        "Unsaved in-memory changes in open files will be lost.\n\nSaved history will not be affected.",
+        "Unsaved in-memory changes in open files will be lost. Please save all your documents before proceeding."
+        "\n\nSaved history will not be affected.",
     )
 
     # Bulk restore uses empty path and should keep the generic warning text.

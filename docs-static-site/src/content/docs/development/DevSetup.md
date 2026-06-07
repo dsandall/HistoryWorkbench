@@ -10,9 +10,8 @@ This guide sets up History Workbench for local development. It installs Python d
 
 - FreeCAD 1.1 or newer
 - Git
-- `uv`
-- `task`
-- Python 3.11 for the local development environment (matches FreeCAD's bundled Python)
+- [uv](https://docs.astral.sh/uv/)
+- [task](https://taskfile.dev/)
 
 ## Clone The Repository
 
@@ -24,6 +23,14 @@ cd HistoryWorkbench
 If you already have a checkout, run the setup commands from the repository root.
 
 ## Install Python Dependencies
+
+From the repository directory, install Python 3.11 using `uv`:
+
+```bash
+uv python install 3.11
+```
+
+Then sync dependencies:
 
 ```bash
 uv sync
@@ -41,7 +48,7 @@ nix-shell
 
 Inside the Nix shell, run `uv sync` to set up the Python virtual environment, then follow the "Link Into FreeCAD's Mod Directory" section to connect the workbench to FreeCAD.
 
-#### Using direnv for Convenience
+#### Using direnv for Convenience on NixOS
 
 To automatically enter the Nix shell when opening the project directory, use `direnv`:
 

@@ -64,44 +64,44 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
-        <source>This operation will overwrite the current file(s) on disk with the selected saved copies.
-
-Open FreeCAD documents will be closed and reopened to ensure links are updated.
-
-Unsaved in-memory changes in open files will be lost.
-
-Saved history will not be affected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="169"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="170"/>
         <location filename="../../ui/views/document_diff/summary_bar.py" line="66"/>
         <source>Restore All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="173"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="174"/>
         <source>Which files would you like to restore?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="178"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="179"/>
         <source>Restore only the FreeCAD files changed in the selected iteration. Other files on disk are left unchanged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="186"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="187"/>
         <source>Restore all previously saved FreeCAD files to how they were in this iteration. Any previously saved FreeCAD files that did not exist in this iteration are removed. New files not yet saved to history are kept.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="176"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="177"/>
         <source>Listed FreeCAD files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="184"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="142"/>
+        <source>This operation will overwrite the current file(s) on disk with the selected saved copies.
+
+ALL open FreeCAD documents will be closed and reopened to ensure links are updated.
+
+Unsaved in-memory changes in open files will be lost. Please save all your documents before proceeding.
+
+Saved history will not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="185"/>
         <source>All FreeCAD files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -114,10 +114,10 @@ Saved history will not be affected.</source>
     <message>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="41"/>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="121"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="154"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="220"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="292"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="338"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="155"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="221"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="293"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="339"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -195,27 +195,27 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="247"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="248"/>
         <source>Initialize Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="252"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="253"/>
         <source>Choose a directory to initialize based on currently open documents. The selected directory will be the root of your project:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="274"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="275"/>
         <source>Already inside project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="286"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="287"/>
         <source>All listed directories are already inside projects.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="290"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="291"/>
         <source>Initialize</source>
         <translation type="unfinished"></translation>
     </message>
@@ -233,7 +233,7 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="318"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="319"/>
         <source>Edit Ignored Files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -243,12 +243,12 @@ Saved history will not be affected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="337"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="338"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="323"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="324"/>
         <source>Update the ignored files list. Lines starting with a &quot;#&quot; are considered comments. Click &lt;a href=&quot;%1&quot;&gt;here&lt;/a&gt; to learn about the full syntax.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -540,8 +540,8 @@ Saved history will not be affected.</source>
         <location filename="../../ui/presenters/document_diff/restore_handler.py" line="104"/>
         <location filename="../../ui/presenters/document_diff/restore_handler.py" line="108"/>
         <location filename="../../ui/views/diff_panel/dialogs.py" line="141"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="153"/>
-        <location filename="../../ui/views/diff_panel/dialogs.py" line="219"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="154"/>
+        <location filename="../../ui/views/diff_panel/dialogs.py" line="220"/>
         <location filename="../../ui/views/document_diff/document_row.py" line="128"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>

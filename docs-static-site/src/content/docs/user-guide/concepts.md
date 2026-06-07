@@ -3,8 +3,6 @@ title: Concepts
 description: This page details the foundational concepts of FreeCAD, document snapshots, and version control for those who have never worked with it before.
 ---
 
-## Intro
-
 This page details the foundational concepts of FreeCAD, document snapshots, and version control for those who have never worked with it before.
 
 Understanding the concepts laid out here will help you understand how to use the History Workbench effectively. Version control is at the heart of the workbench, and this workbench has intentionally replaces developer-centered version-control terminology with CAD-focused terms to make it both approachable and intuitive. This workbench uses a program called `git` under the hood for version control, so the analogous git terminilogy is provided next to each heading for reference.

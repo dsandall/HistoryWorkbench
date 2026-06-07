@@ -4,7 +4,7 @@ on:
   # Trigger the workflow every time you push to the `main` branch
   # Using a different branch name? Replace `main` with your branch’s name
   push:
-    branches: [ documentation ]
+    branches: [ master ]
   # Allows you to run this workflow manually from the Actions tab on GitHub.
   workflow_dispatch:
 
@@ -22,14 +22,14 @@ jobs:
         uses: actions/checkout@v6
       - name: Resolve symlinks for icons and media
         run: |
-          rm docs-website/public/icons docs-website/public/media docs-website/public/favicon.svg
-          cp -r freecad/history_wb/resources/icons docs-website/public/icons
-          cp -r freecad/history_wb/resources/media docs-website/public/media
-          cp freecad/history_wb/resources/icons/Logo.svg docs-website/public/favicon.svg
+          rm docs-static-site/public/icons docs-static-site/public/media docs-static-site/public/favicon.svg
+          cp -r freecad/history_wb/resources/icons docs-static-site/public/icons
+          cp -r freecad/history_wb/resources/media docs-static-site/public/media
+          cp freecad/history_wb/resources/icons/Logo.svg docs-static-site/public/favicon.svg
       - name: Install, build, and upload your site
         uses: withastro/action@v6
         with:
-          path: docs-website # The root location of your Astro project inside the repository. (optional)
+          path: docs-static-site # The root location of your Astro project inside the repository. (optional)
           # node-version: 24 # The specific version of Node that should be used to build your site. Defaults to 22. (optional)
           # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
           # build-cmd: pnpm run build # The command to run to build your site. Runs the package build script/task by default. (optional)
