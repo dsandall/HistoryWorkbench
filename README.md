@@ -12,12 +12,12 @@
 
 ## Quick Links
 
-- [Documentation 🔗](https://eblanshey.github.io/HistoryWorkbench/user-guide/installation/)
-- [1-Minute Quick Start ⤵️](#1-minute-quick-start)
+- 🔗 [Documentation](https://eblanshey.github.io/HistoryWorkbench/user-guide/installation/)
+- ⤵️ [1-Minute Quick Start](#1-minute-quick-start)
 
 ## Intro
 
-History Workbench helps you create CAD projects with confidence by tracking iterations over time, reviewing in-progress work, and showing model changes as detailed 3D and parametric tree comparisons.
+History Workbench helps you create CAD projects with confidence through simple version control: tracking iterations over time, reviewing in-progress work, and showing model changes as detailed 3D and parametric tree comparisons. Once you can review every iteration visually, it's hard to work any other way.
 
 It helps answer questions like:
 
@@ -29,8 +29,6 @@ It helps answer questions like:
 
 History Workbench uses Git internally for version control, but Git knowledge is not required for normal use. The workbench intentionally replaces Git terminology with CAD-focused terms, such as **Project**, **Iteration**, and **Review**, so the workflow intuitively matches how CAD users think about model history.
 
-> [!NOTE]
-> This workbench is relatively new. Sharing feedback, opening issues, and submitting pull requests are encouraged!
 
 ## Features
 
@@ -64,6 +62,7 @@ When you're ready to learn more, jump into the [documentation](https://eblanshey
 - [ ] Detect `.FCStd` file renames and moves, and update snapshots to match
 - [ ] Implement "File Save History" to be able to restore any previous file save (include configurable retention and diffing)
 - [ ] Track and compare non-FCStd files in the project
+- [ ] Compare any commits, not just to the previous commit
 - [ ] Push project to GitHub or other git remote services
 - [ ] Ability to regenerate historical snapshots (discussion in https://github.com/eblanshey/HistoryWorkbench/issues/5)
 

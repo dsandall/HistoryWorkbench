@@ -31,7 +31,7 @@ Example location: `C:\Users\JohnDoe\Documents\FreeCAD\MyProject\`
 
 #### 2. Initialize Project Command
 
-Click <img src="/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Initialize Project** in the History Workbench, select the folder that contains your document, and press "Initialize".
+Click <img src="/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" class="command-icon" /> **Initialize Project** in the History Workbench, select the folder that contains your document, and press "Initialize".
 
 That's it -- you are now ready to start tracking your model history.
 
@@ -45,21 +45,21 @@ Start FreeCAD and open any document from the folder you want to use as the root 
 
 #### 2. Initialize Project command
 
-Click <img src="/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Initialize Project** in the History Workbench, select the folder that contains your project files, and click "Initialize".
+Click <img src="/HistoryWorkbench/icons/CreateGitRepository.svg" width="16" alt="" class="command-icon" /> **Initialize Project** in the History Workbench, select the folder that contains your project files, and click "Initialize".
 
 #### 3. Open All Project Documents
 
-Click <img src="/HistoryWorkbench/icons/OpenAllDocuments.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Open All Documents in Project** to open all FreeCAD documents in the project folder.
+Click <img src="/HistoryWorkbench/icons/OpenAllDocuments.svg" width="16" alt="" class="command-icon" /> **Open All Documents in Project** to open all FreeCAD documents in the project folder.
 
 #### 4. Recompute All Documents
 
-Click <img src="/HistoryWorkbench/icons/RecomputeAll.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Recompute All** to make sure document state is current. Ensure there aren't recomputation errors. If there are, it is advisable to fix them, otherwise the base snapshot(s) will have incomplete data stored.
+Click <img src="/HistoryWorkbench/icons/RecomputeAll.svg" width="16" alt="" class="command-icon" /> **Recompute All** to make sure document state is current. Ensure there aren't recomputation errors. If there are, it is advisable to fix them, otherwise the base snapshot(s) will have incomplete data stored.
 
 #### 5. Create the First Iteration
 
 Select **Current Files** in the iteration list, then click **Mark All Reviewed**. This prepares both the documents and their snapshots.
 
-Finally, use the <img src="/HistoryWorkbench/icons/Commit.svg" width="16" alt="" style="display:inline-block; vertical-align:text-bottom; margin:0 0.25em;" /> **Save Iteration** command to write an initial message like "My first iteration", and press Save.
+Finally, use the <img src="/HistoryWorkbench/icons/Commit.svg" width="16" alt="" class="command-icon" /> **Save Iteration** command to write an initial message like "My first iteration", and press Save.
 
 Now you are ready to work on your project.
 

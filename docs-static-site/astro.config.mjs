@@ -19,6 +19,7 @@ export default defineConfig({
     integrations: [
         starlight({
             title: "History Workbench",
+            customCss: ["./src/styles/custom.css"],
             logo: {
                 src: "./public/icons/Logo.svg",
             },
