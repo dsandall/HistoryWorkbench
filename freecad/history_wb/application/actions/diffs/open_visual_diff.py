@@ -73,38 +73,29 @@ class OpenVisualDiffAction:
         # If there are unsaved changes, they won't be visible in the diff. Save first.
         self._save_working_tree_document(request, revisions)
 
-        extract_root_old, extract_root_new = self._prepare_revisions(request, revisions)
-        if extract_root_old is None and extract_root_new is None:
-            return Result.failure(VisualDiffFailureReason.MISSING_FCSTD.value)
+        old_revision_ctx = self._file_manager.prepare_document_at_revision(request.repo, request.git_path, revisions[0])
+        new_revision_ctx = self._file_manager.prepare_document_at_revision(request.repo, request.git_path, revisions[1])
 
-        old_brep, new_brep = self._find_breps(request, object_name, extract_root_old, extract_root_new)
-        if old_brep is None and new_brep is None:
-            return Result.failure(VisualDiffFailureReason.MISSING_BREP.value)
+        with old_revision_ctx as extract_root_old, new_revision_ctx as extract_root_new:
+            if extract_root_old is None and extract_root_new is None:
+                return Result.failure(VisualDiffFailureReason.MISSING_FCSTD.value)
 
-        document_name = self._construct_document_name(request, object_name)
-        try:
-            self._visual_diff.open_brep_visual_diff(
-                str(old_brep) if old_brep is not None else None,
-                str(new_brep) if new_brep is not None else None,
-                document_name,
-            )
-        except Exception as err:  # noqa: BLE001
-            Log.warning(f"Failed to open visual diff document: {err}")
-            return Result.failure(VisualDiffFailureReason.IMPORT_FAILURE.value)
+            old_brep, new_brep = self._find_breps(request, object_name, extract_root_old, extract_root_new)
+            if old_brep is None and new_brep is None:
+                return Result.failure(VisualDiffFailureReason.MISSING_BREP.value)
+
+            document_name = self._construct_document_name(request, object_name)
+            try:
+                self._visual_diff.open_brep_visual_diff(
+                    str(old_brep) if old_brep is not None else None,
+                    str(new_brep) if new_brep is not None else None,
+                    document_name,
+                )
+            except Exception as err:  # noqa: BLE001
+                Log.warning(f"Failed to open visual diff document: {err}")
+                return Result.failure(VisualDiffFailureReason.IMPORT_FAILURE.value)
 
         return Result.success(True)
-
-    def _prepare_revisions(
-        self,
-        request: OpenVisualDiffRequest,
-        revisions: tuple[str, str],
-    ) -> tuple[Path | None, Path | None]:
-        """Prepare old and new revision extraction roots."""
-        old_revision, new_revision = revisions
-        return (
-            self._file_manager.prepare_document_revision(request.repo, request.git_path, old_revision),
-            self._file_manager.prepare_document_revision(request.repo, request.git_path, new_revision),
-        )
 
     def _find_breps(
         self,

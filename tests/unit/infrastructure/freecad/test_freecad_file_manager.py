@@ -8,6 +8,7 @@ from pathlib import Path
 
 from freecad.history_wb.infrastructure.freecad.freecad_file_manager import (
     FreeCadFileManagerAdapter,
+    PreparedRevision,
 )
 from tests.fakes.fake_git_port import FakeGitPort
 
@@ -74,82 +75,103 @@ class TestFindExtractedFile:
         assert result == target_file
 
 
-class TestExtractSafely:
-    """Tests for FreeCadFileManagerAdapter._extract_safely()."""
+class TestPreparedRevision:
+    """Tests for PreparedRevision context manager."""
 
-    def test_extracts_valid_archive_successfully(self, tmp_path: Path) -> None:
+    def test_extracts_valid_archive_and_returns_path(self, tmp_path: Path) -> None:
         fake_port = FakeGitPort()
-        adapter = FreeCadFileManagerAdapter(git_service=fake_port)
-
+        fake_port.add_git_repo(str(tmp_path))
         archive_path = tmp_path / "test.FCStd"
-        extract_dir = tmp_path / "extracted"
         _create_fcstd_archive(archive_path, {"PartData/test.Shape.brp": "BREP"})
+        fake_port.set_file_bytes("abc123", "test.FCStd", archive_path.read_bytes())
+        fake_port.set_resolved_ref("abc123", "abc123" * 8)
 
-        result = adapter._extract_safely(archive_path, extract_dir, "commits")
-
-        assert result is True
-        assert (extract_dir / "PartData" / "test.Shape.brp").exists()
-
-    def test_returns_false_for_corrupt_archive(self, tmp_path: Path) -> None:
-        fake_port = FakeGitPort()
         adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "test.FCStd", "abc123")
 
+        assert isinstance(ctx, PreparedRevision)
+
+        with ctx as extract_root:
+            assert extract_root is not None
+            assert (extract_root / "PartData" / "test.Shape.brp").exists()
+
+        # Temp directory cleaned up after exit
+        assert not ctx._temp_dir.exists()
+
+    def test_returns_none_for_corrupt_archive(self, tmp_path: Path) -> None:
+        fake_port = FakeGitPort()
+        fake_port.add_git_repo(str(tmp_path))
         archive_path = tmp_path / "corrupt.FCStd"
-        extract_dir = tmp_path / "extracted"
         archive_path.write_bytes(b"Not a valid zip file content")
+        fake_port.set_file_bytes("abc123", "corrupt.FCStd", archive_path.read_bytes())
+        fake_port.set_resolved_ref("abc123", "abc123" * 8)
 
-        result = adapter._extract_safely(archive_path, extract_dir, "commits")
-
-        assert result is False
-
-    def test_returns_false_for_archive_with_unsafe_paths(self, tmp_path: Path) -> None:
-        fake_port = FakeGitPort()
         adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "corrupt.FCStd", "abc123")
 
+        with ctx as extract_root:
+            assert extract_root is None
+
+        assert not ctx._temp_dir.exists()
+
+    def test_returns_none_for_archive_with_unsafe_paths(self, tmp_path: Path) -> None:
+        fake_port = FakeGitPort()
+        fake_port.add_git_repo(str(tmp_path))
         archive_path = tmp_path / "unsafe.FCStd"
-        extract_dir = tmp_path / "extracted"
         with zipfile.ZipFile(archive_path, "w") as zf:
             zf.writestr("../escape.txt", "escaped content")
+        fake_port.set_file_bytes("abc123", "unsafe.FCStd", archive_path.read_bytes())
+        fake_port.set_resolved_ref("abc123", "abc123" * 8)
 
-        result = adapter._extract_safely(archive_path, extract_dir, "commits")
-
-        assert result is False
-        assert not (tmp_path / "escape.txt").exists()
-
-    def test_clears_working_staging_extract_dirs_before_extraction(self, tmp_path: Path) -> None:
-        fake_port = FakeGitPort()
         adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "unsafe.FCStd", "abc123")
 
+        with ctx as extract_root:
+            assert extract_root is None
+            assert not (tmp_path / "escape.txt").exists()
+
+        assert not ctx._temp_dir.exists()
+
+    def test_returns_none_when_git_write_fails(self, tmp_path: Path) -> None:
+        fake_port = FakeGitPort()
+        fake_port.add_git_repo(str(tmp_path))
+
+        adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "missing.FCStd", "abc123")
+
+        with ctx as extract_root:
+            assert extract_root is None
+
+        assert not ctx._temp_dir.exists()
+
+    def test_working_revision_copies_from_working_tree(self, tmp_path: Path) -> None:
+        fake_port = FakeGitPort()
         archive_path = tmp_path / "test.FCStd"
-        extract_dir = tmp_path / "extracted"
-        extract_dir.mkdir(parents=True, exist_ok=True)
-
-        old_file = extract_dir / "old_file.txt"
-        old_file.write_text("old content")
-
         _create_fcstd_archive(archive_path, {"PartData/test.Shape.brp": "BREP"})
 
-        result = adapter._extract_safely(archive_path, extract_dir, "working")
-
-        assert result is True
-        assert not old_file.exists()
-        assert (extract_dir / "PartData" / "test.Shape.brp").exists()
-
-    def test_skips_extraction_when_commit_extract_dir_exists(self, tmp_path: Path) -> None:
-        fake_port = FakeGitPort()
         adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "test.FCStd", "working")
 
+        with ctx as extract_root:
+            assert extract_root is not None
+            assert (extract_root / "PartData" / "test.Shape.brp").exists()
+
+    def test_staging_revision_writes_from_index(self, tmp_path: Path) -> None:
+        fake_port = FakeGitPort()
+        fake_port.add_git_repo(str(tmp_path))
         archive_path = tmp_path / "test.FCStd"
-        extract_dir = tmp_path / "extracted"
-        extract_dir.mkdir(parents=True, exist_ok=True)
-
-        existing_file = extract_dir / "existing.txt"
-        existing_file.write_text("existing content")
-
         _create_fcstd_archive(archive_path, {"PartData/test.Shape.brp": "BREP"})
+        fake_port.set_file_bytes(None, "test.FCStd", archive_path.read_bytes())
 
-        result = adapter._extract_safely(archive_path, extract_dir, "commits")
+        adapter = FreeCadFileManagerAdapter(git_service=fake_port)
+        repo = type("Repo", (), {"absolute_path": str(tmp_path)})()
+        ctx = adapter.prepare_document_at_revision(repo, "test.FCStd", "staging")
 
-        assert result is True
-        assert existing_file.exists()
-        assert not (extract_dir / "PartData" / "test.Shape.brp").exists()
+        with ctx as extract_root:
+            assert extract_root is not None
+            assert (extract_root / "PartData" / "test.Shape.brp").exists()

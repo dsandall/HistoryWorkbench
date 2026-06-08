@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Iterator
 
 from freecad.history_wb.application.actions.diffs.open_visual_diff import (
     OpenVisualDiffAction,
@@ -35,30 +37,38 @@ class FakeVisualDiff:
         return object()
 
 
+class FakePreparedRevision:
+    """Fake context manager that yields a configured path."""
+
+    def __init__(self, path: Path | None) -> None:
+        self._path = path
+
+    def __enter__(self) -> Path | None:
+        return self._path
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # noqa: ANN001
+        pass
+
+
 class FakeFileManager(FreeCadFileManagerPort):
     """Fake implementation of FreeCadFileManagerPort for testing."""
 
     def __init__(self) -> None:
-        """Initialize fake source with empty prepared roots."""
         self._prepared_roots: dict[str, Path | None] = {}
         self._breps_found: dict[tuple[str, str], Path | None] = {}
         self.prepared_revisions: list[str] = []
 
-    def prepare_document_revision(self, repo: GitRepository, git_path: str, revision: str) -> Path | None:
-        """Record preparation call and return configured root."""
+    def prepare_document_at_revision(self, repo: GitRepository, git_path: str, revision: str) -> FakePreparedRevision:
         self.prepared_revisions.append(revision)
-        return self._prepared_roots.get(revision)
+        return FakePreparedRevision(self._prepared_roots.get(revision))
 
     def find_extracted_file(self, extract_root: Path, file_name: str) -> Path | None:
-        """Return configured extracted file path."""
         return self._breps_found.get((str(extract_root), file_name))
 
     def set_prepared_root(self, revision: str, root: Path | None) -> None:
-        """Set prepared root for a given revision."""
         self._prepared_roots[revision] = root
 
     def set_brep_found(self, extract_root: Path, brep_name: str, path: Path | None) -> None:
-        """Set BREP finding result."""
         self._breps_found[(str(extract_root), brep_name)] = path
 
 

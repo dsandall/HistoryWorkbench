@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -200,21 +201,24 @@ class FreeCadFileManagerPort(Protocol):
     """Interface for FreeCAD file materialization and content lookup.
 
     This Protocol defines the contract for preparing FreeCAD document revisions
-    from git commits, staging, or working tree files. Internal storage layout,
-    archive reuse, and extraction are implementation details of the adapter.
+    from git commits, staging, or working tree files. Internal storage layout
+    and extraction are implementation details of the adapter.
 
     Attributes:
-        prepare_document_revision: Materialize and extract document revision.
+        prepare_document_at_revision: Return a context manager for revision preparation.
         find_extracted_file: Find file by name inside extracted document tree.
     """
 
-    def prepare_document_revision(
+    def prepare_document_at_revision(
         self,
         repo: GitRepository,
         git_path: str,
         revision: str,
-    ) -> Path | None:
-        """Materialize and extract requested revision; return extraction root path.
+    ) -> AbstractContextManager[Path | None]:
+        """Return a context manager that materializes and extracts the revision.
+
+        The archive is copied/extracted on __enter__, and the temporary directory
+        is removed on __exit__.
 
         Args:
             repo: Git repository model.
@@ -222,11 +226,7 @@ class FreeCadFileManagerPort(Protocol):
             revision: "working", "staging", or commit reference.
 
         Returns:
-            Path to extraction root directory, or None if preparation fails.
-
-        Notes:
-            Internal implementation handles source selection (staging/working/commit),
-            storage layout, archive reuse, and safe extraction.
+            Context manager yielding the extraction root path, or None on failure.
         """
         ...
 
