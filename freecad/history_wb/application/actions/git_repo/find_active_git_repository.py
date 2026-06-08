@@ -89,5 +89,5 @@ class FindActiveGitRepositoryAction:
         if first_repo is None:
             return Result.failure("No git repository found for open documents")
 
-        Log.info(f"Git repository detected: {first_repo.name} ({first_repo.absolute_path})")
+        Log.debug(f"Git repository detected: {first_repo.name} ({first_repo.absolute_path})")
         return Result.success(first_repo)

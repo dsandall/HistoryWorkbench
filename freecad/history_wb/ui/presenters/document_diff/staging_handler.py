@@ -51,7 +51,7 @@ class DocumentDiffStagingHandler:
                 Log.warning(f"Failed to stage deleted document: {result.message}")
                 return StagingDisplayState()
 
-            Log.info(f"Successfully staged deletion of {git_path}")
+            Log.debug(f"Successfully staged deletion of {git_path}")
             return self._build_working_tree_removal_state(git_path)
 
         working_snapshot = self._require_working_snapshot(git_path)
@@ -60,7 +60,7 @@ class DocumentDiffStagingHandler:
             Log.warning(f"Failed to stage document: {result.message}")
             return StagingDisplayState()
 
-        Log.info(f"Successfully staged {git_path}")
+        Log.debug(f"Successfully staged {git_path}")
         return self._build_working_tree_removal_state(git_path)
 
     def stage_all(self, repo: GitRepository) -> StagingDisplayState:
@@ -88,7 +88,7 @@ class DocumentDiffStagingHandler:
             Log.warning(f"Failed to stage documents: {result.message}")
             return StagingDisplayState()
 
-        Log.info(f"Successfully staged {len(snapshots) + len(deleted_paths)} documents")
+        Log.debug(f"Successfully staged {len(snapshots) + len(deleted_paths)} documents")
         return StagingDisplayState(clear_doc_diff=True, refresh_mode="working_tree")
 
     def remove_document_from_reviewed(self, repo: GitRepository, git_path: str) -> StagingDisplayState:
@@ -98,7 +98,7 @@ class DocumentDiffStagingHandler:
             Log.warning(f"Failed to remove document from reviewed: {result.message}")
             return StagingDisplayState()
 
-        Log.info(f"Removed reviewed document: {git_path}")
+        Log.debug(f"Removed reviewed document: {git_path}")
         return StagingDisplayState(clear_property_diff=True, refresh_mode="staging")
 
     def remove_all_from_reviewed(
@@ -112,7 +112,7 @@ class DocumentDiffStagingHandler:
             Log.warning(f"Failed to remove all reviewed files: {result.message}")
             return StagingDisplayState()
 
-        Log.info("Removed all reviewed files")
+        Log.debug("Removed all reviewed files")
 
         if current_selection is None:
             return StagingDisplayState(clear_property_diff=True)

@@ -251,7 +251,7 @@ class WorkbenchCommandPresenter(QtCore.QObject):
             dialog = self._create_dialog_view()
             dialog.show_info_message(title, message)
         except RuntimeError:
-            Log.info(f"{title}: {message}")
+            Log.debug(f"{title}: {message}")
 
     def _show_error_message(self, title: str, message: str) -> None:
         """Show error message via a temporary DialogView."""

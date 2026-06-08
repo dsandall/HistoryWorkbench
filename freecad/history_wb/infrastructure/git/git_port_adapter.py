@@ -33,7 +33,7 @@ class GitPortAdapter(GitPort):
     def __init__(self) -> None:
         """Initialize adapter with cached git executable path."""
         self._git_executable = shutil.which("git")
-        Log.info(f"Git executable detected: {self._git_executable or '<not found>'}")
+        Log.debug(f"Git executable detected: {self._git_executable or '<not found>'}")
 
     def _windows_no_console_kwargs(self) -> dict[str, Any]:
         """Return subprocess options that suppress console windows on Windows."""
@@ -117,7 +117,7 @@ class GitPortAdapter(GitPort):
             with open(path, "a", encoding="utf-8"):
                 return True
         except OSError as e:
-            Log.info(f"Global git config path is not writable: {path}: {e}")
+            Log.debug(f"Global git config path is not writable: {path}: {e}")
             return False
 
     def _read_git_config_value(

@@ -18,7 +18,7 @@ class OpenDocumentAction:
         """Open document at path and return action result."""
         try:
             self._freecad_port.open_document(path)
-            Log.info(f"Opened document: {path}")
+            Log.debug(f"Opened document: {path}")
             return Result.success(path)
         except (RuntimeError, ValueError, OSError) as err:
             Log.warning(f"Failed to open document {path}: {err}")

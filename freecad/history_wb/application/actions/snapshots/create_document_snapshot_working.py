@@ -55,5 +55,5 @@ class CreateDocumentSnapshotForWorkingTreeAction:
             Log.exception(f"Failed to extract snapshot for {git_path}: {e}")
             return Result.failure(f"Failed to extract snapshot: {e}")
 
-        Log.info(f"Created working tree snapshot for {git_path}")
+        Log.debug(f"Created working tree snapshot for {git_path}")
         return Result.success(snapshot)

@@ -48,7 +48,7 @@ class StageDocumentsAction:
         """
         try:
             self._freecad_port.save_document(doc)
-            Log.info(f"Saved open document before staging: {git_path}")
+            Log.debug(f"Saved open document before staging: {git_path}")
         except Exception as e:  # noqa: BLE001
             # Broad catch required: FreeCAD save adapters and tests can raise arbitrary exceptions.
             Log.exception(f"Failed to save open document before staging {git_path}: {e}")
@@ -103,7 +103,7 @@ class StageDocumentsAction:
             # Write snapshot YAML.
             try:
                 SnapshotYamlSerializer.to_yaml(snapshot, yaml_path)
-                Log.info(f"Persisted snapshot to {yaml_path}")
+                Log.debug(f"Persisted snapshot to {yaml_path}")
             except Exception as e:  # noqa: BLE001
                 # Broad catch required: serialization backends may raise non-IO domain exceptions.
                 Log.exception(f"Failed to persist snapshot for {git_path}: {e}")
@@ -198,6 +198,6 @@ class StageDocumentsAction:
             success = self._git_service.stage_files(repo, deduped_paths_to_stage)
             if not success:
                 return Result.failure("Failed to stage one or more files")
-            Log.info(f"Staged {len(deduped_paths_to_stage)} files")
+            Log.debug(f"Staged {len(deduped_paths_to_stage)} files")
 
         return Result.success(True)

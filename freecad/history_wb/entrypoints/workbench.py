@@ -106,7 +106,7 @@ if Gui is not None:
         def Activated(self) -> None:
             """Called when user switches to this workbench."""
             try:
-                Log.info("Workbench history_wb activated.")
+                Log.debug("Workbench history_wb activated.")
 
                 # Create container on first activation (deferred from Initialize for faster startup)
                 if not getattr(self, "_container_initialized", False):
@@ -160,7 +160,7 @@ if Gui is not None:
             # Register preferences page (now that actions are configured)
             self._register_preferences_page()
 
-            Log.info("Application container initialized")
+            Log.debug("Application container initialized")
 
         def create_or_show_diff_panel(self) -> None:
             """Create the diff panel if it doesn't exist, or show/focus it if it does."""
@@ -178,7 +178,7 @@ if Gui is not None:
 
         def Deactivated(self) -> None:
             """Called when this workbench is deactivated."""
-            Log.info("Workbench history_wb de-activated.")
+            Log.debug("Workbench history_wb de-activated.")
 
             # Don't hide the subwindow - let it stay visible like other FreeCAD panels
             # This prevents interference with FreeCAD's default view management
@@ -227,7 +227,7 @@ if Gui is not None:
 
         def _on_subwindow_closed(self) -> None:
             """Called when the diff panel subwindow is closed."""
-            Log.info("Diff panel closed.")
+            Log.debug("Diff panel closed.")
             self._subwindow = None  # Reset reference so new one will be created on next activation
 
             # Clear panel-scoped presenters; application state survives for command access

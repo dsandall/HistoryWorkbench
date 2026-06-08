@@ -192,7 +192,7 @@ class DiffPresenter:
         if document_results:
             self.present_diffs(document_results)
         else:
-            Log.info("No diff results to display")
+            Log.debug("No diff results to display")
             self.clear_doc_diff()
 
     def _on_staging_selected(self) -> None:
@@ -218,7 +218,7 @@ class DiffPresenter:
         if document_results:
             self.present_diffs(document_results)
         else:
-            Log.info("No diff results to display for staging")
+            Log.debug("No diff results to display for staging")
             self.clear_doc_diff()
 
     def _on_commit_selected(self, commit_hash: str | None) -> None:
@@ -244,7 +244,7 @@ class DiffPresenter:
         if document_results:
             self.present_diffs(document_results)
         else:
-            Log.info(f"No FCStd files changed in commit {commit_hash}")
+            Log.debug(f"No FCStd files changed in commit {commit_hash}")
             self.clear_doc_diff()
 
     def stage_document(self, git_path: str) -> None:
