@@ -11,6 +11,7 @@ from enum import Enum
 from ....domain.freecad_ports import FreeCadPort
 from ....domain.git.git_service import GitService
 from ....domain.git.models import GitRepository
+from ....utils import Log
 from ..result_models import Result
 
 
@@ -68,6 +69,9 @@ class RestoreDocumentsAction:
         if validation_error is not None:
             return Result.failure(validation_error)
 
+        source_name = request.commit_hash if request.source == RestoreSource.COMMIT else request.source.value
+        Log.info(f"Starting restore: source={source_name}, scope={request.scope.value}")
+
         commit_or_none = request.commit_hash if request.source == RestoreSource.COMMIT else None
         restore_paths = self._resolve_paths(request, commit_or_none)
         if not restore_paths:
@@ -81,8 +85,11 @@ class RestoreDocumentsAction:
         if filter_error is not None:
             return Result.failure(filter_error)
         restore_paths = filtered_paths
+        Log.debug(f"Restore paths: {restore_paths}")
 
         open_project_docs = self._collect_open_project_docs(request.repo)
+        open_doc_paths = [doc.file_name for doc in open_project_docs]
+        Log.debug(f"Open documents captured for restore close/reopen: {open_doc_paths}")
 
         restore_success = False
         try:
