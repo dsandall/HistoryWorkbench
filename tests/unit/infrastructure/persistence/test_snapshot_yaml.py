@@ -4,10 +4,12 @@
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
 from freecad.history_wb.domain import Property, Snapshot, SnapshotObject, SnapshotOccurrence
+from freecad.history_wb.infrastructure.persistence import snapshot_yaml as snapshot_yaml_module
 from freecad.history_wb.infrastructure.persistence import SnapshotYamlSerializer
 
 
@@ -607,6 +609,45 @@ occurrences:
             assert file_obj is not None
             assert string_obj is not None
             assert file_obj.id == string_obj.id
+
+    def test_from_yaml_uses_c_safe_loader_when_available(self) -> None:
+        """Test: from_yaml prefers PyYAML C safe loader when present."""
+        sentinel_loader = object()
+        parsed_data = {"uid": "loader-test", "objects": [], "occurrences": []}
+
+        with (
+            patch.object(snapshot_yaml_module.yaml, "CSafeLoader", sentinel_loader, create=True),
+            patch.object(snapshot_yaml_module.yaml, "load", return_value=parsed_data) as load_mock,
+        ):
+            snapshot = SnapshotYamlSerializer.from_yaml("uid: loader-test\nobjects: []\noccurrences: []\n")
+
+        assert snapshot.snapshot_id == "loader-test"
+        load_mock.assert_called_once_with("uid: loader-test\nobjects: []\noccurrences: []\n", Loader=sentinel_loader)
+
+    def test_from_yaml_falls_back_to_safe_loader_when_c_loader_unavailable(self) -> None:
+        """Test: from_yaml falls back to Python safe loader when C loader is absent."""
+        sentinel_loader = object()
+        parsed_data = {"uid": "loader-fallback", "objects": [], "occurrences": []}
+        had_c_safe_loader = hasattr(snapshot_yaml_module.yaml, "CSafeLoader")
+        original_c_safe_loader = getattr(snapshot_yaml_module.yaml, "CSafeLoader", None)
+
+        try:
+            if had_c_safe_loader:
+                delattr(snapshot_yaml_module.yaml, "CSafeLoader")
+
+            with (
+                patch.object(snapshot_yaml_module.yaml, "SafeLoader", sentinel_loader),
+                patch.object(snapshot_yaml_module.yaml, "load", return_value=parsed_data) as load_mock,
+            ):
+                snapshot = SnapshotYamlSerializer.from_yaml("uid: loader-fallback\nobjects: []\noccurrences: []\n")
+
+            assert snapshot.snapshot_id == "loader-fallback"
+            load_mock.assert_called_once_with(
+                "uid: loader-fallback\nobjects: []\noccurrences: []\n", Loader=sentinel_loader
+            )
+        finally:
+            if had_c_safe_loader:
+                setattr(snapshot_yaml_module.yaml, "CSafeLoader", original_c_safe_loader)
 
 
 class TestSnapshotYamlDataPathEnvelope:

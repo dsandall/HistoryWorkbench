@@ -11,6 +11,16 @@ import yaml  # type: ignore[import-untyped]
 from freecad.history_wb.domain import Property, Snapshot, SnapshotObject, SnapshotOccurrence
 
 
+def _safe_loader_class() -> type[Any]:
+    """Return fastest safe YAML loader available in current PyYAML build."""
+    return getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+
+
+def _load_yaml(source: Any) -> dict[str, Any]:
+    """Load YAML using C safe loader when available, else Python safe loader."""
+    return yaml.load(source, Loader=_safe_loader_class())
+
+
 class SnapshotYamlSerializer:
     """Serializer for snapshot YAML format.
 
@@ -78,7 +88,7 @@ class SnapshotYamlSerializer:
             The deserialized Snapshot object.
         """
         with open(path, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+            data = _load_yaml(f)
         return SnapshotYamlSerializer._from_data(data)
 
     @staticmethod
@@ -91,7 +101,7 @@ class SnapshotYamlSerializer:
         Returns:
             The deserialized Snapshot object.
         """
-        data = yaml.safe_load(yaml_string)
+        data = _load_yaml(yaml_string)
         return SnapshotYamlSerializer._from_data(data)
 
     @staticmethod
