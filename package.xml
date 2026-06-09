@@ -6,7 +6,7 @@
     <freecadmin>1.1.0</freecadmin>
     <pythonmin>3.11</pythonmin>
     <version>0.1.0</version>
-    <date>2026-03-11</date>
+    <date>2026-06-09</date>
 
     <!--[ Dependencies ]―――――――――――――――――――――――――――――――――――――――――――――――――――――-->
 
@@ -16,7 +16,7 @@
     <!--[ Info ]―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――-->
 
     <name>History</name>
-    <description>Track CAD model history and review changes using 3D and tree comparisons.</description>
+    <description>Easy version control for FreeCAD: track document history and review changes using 3D and tree comparisons.</description>
 
     <!--[ Tags ]―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――-->
 
@@ -43,7 +43,8 @@
 
     <!--[ Urls ]―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――-->
 
-    <url type="documentation">https://github.com/eblanshey/HistoryWorkbench#readme</url>
+    <url type="documentation">https://eblanshey.github.io/HistoryWorkbench/</url>
+    <url type="discussion">https://github.com/eblanshey/HistoryWorkbench/discussions</url>
     <url branch="master" type="repository">https://github.com/eblanshey/HistoryWorkbench</url>
     <url type="bugtracker">https://github.com/eblanshey/HistoryWorkbench/issues</url>
     <url type="readme">https://github.com/eblanshey/HistoryWorkbench/raw/master/README.md</url>
