@@ -12,6 +12,9 @@
 
 - 🔗 [Documentation](https://eblanshey.github.io/HistoryWorkbench/user-guide/installation/)
 - ⤵️ [1-Minute Quick Start](#1-minute-quick-start)
+- 🐛 [Issues](https://github.com/eblanshey/HistoryWorkbench/issues)
+
+Ask questions and share feedback in [Discussions](https://github.com/eblanshey/HistoryWorkbench/discussions).
 
 ## Intro
 
@@ -25,20 +28,18 @@ It helps answer questions like:
 - Which objects, dimensions, placements, expressions, or dependencies changed?
 - Why did I change this model 2 months ago, and what changed?
 
-History Workbench uses Git internally for version control, but Git knowledge is not required for normal use. The workbench intentionally replaces Git terminology with CAD-focused terms, such as **Project**, **Iteration**, and **Review**, so the workflow intuitively matches how CAD users think about model history.
-
+History Workbench uses Git internally for version control, but Git knowledge is not required for normal use. The workbench intentionally replaces Git terminology with CAD-focused terms so that the workflow intuitively matches how CAD users think about model history.
 
 ## Features
 
-- **3D feature comparison:** Open visual comparisons for Part, PartDesign, and Sketcher objects, with added, removed, and shared geometry shown in separate colors.
-- **Model tree comparison:** See added, removed, and modified objects in FreeCAD's model tree hierarchy with color-coded highlighting
-- **Detailed property review:** Inspect exact changes to dimensions, placements, expressions, constraints, quantities, links, and other editable properties.
+- **3D feature comparison:** Visually compare modified geometry in distinct colors.
+- **Document tree comparison:** See color-coded added, removed, and modified objects in FreeCAD's document tree hierarchy.
+- **Detailed property review:** Inspect exact changes to dimensions, placements, expressions, constraints, links, and other properties.
 - **Review workflow:** Review model changes incrementally and save the result as a new iteration when ready.
 - **Project history timeline:** Move between in-progress work, reviewed changes, and saved iterations from one history panel.
-- **Safe restore workflow:** Restore individual files or batches from **Reviewed** or any saved iteration back onto disk without rewriting project history.
+- **Safe restore workflow:** Restore individual files or batches without rewriting project history.
 - **Multi-document support:** Review and iterate on multiple related documents at once, such as assemblies spread across several `.FCStd` files.
-- **Noise control:** Hide generated object types or properties, tune floating-point precision, and keep comparisons focused on meaningful CAD changes.
-- **Light and dark theme support:** Keep comparison highlights readable in both light and dark FreeCAD themes.
+- **Noise control:** Hide any object types or properties, tune floating-point precision, and keep comparisons focused on meaningful CAD changes.
 - **Local-first storage:** your project stays on your computer. Optional remote storage and sharing available for advanced users.
 
 ## 1-Minute Quick Start
@@ -73,6 +74,6 @@ Done:
 
 ## Contributors
 
-This workbench is shared publicly so as to serve you, the FreeCAD community. Please open an issue to report bugs, confusing comparisons, setup problems, documentation gaps, or feature requests. Development so far has happened on Linux, so additional platform setup notes and test instructions are also welcome as contributions.
+This workbench is shared publicly so as to serve you, the FreeCAD community. Please open an [issue](https://github.com/eblanshey/HistoryWorkbench/issues) to report bugs, confusing comparisons, or other problems, or start a [discussion](https://github.com/eblanshey/HistoryWorkbench/discussions) to ask questions or share feedback. Development so far has happened on Linux, so additional platform setup notes and test instructions are also welcome as contributions.
 
 Visit the [Development Docs](https://eblanshey.github.io/HistoryWorkbench/development/devsetup/) for information on how to contribute code to the workbench.
