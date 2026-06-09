@@ -99,7 +99,7 @@ class Logger:
         """
 
         # During development just use info for now
-        _logger.info(message)
+        _logger.debug(message)
 
     def info(self, message: str) -> None:
         """Log an informational message.
