@@ -707,32 +707,37 @@ class GitPortAdapter(GitPort):
             Log.warning(f"Git show failed for {git_path}: {e}")
             return None
 
-    def write_file_from_ref(self, git_root: str, commit: str | None, git_path: str, destination: str) -> bool:
-        """Write file bytes from git ref/index to destination path."""
+    def get_file_bytes_from_ref(self, git_root: str, commit: str | None, git_path: str) -> bytes | None:
+        """Read file bytes from git ref/index without decoding."""
         if self._git_executable is None:
             Log.warning("Git command not found - git may not be installed or not in PATH")
-            return False
+            return None
         try:
             target = self._show_target(commit, git_path)
-            os.makedirs(os.path.dirname(destination), exist_ok=True)
-            run_kwargs: dict[str, Any] = {"cwd": git_root, "shell": False, "stderr": subprocess.PIPE}
+            run_kwargs: dict[str, Any] = {
+                "cwd": git_root,
+                "shell": False,
+                "stdout": subprocess.PIPE,
+                "stderr": subprocess.PIPE,
+                "timeout": 30,
+            }
             env_overrides = self._default_git_env()
             if env_overrides:
                 run_kwargs["env"] = os.environ | env_overrides
             run_kwargs.update(self._windows_no_console_kwargs())
-            with open(destination, "wb") as output:
-                process = subprocess.Popen([self._git_executable, "show", target], stdout=output, **run_kwargs)
-                return_code = process.wait(timeout=30)
-                return return_code == 0
+            result = subprocess.run([self._git_executable, "show", target], **run_kwargs)
+            if result.returncode != 0:
+                return None
+            return result.stdout
         except subprocess.TimeoutExpired:
             Log.warning(f"Git show command timed out for {git_path}")
-            return False
+            return None
         except FileNotFoundError as e:
             Log.exception(f"File not found: {e}")
-            return False
+            return None
         except (NotADirectoryError, OSError) as e:
             Log.warning(f"Git show failed for {git_path}: {e}")
-            return False
+            return None
 
     def _show_target(self, commit: str | None, git_path: str) -> str:
         """Build git show target for commit or index."""

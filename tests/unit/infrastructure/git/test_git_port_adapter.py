@@ -301,25 +301,21 @@ class TestGitPortAdapter:
 
         assert result is False
 
-    def test_write_file_from_ref_writes_bytes_without_decoding(self, tmp_path) -> None:  # type: ignore[no-untyped-def]
-        destination = tmp_path / "old.FCStd"
+    def test_get_file_bytes_from_ref_reads_bytes_without_decoding(self) -> None:
+        mock_result = subprocess.CompletedProcess(
+            args=["git", "show", ":doc.FCStd"],
+            returncode=0,
+            stdout=b"\x50\x4b\x03\x04",
+            stderr=b"",
+        )
 
-        class FakeProcess:
-            def __init__(self, stdout_target) -> None:  # type: ignore[no-untyped-def]
-                stdout_target.write(b"\x50\x4b\x03\x04")
+        with patch.object(subprocess, "run", return_value=mock_result) as mock_run:
+            result = self.adapter.get_file_bytes_from_ref("/repo", None, "doc.FCStd")
 
-            def wait(self, timeout=None) -> int:  # type: ignore[no-untyped-def]
-                return 0
-
-        with patch.object(
-            subprocess, "Popen", side_effect=lambda *args, **kwargs: FakeProcess(kwargs["stdout"])
-        ) as mock_popen:
-            result = self.adapter.write_file_from_ref("/repo", None, "doc.FCStd", str(destination))
-
-        assert result is True
-        assert destination.read_bytes() == b"\x50\x4b\x03\x04"
-        kwargs = mock_popen.call_args.kwargs
+        assert result == b"\x50\x4b\x03\x04"
+        kwargs = mock_run.call_args.kwargs
         assert "text" not in kwargs
+        assert kwargs["stdout"] == subprocess.PIPE
 
     def test_resolve_ref_returns_full_commit_hash(self) -> None:
         commit_hash = "abcdef1234567890abcdef1234567890abcdef12"

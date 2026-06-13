@@ -6,9 +6,7 @@
 
 from __future__ import annotations
 
-from contextlib import AbstractContextManager
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Protocol
 
 from .git.models import GitRepository
@@ -108,6 +106,14 @@ class FreeCadContext:
     gui: GuiLike
 
 
+@dataclass(frozen=True)
+class BrepLookupResult:
+    """Result of looking up one BREP inside one FCStd revision."""
+
+    document_exists: bool
+    brep: bytes | None
+
+
 class FreeCadPort(Protocol):
     """Interface for FreeCAD document operations.
 
@@ -198,53 +204,40 @@ class AppPort(Protocol):
 
 
 class FreeCadFileManagerPort(Protocol):
-    """Interface for FreeCAD file materialization and content lookup.
+    """Interface for FreeCAD revision BREP content lookup.
 
-    This Protocol defines the contract for preparing FreeCAD document revisions
-    from git commits, staging, or working tree files. Internal storage layout
-    and extraction are implementation details of the adapter.
+    This Protocol defines the contract for reading BREP data from FreeCAD
+    document revisions in git commits, staging, or working tree files.
 
     Attributes:
-        prepare_document_at_revision: Return a context manager for revision preparation.
-        find_extracted_file: Find file by name inside extracted document tree.
+        get_brep: Return BREP bytes for one revision and member name.
     """
 
-    def prepare_document_at_revision(
+    def get_brep(
         self,
         repo: GitRepository,
         git_path: str,
         revision: str,
-    ) -> AbstractContextManager[Path | None]:
-        """Return a context manager that materializes and extracts the revision.
-
-        The archive is copied/extracted on __enter__, and the temporary directory
-        is removed on __exit__.
+        brep_name: str,
+    ) -> BrepLookupResult:
+        """Return BREP bytes from one FCStd revision.
 
         Args:
             repo: Git repository model.
             git_path: Relative path to FCStd file within repository.
             revision: "working", "staging", or commit reference.
+            brep_name: BREP member basename, e.g. "Pad.Shape.brp".
 
         Returns:
-            Context manager yielding the extraction root path, or None on failure.
-        """
-        ...
-
-    def find_extracted_file(self, extract_root: Path, file_name: str) -> Path | None:
-        """Find file by name inside extracted document tree.
-
-        Args:
-            extract_root: Root directory of extracted FCStd archive.
-            file_name: Name of file to find (e.g., "Pad.Shape.brp").
-
-        Returns:
-            Path to BREP file if found, None otherwise.
+            Lookup result indicating whether the FCStd existed and whether the
+            BREP member was found.
         """
         ...
 
 
 __all__ = [
     "FreeCadContext",
+    "BrepLookupResult",
     "FreeCadPort",
     "AppPort",
     "FreeCadFileManagerPort",

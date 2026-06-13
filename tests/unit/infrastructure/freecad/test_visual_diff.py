@@ -14,12 +14,15 @@ from freecad.history_wb.infrastructure.freecad.freecad_visual_diff_creator impor
 class FakeShape:
     def __init__(self, name: str = "") -> None:
         self.name = name
-        self.read_path = ""
+        self.imported_brep = b""
         self.Placement: object | None = None
 
-    def read(self, path: str) -> None:
-        self.read_path = path
-        self.name = path
+    def importBrep(self, source: object) -> None:
+        content = source.read()
+        if not isinstance(content, bytes):
+            raise TypeError
+        self.imported_brep = content
+        self.name = content.decode("utf-8")
 
     def cut(self, other: object) -> FakeShape:
         other_shape = other
@@ -138,7 +141,7 @@ def test_visual_diff_creates_reference_and_colored_boolean_difference_features(
     fake_freecad_gui = _install_freecad_fakes(monkeypatch)
 
     ctx = FakeContext()
-    document = FreeCADVisualDiffCreator(ctx).open_brep_visual_diff("old.brep", "new.brep", "Diff_Test_working")
+    document = FreeCADVisualDiffCreator(ctx).open_brep_visual_diff(b"old.brep", b"new.brep", "Diff_Test_working")
 
     feature_by_name = {feature.name: feature for feature in document.features}
     expected_names = ["Old", "New", "Diff", "Unchanged", "Added", "Removed"]
@@ -173,23 +176,23 @@ def test_visual_diff_creates_reference_and_colored_boolean_difference_features(
 
 
 @pytest.mark.parametrize(
-    ("old_brep_path", "new_brep_path", "expected_name", "expected_shape"),
+    ("old_brep", "new_brep", "expected_name", "expected_shape"),
     [
-        ("old.brep", None, "Old", "old.brep"),
-        (None, "new.brep", "New", "new.brep"),
+        (b"old.brep", None, "Old", "old.brep"),
+        (None, b"new.brep", "New", "new.brep"),
     ],
 )
 def test_visual_diff_creates_single_visual_when_one_side_missing(
     monkeypatch: Any,
-    old_brep_path: str | None,
-    new_brep_path: str | None,
+    old_brep: bytes | None,
+    new_brep: bytes | None,
     expected_name: str,
     expected_shape: str,
 ) -> None:
     fake_freecad_gui = _install_freecad_fakes(monkeypatch)
     ctx = FakeContext()
 
-    document = FreeCADVisualDiffCreator(ctx).open_brep_visual_diff(old_brep_path, new_brep_path, "Diff_Test_working")
+    document = FreeCADVisualDiffCreator(ctx).open_brep_visual_diff(old_brep, new_brep, "Diff_Test_working")
 
     assert [feature.name for feature in document.features] == [expected_name]
     assert document.features[0].Label == expected_name
@@ -201,7 +204,7 @@ def test_visual_diff_creates_single_visual_when_one_side_missing(
 def test_visual_diff_rejects_missing_old_and_new_paths() -> None:
     ctx = FakeContext()
 
-    with pytest.raises(ValueError, match="At least one BREP path is required"):
+    with pytest.raises(ValueError, match="At least one BREP is required"):
         FreeCADVisualDiffCreator(ctx).open_brep_visual_diff(None, None, "Diff_Test_working")
 
 

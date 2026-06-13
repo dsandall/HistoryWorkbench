@@ -303,19 +303,16 @@ class FakeGitPort:
             return self._file_exists[key]
         return key in self._file_contents or key in self._file_bytes
 
-    def write_file_from_ref(self, git_root: str, commit: str | None, git_path: str, destination: str) -> bool:
-        """Write configured fake file bytes to destination path."""
+    def get_file_bytes_from_ref(self, git_root: str, commit: str | None, git_path: str) -> bytes | None:
+        """Return configured fake file bytes."""
         key = (commit, git_path)
         content = self._file_bytes.get(key)
-        if content is None:
-            text_content = self._file_contents.get(key)
-            if text_content is None:
-                return False
-            content = text_content.encode("utf-8")
-        destination_path = Path(destination)
-        destination_path.parent.mkdir(parents=True, exist_ok=True)
-        destination_path.write_bytes(content)
-        return True
+        if content is not None:
+            return content
+        text_content = self._file_contents.get(key)
+        if text_content is None:
+            return None
+        return text_content.encode("utf-8")
 
     def restore_paths_from_ref(self, git_root: str, commit: str | None, paths: list[str]) -> bool:
         """Record restore call and succeed."""

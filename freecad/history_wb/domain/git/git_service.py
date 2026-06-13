@@ -137,9 +137,9 @@ class GitService:
         """
         return self._git_port.get_file_contents(repo.absolute_path, commit, git_path)
 
-    def write_file_from_ref(self, repo: GitRepository, commit: str | None, git_path: str, destination: str) -> bool:
-        """Write file bytes from git ref/index to destination path."""
-        return self._git_port.write_file_from_ref(repo.absolute_path, commit, git_path, destination)
+    def get_file_bytes_from_ref(self, repo: GitRepository, commit: str | None, git_path: str) -> bytes | None:
+        """Read file bytes from git ref/index."""
+        return self._git_port.get_file_bytes_from_ref(repo.absolute_path, commit, git_path)
 
     def restore_paths_from_ref(self, repo: GitRepository, commit: str | None, paths: list[str]) -> bool:
         """Restore repository paths in worktree from commit or index."""

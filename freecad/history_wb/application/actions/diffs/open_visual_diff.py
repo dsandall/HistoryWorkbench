@@ -73,42 +73,22 @@ class OpenVisualDiffAction:
         # If there are unsaved changes, they won't be visible in the diff. Save first.
         self._save_working_tree_document(request, revisions)
 
-        old_revision_ctx = self._file_manager.prepare_document_at_revision(request.repo, request.git_path, revisions[0])
-        new_revision_ctx = self._file_manager.prepare_document_at_revision(request.repo, request.git_path, revisions[1])
+        brep_name = f"{object_name}.{request.property_name}.brp"
+        old_lookup = self._file_manager.get_brep(request.repo, request.git_path, revisions[0], brep_name)
+        new_lookup = self._file_manager.get_brep(request.repo, request.git_path, revisions[1], brep_name)
+        if not old_lookup.document_exists and not new_lookup.document_exists:
+            return Result.failure(VisualDiffFailureReason.MISSING_FCSTD.value)
+        if old_lookup.brep is None and new_lookup.brep is None:
+            return Result.failure(VisualDiffFailureReason.MISSING_BREP.value)
 
-        with old_revision_ctx as extract_root_old, new_revision_ctx as extract_root_new:
-            if extract_root_old is None and extract_root_new is None:
-                return Result.failure(VisualDiffFailureReason.MISSING_FCSTD.value)
-
-            old_brep, new_brep = self._find_breps(request, object_name, extract_root_old, extract_root_new)
-            if old_brep is None and new_brep is None:
-                return Result.failure(VisualDiffFailureReason.MISSING_BREP.value)
-
-            document_name = self._construct_document_name(request, object_name)
-            try:
-                self._visual_diff.open_brep_visual_diff(
-                    str(old_brep) if old_brep is not None else None,
-                    str(new_brep) if new_brep is not None else None,
-                    document_name,
-                )
-            except Exception as err:  # noqa: BLE001
-                Log.warning(f"Failed to open visual diff document: {err}")
-                return Result.failure(VisualDiffFailureReason.IMPORT_FAILURE.value)
+        document_name = self._construct_document_name(request, object_name)
+        try:
+            self._visual_diff.open_brep_visual_diff(old_lookup.brep, new_lookup.brep, document_name)
+        except Exception as err:  # noqa: BLE001
+            Log.warning(f"Failed to open visual diff document: {err}")
+            return Result.failure(VisualDiffFailureReason.IMPORT_FAILURE.value)
 
         return Result.success(True)
-
-    def _find_breps(
-        self,
-        request: OpenVisualDiffRequest,
-        object_name: str,
-        extract_root_old: Path | None,
-        extract_root_new: Path | None,
-    ) -> tuple[Path | None, Path | None]:
-        """Find old and new BREP paths in prepared extraction roots."""
-        brep_name = f"{object_name}.{request.property_name}.brp"
-        old_brep = self._file_manager.find_extracted_file(extract_root_old, brep_name) if extract_root_old else None
-        new_brep = self._file_manager.find_extracted_file(extract_root_new, brep_name) if extract_root_new else None
-        return old_brep, new_brep
 
     def _save_working_tree_document(
         self,

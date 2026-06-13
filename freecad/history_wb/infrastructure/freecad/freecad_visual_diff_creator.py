@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import io
 from typing import Any, cast
 
 from ...domain.freecad_ports import FreeCadContext
@@ -33,18 +34,18 @@ class FreeCADVisualDiffCreator:
 
     def open_brep_visual_diff(
         self,
-        old_brep_path: str | None,
-        new_brep_path: str | None,
+        old_brep: bytes | None,
+        new_brep: bytes | None,
         document_name: str,
     ) -> object:
         """Open a new document showing unchanged, added, and removed BREP regions."""
-        if old_brep_path is None and new_brep_path is None:
-            raise ValueError("At least one BREP path is required")
+        if old_brep is None and new_brep is None:
+            raise ValueError("At least one BREP is required")
 
         document = self._ctx.app.newDocument(document_name)
 
-        old_shape = self._load_shape(old_brep_path) if old_brep_path is not None else None
-        new_shape = self._load_shape(new_brep_path) if new_brep_path is not None else None
+        old_shape = self._load_shape(old_brep) if old_brep is not None else None
+        new_shape = self._load_shape(new_brep) if new_brep is not None else None
         if old_shape is not None:
             self._reset_placement(old_shape)
         if new_shape is not None:
@@ -103,11 +104,11 @@ class FreeCADVisualDiffCreator:
         self._set_color(removed_feature, REMOVED_COLOR)
         diff_folder.addObject(removed_feature)
 
-    def _load_shape(self, path: str) -> object:
+    def _load_shape(self, brep: bytes) -> object:
         import Part
 
         shape = Part.Shape()
-        shape.read(path)
+        shape.importBrep(io.BytesIO(brep))
         return shape
 
     def _reset_placement(self, feature: Any) -> None:

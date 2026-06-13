@@ -11,9 +11,9 @@ class FreeCADVisualDiffPort(Protocol):
 
     def open_brep_visual_diff(
         self,
-        old_brep_path: str | None,
-        new_brep_path: str | None,
+        old_brep: bytes | None,
+        new_brep: bytes | None,
         document_name: str,
     ) -> object:
-        """Open visual diff document for old and new BREP paths."""
+        """Open visual diff document for old and new BREP bytes."""
         ...
