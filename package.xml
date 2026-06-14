@@ -45,9 +45,9 @@
 
     <url type="documentation">https://eblanshey.github.io/HistoryWorkbench/</url>
     <url type="discussion">https://github.com/eblanshey/HistoryWorkbench/discussions</url>
-    <url branch="master" type="repository">https://github.com/eblanshey/HistoryWorkbench</url>
+    <url branch="release" type="repository">https://github.com/eblanshey/HistoryWorkbench</url>
     <url type="bugtracker">https://github.com/eblanshey/HistoryWorkbench/issues</url>
-    <url type="readme">https://github.com/eblanshey/HistoryWorkbench/raw/master/README.md</url>
+    <url type="readme">https://github.com/eblanshey/HistoryWorkbench/raw/release/README.md</url>
 
     <!--[ Content ]――――――――――――――――――――――――――――――――――――――――――――――――――――――――――-->
 
